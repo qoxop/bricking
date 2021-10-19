@@ -5,9 +5,13 @@
   "license": "MIT",
   "bin": "./bin/mf-build.js",
   "scripts": {
-    "build": "rm -rf ./dist && npx tsc"
+    "build": "rm -rf ./lib && npx tsc"
   },
-  "devDependencies": {},
+  "files": [
+    "lib",
+    "bin",
+    "templates"
+  ],
   "dependencies": {
     "@qoxop/rs-tools": "^0.0.1",
     "@rollup/plugin-alias": "^3.1.5",

@@ -13,7 +13,7 @@
         "resolveJsonModule": true,
         "preserveConstEnums": true,
         "sourceMap": false,
-        "outDir": "./dist",
+        "outDir": "./lib",
         "moduleResolution": "node",
         "noImplicitOverride": true,
         "noUnusedLocals": true,

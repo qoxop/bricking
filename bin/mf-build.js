@@ -11,17 +11,17 @@ process.env.NODE_ENV = 'production';
 
 function buildSdk() {
     process.env.NODE_ENV = 'production';
-    require('../dist/sdk').buildSdk(true);
+    require('../lib/sdk').buildSdk(true);
 }
 
 function buildModules(app = false) {
     process.env.NODE_ENV = 'production';
-    return require('../dist/build').build(app);
+    return require('../lib/build').build(app);
 }
 
 function startDevServe() {
     process.env.NODE_ENV = 'development';
-    require('../dist/dev').start();
+    require('../lib/dev').start();
 }
 
 switch(command) {
@@ -48,7 +48,7 @@ switch(command) {
             ps = buildModules(false);
         }
         ps.then(() => {
-            require('../dist/serve').serve();
+            require('../lib/serve').serve();
         })
         break;
     default:
