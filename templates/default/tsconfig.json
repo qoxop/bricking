@@ -19,7 +19,6 @@
         "removeComments": true,
         "preserveConstEnums": true,
         "sourceMap": false,
-        "declaration":true,
         "paths": {
             "my-app-name": ["./mytodo/index.tsx"]
         }
