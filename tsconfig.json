@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        "experimentalDecorators": true,
+        "target": "ES2019",
+        "typeRoots": ["node_modules/@types"],
+        "strict": false,
+        "isolatedModules": true,
+        "allowJs": true,
+        "skipLibCheck": true,
+        "allowSyntheticDefaultImports": true,
+        "forceConsistentCasingInFileNames": true,
+        "module": "commonjs",
+        "resolveJsonModule": true,
+        "preserveConstEnums": true,
+        "sourceMap": false,
+        "outDir": "./dist",
+        "moduleResolution": "node",
+        "noImplicitOverride": true,
+        "noUnusedLocals": true,
+        "esModuleInterop": true,
+        "useUnknownInCatchVariables": false
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}

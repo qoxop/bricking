@@ -1,0 +1,31 @@
+{
+    "compilerOptions": {
+        "experimentalDecorators": true,
+        "target": "ES5",
+        "lib": ["DOM", "DOM.Iterable", "ESNext"],
+        "typeRoots": ["node_modules/@types"],
+        "strict": false,
+        "isolatedModules": true,
+        "allowJs": false,
+        "skipLibCheck": false,
+        "esModuleInterop": false,
+        "allowSyntheticDefaultImports": true,
+        "forceConsistentCasingInFileNames": true,
+        "module": "ESNext",
+        "moduleResolution": "Node",
+        "resolveJsonModule": true,
+        "noEmit": true,
+        "jsx": "react",
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "sourceMap": false,
+        "declaration":true,
+        "paths": {
+            "my-app-name": ["./mytodo/index.tsx"]
+        }
+    },
+    "include": [
+        "./src/**/*",
+        "./mytodo/**/*",
+    ]
+}
