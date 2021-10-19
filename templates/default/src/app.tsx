@@ -4,7 +4,7 @@ import MyApp, { reducer } from "my-app-name";
 import { ReduxProvider } from '@qoxop/rs-tools';
 import { store, injectReduce } from './store';
 
-injectReduce({ key: 'todos', reducer });
+injectReduce({ key: 'todo', reducer });
 
 ReactDOM.render(
     <React.StrictMode>
