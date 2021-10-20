@@ -17,7 +17,7 @@ const customConfig = getConfigs();
 
 const { inputConfig, outputConfig } = rollupConfig(customConfig);
 
-const { tsconfig, base, output, dev, bootstrap, sdk } = customConfig;
+const { tsconfig, base, output, dev, bootstrap } = customConfig;
 
 const EntryFileName = 'app.js';
 
@@ -26,15 +26,9 @@ export const start = async () => {
     // 1. 清空输出目录
     await clear(`${output}/**/*`);
     // 2. 构建 SDK
-    let sdkEntry = await buildSdk();
+    const sdkInfo = await buildSdk();
     // 3. 生成HTML文件
-    buildHtml({
-        output,
-        sdkEntry,
-        realTime: sdk.realTime,
-        appEntry: EntryFileName,
-        cdn: customConfig.prod.cdn
-    });
+    buildHtml({ output, sdkInfo, appEntry: EntryFileName, cdn: '/' });
     // 4. 监听变化，实时编译
     const watcher = watch({
         ...inputConfig,
@@ -45,7 +39,7 @@ export const start = async () => {
         input: bootstrap,
         output: { ...outputConfig, entryFileNames: EntryFileName },
         watch: {
-            buildDelay: 500,
+            buildDelay: 300,
             exclude: ['node_modules/**']
         }
     });

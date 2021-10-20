@@ -21,7 +21,7 @@ export const InputName = path.resolve(process.cwd(), `./rumtime-systemjs-sdk.js`
 
 export const GetMd5 = (options:Omit<SDKPluginOptions, 'callback'>) => { 
     const { pkg_json = {}, import_maps ={}, sdk_config} = options;
-    const {extraCodes = '', version = ''} = sdk_config || {};
+    const {extraCodes = '', version = ''} = (sdk_config || {}) as any;
     return MD5(
         JSON.stringify(pkg_json) +
         JSON.stringify(import_maps) +
@@ -32,7 +32,7 @@ export const GetMd5 = (options:Omit<SDKPluginOptions, 'callback'>) => {
 
 export default function(options: SDKPluginOptions):Plugin {
     const { cdnPath = '/', pkg_json = {}, import_maps ={}, sdk_config, callback } = options;
-    const { extraCodes = '' } = sdk_config || {};
+    const { extraCodes = '' } = (sdk_config || {}) as any;
     const { peerDependencies = {} } = pkg_json;
     const md5 = GetMd5(options);
     const modules = Object.keys(peerDependencies).map(name => (`'${name}': () => import('${name}'),\n`)).join('\t');
@@ -60,11 +60,12 @@ export default function(options: SDKPluginOptions):Plugin {
                 entry: '',
                 files: [],
                 cdnPath,
+                systemjs: 'system.min.js'
             }
             const [ entryId ] = Object.entries(bundle).find(([_, chunk]) => (chunk as OutputChunk).isEntry) as [string, OutputChunk];
             SDKInfo.entry = entryId;
             SDKInfo.files = Object.keys(bundle);
-            if (sdk_config.pack) {
+            if ((sdk_config as any).pack) {
                 SDKInfo.zipPath =  NAMES.packSDK()
             }
             callback(SDKInfo);

@@ -9,8 +9,7 @@ module.exports = {
     output: "./dist",
     minimize: true,
     sdk: {
-        type: 'remote',
-        location: 'http://files.codcats.com/mf/SDK.json',
-        // realTime: boolean
+        type: 'remote-json',
+        remote: 'http://files.codcats.com/mf/SDK.json'
     }
 }

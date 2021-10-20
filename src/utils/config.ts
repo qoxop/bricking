@@ -5,6 +5,7 @@ const cwd = process.cwd();
 const configPath = path.resolve(cwd, './s.config.js');
 const pkgPath = path.resolve(cwd, 'package.json');
 const prodMode = process.env.NODE_ENV === 'production';
+const DefaultSystemjsCdn = 'https://cdnjs.cloudflare.com/ajax/libs/systemjs/6.11.0/system.min.js';
 
 /**
  * 相对路径改绝对路径
@@ -45,7 +46,6 @@ const config:Configs = {
         type: 'local',
         location: './libs',
         extraCodes: '',
-        realTime: false,
         pack: false
     },
     dev: {
@@ -77,8 +77,35 @@ export function getConfigs() {
     config.externals = userOptions.externals ?? config.externals;
     config.prod = { ...config.prod, ...(userOptions.prod || {}) };
     config.assets = { ...config.assets, ...(userOptions.assets || {}) };
-    config.sdk = { ...config.sdk, ...(userOptions.sdk || {}) };
     config.dev = { ...config.dev, ...(userOptions.dev || {}) };
+    switch (userOptions?.sdk?.type) {
+        case 'local':
+            config.sdk = { 
+                type: 'local',
+                location: './libs',
+                extraCodes: '',
+                pack: false,
+                ...userOptions.sdk
+            }
+            break;
+        case 'remote-js':
+            if (!userOptions.sdk.remote) throw new Error("remote-js模式需要一个远端入口文件");
+            config.sdk = {
+                type: 'remote-js',
+                systemjs: userOptions.sdk.systemjs || DefaultSystemjsCdn,
+                remote: userOptions.sdk.remote
+            }
+            break;
+        case 'remote-json':
+            if (!userOptions.sdk.remote) throw new Error("remote-json模式需要一个远端入口文件");
+            config.sdk = {
+                type: 'remote-json',
+                systemjs: userOptions.sdk.systemjs || DefaultSystemjsCdn,
+                remote: userOptions.sdk.remote,
+                build_in: userOptions.sdk.build_in === false ? false : true
+            }
+            break;
+    }
     config.init = true;
     ConfigAbsolutely(config, config.base, [ 'output', 'bootstrap', 'tsconfig']);
 
@@ -104,6 +131,6 @@ export const getAliasEntries = (tsconfig: string, base: string) => {
         if (!/\*/.test(key) && value[0] && /\.tsx?$/.test(value[0])) {
             entries[key] = path.resolve(base, value[0]);
         }
-    })
+    });
     return entries;
 }

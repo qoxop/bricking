@@ -1,13 +1,22 @@
 import { Options as ProxyOptions } from 'http-proxy-middleware'
 
 export type SDKConfig = {
-    type: 'local'|'remote';
+    type: 'local',
     location: string;
-    extraCodes: string|string[];
-    realTime: boolean;
-    pack: boolean;
-    version?: string
+    pack?: boolean;
+    extraCodes?: string|string[];
+    version?: string;
+} | {
+    type: 'remote-js',
+    remote: string;
+    systemjs?: string;
+} | {
+    type: 'remote-json',
+    remote: string;
+    build_in: boolean;
+    systemjs?: string;
 }
+
 export type DEVConfig = {
     port: number;
     proxyPath?: string;
@@ -27,6 +36,7 @@ export type SDKJson = {
     md5: string;
     files: string[];
     entry: string;
+    systemjs: string;
     cdnPath?: string;
     zipPath?: string;
 }

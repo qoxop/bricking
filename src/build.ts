@@ -10,7 +10,7 @@ import colors from 'colors';
 import buildAppPlugin from './rollup-plugins/build-app';
 // 配置信息
 import { dom } from './html';
-import { buildSdk } from './sdk';
+import { buildSdk, SDKInfo } from './sdk';
 import NAMES from './utils/names';
 import { MODULESJson } from './types';
 import { clear } from './utils/fs-tools';
@@ -19,40 +19,37 @@ import { rollupConfig } from './rollup_config';
 import { REAL_TIME_CODE } from './rollup-plugins/build-sdk';
 
 export const buildHtml = (options: {
-    sdkEntry: string,
-    appEntry: string,
-    realTime: boolean,
-    output: string,
-    cdn: string,
+    sdkInfo: SDKInfo;
+    appEntry: string;
+    output: string;
+    cdn: string;
 }) => {
-    let {sdkEntry, appEntry, realTime = false, output, cdn } = options;
-    sdkEntry = realTime ? sdkEntry : path.resolve(cdn, sdkEntry);
-    appEntry = path.resolve(cdn, appEntry);
-    
-    if (realTime) { // 整合 SDK 与 app 入口
-        const combineCode = REAL_TIME_CODE(sdkEntry, appEntry);
-        const hash = createHash("sha256").update([combineCode, 't2dkoi1a'].join(":")).digest("hex").slice(0, 8);
-        sdkEntry = NAMES.sdkEntry.replace('[hash]', hash);
-        fs.writeFileSync(path.resolve(output, sdkEntry), combineCode);
-    }
     const { document } = dom.window;
+    let {sdkInfo: { sdkEntry, systemjs, isRemote, realTime }, appEntry, output, cdn } = options;
+    if (!isRemote) {
+        sdkEntry = path.resolve(cdn, sdkEntry);
+        systemjs = path.resolve(cdn, systemjs);
+        appEntry = path.resolve(cdn, appEntry);
+    }
     // 引入 system
     const systemScript = document.createElement('script');
-    systemScript.src = 'system.min.js';
+    systemScript.src = systemjs;
     document.body.append(systemScript);
-
-
-    if (realTime) {
+    if (realTime) { // 实时 SDK 模块
+        // sdkEntry json 
+        const combineCode = REAL_TIME_CODE(sdkEntry, path.resolve(cdn, appEntry));
+        const hash = createHash("sha256").update([combineCode, 't2dkoi1a'].join(":")).digest("hex").slice(0, 8);
+        const truesdkEntry = NAMES.sdkEntry.replace('[hash]', hash);
+        fs.writeFileSync(path.resolve(output, truesdkEntry), combineCode);
         const sdkScript = document.createElement('script');
-        sdkScript.src = sdkEntry;
+        sdkScript.src = path.resolve(cdn, truesdkEntry);
         sdkScript.type = 'systemjs-module';
         document.body.append(sdkScript);
-    } else {
+    } else { // build_in SDK 模块
         const startScript = document.createElement('script');
-        startScript.innerHTML = `System.import("${sdkEntry}").then(function() { System.import("${appEntry}") })`;
+        startScript.innerHTML = `System.import(${JSON.stringify(sdkEntry)}).then(function() { System.import(${JSON.stringify(appEntry)}) })`;
         document.body.append(startScript);
     }
-
     fs.writeFileSync(path.resolve(output, './index.html'), dom.serialize(), { encoding: 'utf-8' });
 }
 
@@ -61,7 +58,7 @@ export const build = async (app = false) => {
     console.time(colors.red.underline('构建时间'));
     // 1. 初始化配置参数
     const configs = getConfigs();
-    const {prod: {cdn, pack, version }, entry, output, name, bootstrap, sdk } = configs;
+    const {prod: {cdn, pack, version }, entry, output, name, bootstrap } = configs;
     const entries = Object.entries(typeof entry === 'object' ? entry : { [configs.name]: entry });
     // 2. 定义模块信息对象
     const moduleInfo: MODULESJson = {
@@ -109,7 +106,7 @@ export const build = async (app = false) => {
     }
     // 7. 构建完整应用
     if (app) {
-        const appInfo = { appEntry: '', sdkEntry: '' };
+        let appEntry = '';
         const { inputConfig, outputConfig } = rollupConfig(configs);
         const bundle = await rollup({
             ...inputConfig,
@@ -121,13 +118,13 @@ export const build = async (app = false) => {
             entryFileNames: NAMES.appEntry,
             chunkFileNames: NAMES.appChunk,
         });
-        appInfo.appEntry = output.output.find(item => item.type === 'chunk' && item.isEntry).fileName
-        appInfo.sdkEntry = await buildSdk();
+        appEntry = output.output.find(item => item.type === 'chunk' && item.isEntry).fileName
+        const sdkInfo = await buildSdk();
         buildHtml({
-            ...appInfo,
-            realTime: sdk.realTime,
+            sdkInfo,
+            appEntry,
+            cdn: configs.prod.cdn,
             output: configs.output,
-            cdn: configs.prod.cdn
         })
     }
     console.timeEnd(colors.red.underline('构建时间'));

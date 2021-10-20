@@ -17,71 +17,108 @@ const customConfig = getConfigs();
 const { inputConfig: { plugins } } = rollupConfig(customConfig, false);
 const { output, packageJson, sdk, minimize, base } = customConfig;
 
+const DefaultSystemjsCdn = 'https://cdnjs.cloudflare.com/ajax/libs/systemjs/6.11.0/system.min.js'
+
 /**
  * 拷贝SDK文件到输出目录
  * @returns
  */
-export const copySdk = () => copy(`${sdk.location}/**/*`, output);
+export const copySdk = () => (sdk.type === 'local' && copy(`${sdk.location}/**/*`, output));
 
 /**
  * 检测SDK是否需要重新构建
  */
 export const sdkHasChange = () => {
-    const { location } = sdk;
-    const md5 = GetMd5({ pkg_json: packageJson, sdk_config: sdk });
-    const sdkInfoPath = resolve(location, `./${NAMES.sdkInfo}`);
-    // 1. SDK.json 是否存在？
-    if (!fs.existsSync(sdkInfoPath)) return true;
-    // 2. 读取 SDK.json 中的信息
-    const {md5: lastMd5, files = []} = require(sdkInfoPath);
-    // 3. MD5 是否一致，文件列表是否为空
-    if (lastMd5 !== md5 || !files.length) return; true;
-    // 4. 文件列表中指定的文件是否存在
-    for (const file of files) {
-        const exists = fs.existsSync(resolve(location,file)); 
-        if (!exists) return true;
+    if (sdk.type === 'local') {
+        const { location } = sdk;
+        const md5 = GetMd5({ pkg_json: packageJson, sdk_config: sdk });
+        const sdkInfoPath = resolve(location, `./${NAMES.sdkInfo}`);
+        // 1. SDK.json 是否存在？
+        if (!fs.existsSync(sdkInfoPath)) return true;
+        // 2. 读取 SDK.json 中的信息
+        const {md5: lastMd5, files = []} = require(sdkInfoPath);
+        // 3. MD5 是否一致，文件列表是否为空
+        if (lastMd5 !== md5 || !files.length) return; true;
+        // 4. 文件列表中指定的文件是否存在
+        for (const file of files) {
+            const exists = fs.existsSync(resolve(location,file)); 
+            if (!exists) return true;
+        }
+        return false;
     }
-    return false;
+    return true;
+}
+
+const urlResolve = (source:string, subPath: string) => {
+    if (/\.\w+$/.test(source)) {
+        return url.resolve(source, subPath);
+    }
+    if (/\/\w+$/.test(source)) {
+        source += '/';
+    }
+    return url.resolve(source, subPath);
+}
+
+export type SDKInfo = {
+    sdkEntry: string;
+    systemjs: string;
+    isRemote: boolean;
+    realTime?: boolean;
 }
 
 /**
  * 构建SDK
  */
-export async function buildSdk(force = false):Promise<string> {
-    const { location, type, realTime } = sdk;
-    if (type === 'remote' ) { //### 使用远端在线的 SDK
-        // 实时的或者以 js 结尾的
-        if (/https?.*\.js$/.test(location) || realTime) {
-            return location;
+export async function buildSdk(force = false):Promise<SDKInfo> {
+    if (sdk.type === 'remote-js') {
+        return {
+            isRemote: true,
+            sdkEntry: sdk.remote,
+            systemjs: sdk.systemjs || DefaultSystemjsCdn
         }
-        const remoteSDKInfo = await getJson<SDKJson>(location);
-        // 存在 zip 包的
-        if (remoteSDKInfo.zipPath) {
-            const fileName = parse(remoteSDKInfo.zipPath).base;
-            const zipPath = resolve(base, `./libs/SDK/${fileName}`);
-            // 本地已经存在同名的zip包
-            if (!fs.existsSync(zipPath) || force) {
-                let zipDownloadUrl = url.resolve(new URL(location).origin, remoteSDKInfo.zipPath);
-                if (/^https?/.test(remoteSDKInfo.cdnPath || '')) {
-                    zipDownloadUrl = url.resolve(remoteSDKInfo.cdnPath, remoteSDKInfo.zipPath);
+    } else if (sdk.type === 'remote-json') {
+        const remoteSDKInfo = await getJson<SDKJson>(sdk.remote);
+        if (!remoteSDKInfo.systemjs) {
+            remoteSDKInfo.systemjs = 'system.min.js'
+        }
+        if (sdk.build_in) {
+            if (remoteSDKInfo.zipPath) {
+                const zipFileName = parse(remoteSDKInfo.zipPath).base;
+                const zipFilePath = resolve(base, `./libs/SDK/${zipFileName}`);
+                if (!fs.existsSync(zipFilePath) || force) {
+                    const downloadUrl = /^https?/.test(remoteSDKInfo.cdnPath || '') ?
+                        urlResolve(remoteSDKInfo.cdnPath, remoteSDKInfo.zipPath) :
+                        urlResolve(sdk.remote, remoteSDKInfo.zipPath);
+                    if (fs.existsSync(resolve(base, './libs/SDK'))) {
+                        await clear(resolve(base, './libs/SDK/**/*'));
+                    }
+                    await download(downloadUrl, zipFilePath);
                 }
-                // 清空存放zip包的目录
-                if (fs.existsSync(resolve(base, './libs/SDK'))) {
-                    await clear(resolve(base, './libs/SDK/**/*'));
+                await unzip(zipFilePath, output);
+                return {
+                    // 本地相对路径
+                    isRemote: false,
+                    sdkEntry: remoteSDKInfo.entry,
+                    systemjs: remoteSDKInfo.systemjs
                 }
-                await download(zipDownloadUrl, zipPath);
+            } else {
+                return {
+                    // 远程绝对路径
+                    isRemote: true,
+                    sdkEntry: urlResolve(remoteSDKInfo.cdnPath, remoteSDKInfo.entry),
+                    systemjs: urlResolve(remoteSDKInfo.cdnPath, remoteSDKInfo.systemjs),
+                }
             }
-            // 解压到输出目录
-            console.log(zipPath, output);
-            await unzip(zipPath, output);
-            // 使用相对路径
-            return remoteSDKInfo.entry;
+        } else {
+            return {
+                // 实时获取 SDK 入口文件
+                isRemote: true,
+                realTime: true,
+                sdkEntry: sdk.remote,
+                systemjs: urlResolve(remoteSDKInfo.cdnPath, remoteSDKInfo.systemjs),
+            }
         }
-        if (!remoteSDKInfo.cdnPath || ['', '/'].includes(remoteSDKInfo.cdnPath)) {
-            return url.resolve(new URL(location).origin, remoteSDKInfo.entry);
-        }
-        return url.resolve(remoteSDKInfo.cdnPath, remoteSDKInfo.entry);
-    } else {                  //### 使用本地缓存的 SDK
+    } else if (sdk.type === 'local') {                  //### 使用本地缓存的 SDK
         let SDKInfo: SDKJson;
         // 1. 初始化参数
         const { peerDependencies = {} } = packageJson;
@@ -102,7 +139,7 @@ export async function buildSdk(force = false):Promise<string> {
             });
             // 5. 写入文件
             await bundle.write({
-                dir: location,
+                dir: sdk.location,
                 format: "system",
                 entryFileNames: NAMES.sdkEntry,
                 chunkFileNames: NAMES.sdkChunk,
@@ -114,16 +151,18 @@ export async function buildSdk(force = false):Promise<string> {
             // 6. 打包zip包📦
             if (sdk.pack) {
                 await require('zip-dir')(location, {
-                    saveTo: resolve(location, SDKInfo.zipPath),
+                    saveTo: resolve(sdk.location, SDKInfo.zipPath),
                 });
             }
         } else {
-            SDKInfo = require(resolve(location, `./${NAMES.sdkInfo}`))
+            SDKInfo = require(resolve(sdk.location, `./${NAMES.sdkInfo}`))
         }
         // 6. 拷贝一份到输出目录
         await copySdk();
-        return SDKInfo.entry;
+        return {
+            isRemote: false,
+            sdkEntry: SDKInfo.entry,
+            systemjs: 'system.min.js'
+        };
     }
 }
-
-
