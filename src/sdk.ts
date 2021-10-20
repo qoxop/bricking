@@ -15,7 +15,7 @@ import sdkPlugin, { InputName, GetMd5 } from './rollup-plugins/build-sdk';
 
 const customConfig = getConfigs();
 const { inputConfig: { plugins } } = rollupConfig(customConfig, false);
-const { output, packageJson, sdk, minimize } = customConfig;
+const { output, packageJson, sdk, minimize, base } = customConfig;
 
 /**
  * 拷贝SDK文件到输出目录
@@ -58,21 +58,22 @@ export async function buildSdk(force = false):Promise<string> {
         // 存在 zip 包的
         if (remoteSDKInfo.zipPath) {
             const fileName = parse(remoteSDKInfo.zipPath).base;
-            const zipPath = resolve(location, `./SDK/${fileName}`);
+            const zipPath = resolve(base, `./libs/SDK/${fileName}`);
             // 本地已经存在同名的zip包
             if (!fs.existsSync(zipPath) || force) {
-                let zipDownloadUrl = url.resolve(new URL(location).origin, remoteSDKInfo.entry);
+                let zipDownloadUrl = url.resolve(new URL(location).origin, remoteSDKInfo.zipPath);
                 if (/^https?/.test(remoteSDKInfo.cdnPath || '')) {
-                    zipDownloadUrl = url.resolve(remoteSDKInfo.cdnPath, remoteSDKInfo.entry);
+                    zipDownloadUrl = url.resolve(remoteSDKInfo.cdnPath, remoteSDKInfo.zipPath);
                 }
                 // 清空存放zip包的目录
-                if (fs.existsSync(resolve(location, './SDK'))) {
-                    await clear(resolve(location, './SDK/**/*'));
+                if (fs.existsSync(resolve(base, './libs/SDK'))) {
+                    await clear(resolve(base, './libs/SDK/**/*'));
                 }
                 await download(zipDownloadUrl, zipPath);
             }
             // 解压到输出目录
-            await unzip(zipPath, output)
+            console.log(zipPath, output);
+            await unzip(zipPath, output);
             // 使用相对路径
             return remoteSDKInfo.entry;
         }

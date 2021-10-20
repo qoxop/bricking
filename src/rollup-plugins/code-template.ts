@@ -3,8 +3,9 @@ import path from 'path';
 
 export const SYSTEM_JS_CODE = () => fs.readFileSync(require.resolve('systemjs/dist/system.min.js'), {encoding: 'utf8'});
 
-export const REAL_TIME_CODE = (jsonUrl: string, appEntry:string) => (`
-System.register(["${jsonUrl}"], (function (e) {
+export const REAL_TIME_CODE = (jsonUrl: string, appEntry:string) => {
+    return (`
+System.register([__json_url__], (function (e) {
     "use strict";
     var m;
     return {
@@ -13,20 +14,22 @@ System.register(["${jsonUrl}"], (function (e) {
         }],
         execute: function () {
             if (!m.entry) {
-                throw new Error("模块入口不存在")
+                throw new Error("模块入口不存在");
             }
-            var cdn = "${path.dirname(jsonUrl)}";
+            var cdn = __json_url_path__;
             if (/^https?/.test(m.cdnPath || '')) {
                 cdn = m.cdnPath;
             }
-            var sdkEntry = cdn.replace(/\/$/, '') + '/' + m.entry.replace(/^\.?\//, '');
+            var sdkEntry = cdn.replace(/\\\/$/, '') + '/' + m.entry.replace(/^\\.?\\//, '');
             System.import(sdkEntry).then(function () {
                 System.import("${appEntry}");
             })
         }
     }
 }));
-`)
+`).replace('__json_url__', JSON.stringify(jsonUrl))
+    .replace('__json_url_path__', JSON.stringify(path.dirname(jsonUrl)))
+}
 
 export const SDK_TPL_STRING = ({dynamic_module_maps = '', import_maps = '', extra = ''} = {}) => `
 

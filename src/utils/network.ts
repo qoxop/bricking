@@ -1,5 +1,6 @@
 import https from 'https';
 import http from 'http';
+import path from 'path';
 import fs from 'fs';
 
 export function getJson<T = any>(jsonUrl: string):Promise<T> {
@@ -24,6 +25,9 @@ export function getJson<T = any>(jsonUrl: string):Promise<T> {
 }
 
 export function download(downloadUrl:string, to: string): Promise<string> {
+    if (!fs.existsSync(path.dirname(to))) {
+        fs.mkdirSync(path.dirname(to), { recursive: true });
+    }
     return new Promise((resolve, reject) => {
         const url = new URL(downloadUrl);
         const client = /https/.test(url.protocol) ? https : http;

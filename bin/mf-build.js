@@ -4,7 +4,6 @@ const { argv } = require('yargs');
 
 const { _: commands, $0, ...ARGS} = argv;
 const command = commands[0];
-
 // 参数环境变量
 process.env.$ARGS = ARGS;
 process.env.NODE_ENV = 'production';
@@ -26,7 +25,9 @@ function startDevServe() {
 
 switch(command) {
     case 'create':
-        require('../lib/create').create();
+        const tplName = ARGS['t'] || 'default';
+        const projName = ARGS['n'] || 'my-app';
+        require('../lib/create').create(tplName, projName);
         break;
     case 'build':
         if (ARGS['sdk']) {

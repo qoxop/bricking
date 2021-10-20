@@ -14,6 +14,10 @@ const DefaultTemplate = {
 
 const templates: {[key: string]: typeof DefaultTemplate } = {
     default: DefaultTemplate,
+    remote: {
+        ...DefaultTemplate,
+        path: path.resolve(templatesDir, './remote')
+    }
 }
 
 export const create = async (tplName = 'default', name = 'my-app') => {

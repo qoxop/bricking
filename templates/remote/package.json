@@ -1,0 +1,27 @@
+{
+  "name": "my-app-name",
+  "version": "1.0.0",
+  "main": "./src/app.tsx",
+  "license": "MIT",
+  "scripts": {
+    "build": "mf-build build",
+    "build-all": "mf-build build --app",
+    "build-sdk": "mf-build build --sdk",
+    "serve": "mf-build serve",
+    "dev": "mf-build dev"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.28",
+    "@types/react-dom": "^17.0.9",
+    "@types/redux": "^3.6.0",
+    "mf-build": "^1.0.0",
+    "@qoxop/rs-tools": "^0.0.1",
+    "immer": "^9.0.6",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "redux": "^4.1.1"
+  },
+  "dependencies": {
+    "tslib": "^2.3.1"
+  }
+}

@@ -26,7 +26,7 @@ export const buildHtml = (options: {
     cdn: string,
 }) => {
     let {sdkEntry, appEntry, realTime = false, output, cdn } = options;
-    sdkEntry = path.resolve(cdn, sdkEntry);
+    sdkEntry = realTime ? sdkEntry : path.resolve(cdn, sdkEntry);
     appEntry = path.resolve(cdn, appEntry);
     
     if (realTime) { // 整合 SDK 与 app 入口
