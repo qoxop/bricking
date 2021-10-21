@@ -1,7 +1,8 @@
 {
   "name": "mf-build",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "./lib/index.js",
+  "module": "./lib/index.js",
   "license": "MIT",
   "bin": "./bin/mf-build.js",
   "scripts": {
@@ -37,6 +38,7 @@
     "md5": "^2.3.0",
     "node-sass": "^6.0.1",
     "pify": "^5.0.0",
+    "pirates": "^4.0.1",
     "postcss": "^8.3.9",
     "postcss-load-config": "^3.0.0",
     "postcss-modules": "^4.0.0",

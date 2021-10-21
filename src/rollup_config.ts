@@ -12,26 +12,25 @@ import { Configs } from './types';
 
 const prodMode = process.env.NODE_ENV === 'production';
 
-export function rollupConfig(options: Configs, isApp = true) {
-    const { peerDependencies } =  options.packageJson;
-    const assetsOutput = path.resolve(options.output, options.assets.relative);
+export function rollupConfig(configs: Configs, isApp = true) {
+    const { peerDependencies } = configs.packageJson;
+    const assetsOutput = path.resolve(configs.output, configs.assets.relative);
     // 输入配置
     const inputConfig: RollupOptions = {
         preserveEntrySignatures: "exports-only",
         plugins: [
             require('@rollup/plugin-node-resolve').default(),
-            // @ts-ignore
             require('@rollup/plugin-commonjs')(),
             // Css 文件处理
             runtimeCss({
-                modules: options?.assets?.cssModules,
-                autoModules: options?.assets?.autoCssModules,
-                relativeBase: options.assets.relative,
+                modules: configs?.assets?.cssModules,
+                autoModules: configs?.assets?.autoCssModules,
+                relativeBase: configs.assets.relative,
                 output: assetsOutput,
                 combineExtract: isApp,
                 plugins: [
                     require('postcss-url')({ url: 'copy', assetsPath: assetsOutput, useHash: true }),
-                    ...(options.minimize && prodMode ? [require('cssnano')({ preset: 'default' })] : []),
+                    ...(configs.minimize && prodMode ? [require('cssnano')({ preset: 'default' })] : []),
                 ],
                 use: {
                     less: { rewriteUrls: 'all' }
@@ -47,14 +46,14 @@ export function rollupConfig(options: Configs, isApp = true) {
             }),
             // 编译 ts
             require('@rollup/plugin-typescript')({
-                tsconfig: options.tsconfig,
+                tsconfig: configs.tsconfig,
             }),
-            ...(options.minimize && prodMode ? [require('rollup-plugin-terser').terser({ format: {comments: false }})] : [])
+            ...(configs.minimize && prodMode ? [require('rollup-plugin-terser').terser({ format: {comments: false }})] : [])
         ],
-        external: Object.keys(peerDependencies || {}).concat(options.externals),
+        external: Object.keys(peerDependencies || {}).concat(configs.sdk.externals || []),
     };
     const outputConfig: OutputOptions = {
-        dir: options.output,
+        dir: configs.output,
         format: 'system',
     }
     return { inputConfig, outputConfig }

@@ -18,6 +18,7 @@
         "noImplicitOverride": true,
         "noUnusedLocals": true,
         "esModuleInterop": true,
+        "declaration": true,
         "useUnknownInCatchVariables": false
     },
     "include": [
