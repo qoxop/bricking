@@ -22,6 +22,7 @@ export type SDKConfig = {
 
 export type DEVConfig = {
     port: number;
+    host?: string;
     proxyPath?: string;
     proxyOption?: ProxyOptions
 }

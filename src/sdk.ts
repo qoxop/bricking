@@ -14,7 +14,7 @@ import { copy, clear, unzip } from './utils/fs-tools';
 import sdkPlugin, { InputName, GetMd5 } from './rollup-plugins/build-sdk';
 
 const customConfig = getConfigs();
-const { inputConfig: { plugins } } = rollupConfig(customConfig, false);
+
 const { output, packageJson, sdk, minimize, base } = customConfig;
 
 const DefaultSystemjsCdn = 'https://cdnjs.cloudflare.com/ajax/libs/systemjs/6.11.0/system.min.js'
@@ -121,6 +121,7 @@ export async function buildSdk(force = false):Promise<SDKInfo> {
     } else if (sdk.type === 'local') {                  //### 使用本地缓存的 SDK
         let SDKInfo: SDKJson;
         // 1. 初始化参数
+        const { inputConfig: { plugins } } = rollupConfig(customConfig, false);
         const { peerDependencies = {} } = packageJson;
         // 2. 检测是否有变化
         if (sdkHasChange() || force) {

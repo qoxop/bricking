@@ -52,6 +52,7 @@ export function rollupConfig(configs: Configs, isApp = true) {
         ],
         external: Object.keys(peerDependencies || {}).concat(configs.sdk.externals || []),
     };
+    console.log(Object.keys(peerDependencies || {}).concat(configs.sdk.externals || []))
     const outputConfig: OutputOptions = {
         dir: configs.output,
         format: 'system',

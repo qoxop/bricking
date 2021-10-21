@@ -20,6 +20,7 @@ export declare type SDKConfig = {
 };
 export declare type DEVConfig = {
     port: number;
+    host?: string;
     proxyPath?: string;
     proxyOption?: ProxyOptions;
 };

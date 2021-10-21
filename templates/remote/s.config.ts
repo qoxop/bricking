@@ -11,6 +11,7 @@ export default mfConfig({
     minimize: true,
     sdk: {
         type: 'remote-json',
-        remote: 'http://files.codcats.com/mf/SDK.json'
+        remote: 'http://files.codcats.com/mf/SDK.json',
+        externals: ["@qoxop/rs-tools", "immer", "react", "react-dom", "redux"]
     }
 })
