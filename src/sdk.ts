@@ -126,7 +126,7 @@ export async function buildSdk(force = false):Promise<SDKInfo> {
         // 2. 检测是否有变化
         if (sdkHasChange() || force) {
             // 3. 清空目录
-            await clear(`${location}/**/*`);
+            await clear(`${sdk.location}/**/*`);
             // 4. 编译
             const bundle = await rollup({
                 input: InputName,
