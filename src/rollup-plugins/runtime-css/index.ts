@@ -1,156 +1,117 @@
 /**
  * 处理 css 以及其引用的图片等资源
  */
-import path from 'path'
-import { createFilter } from 'rollup-pluginutils'
-import Concat from 'concat-with-sourcemaps'
-import Loaders from './loaders'
-import normalizePath from './utils/normalize-path'
-import { getSafeId } from './utils/safe-id'
-import { Virtual_Inject_Module_Id, Entry_Css_Str_Tpl, Virtual_Inject_Module_Code, Entry_Css_Str_Tpl_Code } from './constants';
-
-/**
- * The options that could be `boolean` or `object`
- * We convert it to an object when it's truthy
- * Otherwise fallback to default value
- */
-function inferOption(option, defaultValue) {
-  if (option === false) return false
-  if (option && typeof option === 'object') return option
-  return option ? {} : defaultValue
-}
-
-/**
- * 默认的 inject 配置
- * @param {*} injectConfig
- * @returns
- */
-function inferInject(injectConfig = { type: 'link', injectCode: null }) {
-  let { type = 'link', injectCode, ...others } = injectConfig;
-  if (!injectCode) {
-      injectCode = (info) => {
-          const paramsString = JSON.stringify({...info, type });
-          let code = '';
-          code += `import injectStyles from "${Virtual_Inject_Module_Id}";\n`;
-          code += `injectStyles(${paramsString});\n`;
-          return code;
-      }
-  }
-  return { type, injectCode, ...others };
-}
+import fs from 'fs';
+import path from 'path';
+import Concat from 'concat-with-sourcemaps';
+import { GetModuleInfo, OutputChunk, Plugin } from 'rollup'
+import { createFilter } from 'rollup-pluginutils';
+import Loaders, { LoadersConfig } from './loaders/loaders';
+import { getSafeId } from '../../utils/hash';
+import { normalizePath } from '../../utils/paths';
+import { STYLE_EXTERNALS_MODULE } from '../../constants';
+import { ExtractedInfo, LoaderContext } from './loaders/types';
 
 /**
  * Recursively get the correct import order from rollup
  * We only process a file once
- *
- * @param {string} id
- * @param {Function} getModuleInfo
- * @param {Set<string>} seen
  */
-function getRecursiveImportOrder(id, getModuleInfo, seen = new Set()) {
+function getRecursiveImportOrder(id: string, getModuleInfo: GetModuleInfo, seen = new Set()): string[] {
   if (seen.has(id)) {
     return []
   }
-
   seen.add(id)
-
   const result = [id]
   getModuleInfo(id).importedIds.forEach(importFile => {
     result.push(...getRecursiveImportOrder(importFile, getModuleInfo, seen))
   })
-
   return result
 }
 
+type HandleMode = { inject: { type: 'style'|'link', options?: any } } | { extracted: true }
 
-/* eslint import/no-anonymous-default-export: [2, {"allowArrowFunction": true}] */
-export default (options = {} as any) => {
+type Options = HandleMode & {
+  output: string;
+  stylesRelative?: string; // 样式文件(相对于入口js文件)的相对位置
+  assetsRelative?: string; // 资源文件(相对于入口样式文件)的相对位置
+  include?: any[];
+  exclude?: any[];
+  sourceMap?: boolean|"inline";
+  useLoaders?: LoadersConfig[];
+  postcss?: {
+    syntax?: any;
+    parser?: any;
+    stringifier?: any;
+    plugins?: any[];
+    map?: any;
+  };
+  modules?: {
+    auto: boolean;
+    force: boolean;
+    namedExports: boolean | Function;
+    [key: string]: any;
+  };
+}
+export default (options: Options): Plugin => {
+  
   const filter = createFilter(options.include, options.exclude);
-  const postcssPlugins = Array.isArray(options.plugins) ? options.plugins.filter(Boolean) : options.plugins;
-
-  const { sourceMap } = options;
-  const inject = inferInject(options.inject);
-  const postcssLoaderOptions = {
-    /** 注入 css 的方式 的配置 */
-    inject,
-    /** 合并所有的 css 代码到一个外部文件上 */
-    combineExtract: inject.type === 'link' && !!options.combineExtract,
-    /** 生产的css文件与js文件的相对位置 */
-    relativeBase: options.relativeBase || '',
-    /** css 文件的最终输出目录，绝对路径 */
-    output: options.output,
-    /** css modules 配置  */
-    modules: inferOption(options.modules, false),
-    namedExports: options.namedExports,
-    /** Automatically CSS modules for .module.xxx files */
-    autoModules: options.autoModules,
-    /** Postcss config file */
-    config: inferOption(options.config, {}),
-    /** PostCSS options */
-    postcss: {
-      parser: options.parser,
-      plugins: postcssPlugins,
-      syntax: options.syntax,
-      stringifier: options.stringifier,
-      exec: options.exec
-    }
+  const {
+    output,
+    stylesRelative = 'assets/',
+    assetsRelative = '',
+    sourceMap,
+    useLoaders,
+    modules,
+    postcss,
+  } = options;
+  const modifyEntry = (('inject' in options) && options.inject.type === 'link');
+  const needCombine = modifyEntry || ('extracted' in options && options.extracted);
+  // add Less loader 
+  if (useLoaders.every(item => !(('name' in item) && item.name === 'less'))) {
+    useLoaders.unshift({name: 'less'});
   }
+  // add postcss loader
+  const postcssConfigPath = path.resolve(process.cwd(), 'postcss.config.js');
+  useLoaders.push({name: 'postcss', options: {
+    output,
+    stylesRelative,
+    assetsRelative,
+    injectStyle: ('inject' in options) && options.inject.type === 'style' ? { ...(options.inject.options || {}) } : false,
+    modules: modules || { auto: true, force: false, namedExports: false },
+    plugins: postcss.plugins || [],
+    syntax: postcss.syntax,
+    parser: postcss.parser,
+    stringifier: postcss.stringifier,
+    config: fs.existsSync(postcssConfigPath) ? postcssConfigPath : false,
+    map: postcss.map ? postcss.map : (sourceMap ? { inline: sourceMap === 'inline' } : false)
+  }})
 
-  // loader 配置
-  let use: any[] = ['stylus', 'less'];
-  if (Array.isArray(options.use)) {
-    use = options.use;
-  } else if (options.use !== null && typeof options.use === 'object') {
-    use = [
-      ['stylus', options.use.stylus || {}],
-      ['less', options.use.less || {}]
-    ]
-  }
-  use.unshift(['postcss', postcssLoaderOptions])
-
-  const loaders = new Loaders({
-    use,
-    loaders: options.loaders,
-    extensions: options.extensions
-  });
+  const loaders = new Loaders(useLoaders);
   // 引出的文件集合
-  const extracted = new Map()
-  const assetsEmited = new Set();
+  const extracted = new Map<string, ExtractedInfo>();
   return {
-    name: 'postcss',
+    name: 'runtime-css',
     resolveId ( source ) {
-      if (source === Virtual_Inject_Module_Id) {
-        return source;
-      }
+      if (source === '') return source;
       return null;
     },
     async load(id) {
-      if (id === Virtual_Inject_Module_Id) {
-        return Virtual_Inject_Module_Code;
-      }
+      if (id === '') return 'code';
       return null;
     },
-    async transform(code, id) {
-      // 给入口文件添加引入主css的代码
-      if (postcssLoaderOptions.combineExtract) {
-        const { isEntry } = this.getModuleInfo(id);
-        if (isEntry) {
-          return Entry_Css_Str_Tpl_Code + '\n\n;' + code;
-        }
+    async transform(code: string, id: string) {
+      if (modifyEntry && this.getModuleInfo(id).isEntry) {
+        return `import "${STYLE_EXTERNALS_MODULE}"\n${code}`;
       }
       // 过滤掉不处理的类型
-      if (!filter(id) || !loaders.isSupported(id)) {
-        return null
-      }
-
-      // loader.process的 this 对象
-      const loaderContext = {
+      if (!filter(id) || !loaders.isSupported(id)) return null;
+      // 配置 loader 上下文
+      const loaderContext: LoaderContext ={
         id,
         sourceMap,
         dependencies: new Set(),
-        assets: new Map(),
         warn: this.warn.bind(this),
-        plugin: this
+        rollupPlugin: this
       }
       // 执行处理
       const result = await loaders.process({ code, map: undefined }, loaderContext);
@@ -158,34 +119,14 @@ export default (options = {} as any) => {
       for (const dep of loaderContext.dependencies) {
         this.addWatchFile(dep)
       }
-      // 输出静态文件
-      for (const [fileName, source] of loaderContext.assets) {
-        if (!assetsEmited.has(fileName)) {
-          this.emitFile({ type: "asset", fileName, source });
-          assetsEmited.add(fileName);
-        }
-      }
-      // 通过外链方式引入，需要输出 css 资源文件
-      if (postcssLoaderOptions.inject.type === 'link') {
-        if (postcssLoaderOptions.combineExtract) {
-          extracted.set(id, result.extracted);
-        } else if (result.extracted) {
-          // 输出 css 资源文件
-          let { code, map, chunkName } = result.extracted;
-          if (map) {
-            code += `\n/*# sourceMappingURL=./${path.parse(chunkName).base}.map */`;
-            this.emitFile({ type: "asset", fileName: `${chunkName}.map`, source: JSON.stringify(map) });
-          }
-          this.emitFile({ type: "asset", fileName: chunkName, source: code });
-        }
-        return { code: result.code, map: { mappings: '' } }
+      if (needCombine) {
+        extracted.set(id, result.extracted);
       }
       return { code: result.code, map: result.map || { mappings: '' } }
     },
 
     augmentChunkHash() {
       if (extracted.size === 0) return
-      // eslint-disable-next-line unicorn/no-reduce
       const extractedValue = [...extracted].reduce((object, [key, value]) => ({
         ...object,
         [key]: value
@@ -193,35 +134,30 @@ export default (options = {} as any) => {
       return JSON.stringify(extractedValue)
     },
 
-    async generateBundle(writeOptions, bundle) {
-      if (extracted.size === 0 || !(writeOptions.dir || writeOptions.file)) {
-        return;
-      }
+    async generateBundle(outputOptions, bundle) {
+      if (extracted.size === 0 || !(outputOptions.dir || outputOptions.file)) return;
 
       // 输出目录
-      const dir = writeOptions.dir || path.dirname(writeOptions.file);
-      // 入口chunk文件
-      const entryChunkId = Object.keys(bundle).find(fileName => bundle[fileName].isEntry);
+      const dir = outputOptions.dir || path.dirname(outputOptions.file);
+      // 入口 chunk
+      const [entryChunkId, entryChunk] = Object.entries(bundle).find(([_, chunk]) => chunk.type === 'chunk' && chunk.isEntry) as [string, OutputChunk]
       // 入口chunk文件(输出位置)
-      const entryFile = writeOptions.file || path.join(writeOptions.dir, entryChunkId);
+      const entryFile = outputOptions.file || path.join(outputOptions.dir, entryChunkId);
 
       const getExtracted = () => {
         const entries = [...extracted.values()];
         // 根据引用关系，对入口 css 进行排序
-        const { modules, facadeModuleId } = bundle[normalizePath(path.relative(dir, entryFile))]
+        const { modules, facadeModuleId } = entryChunk;
         if (modules) {
-          const moduleIds = getRecursiveImportOrder(
-            facadeModuleId,
-            this.getModuleInfo
-          )
+          const moduleIds = getRecursiveImportOrder(facadeModuleId, this.getModuleInfo);
           entries.sort((a, b) => moduleIds.indexOf(a.id) - moduleIds.indexOf(b.id))
         }
         // 计算 hash 值
-        const filehash = getSafeId(entries.map(entry => entry.chunkName || entry.code).join('-'), path.basename(entryFile, path.extname(entryFile)));
+        const filehash = getSafeId(entries.map(entry => entry.hash || entry.code).join('-'), path.parse(entryFile).name);
         const fileName = `${filehash}.css`;
-        // @ts-ignore 拼接代码
+        // 拼接代码
         const concat = new Concat(true, fileName, '\n');
-        for (const result of entries) { // result = { id: this.id, code: result.css, map: outputMap, chunkName }
+        for (const result of entries) {
           const relative = normalizePath(path.relative(dir, result.id))
           const map = result.map || null
           if (map) {
@@ -245,26 +181,15 @@ export default (options = {} as any) => {
         return {
           code,
           map: sourceMap === true && concat.sourceMap,
-          codeFileName:  postcssLoaderOptions.relativeBase + fileName,
-          mapFileName: postcssLoaderOptions.relativeBase + fileName + '.map'
+          codeFileName: path.join(options.stylesRelative, fileName),
+          mapFileName: path.join(options.stylesRelative, fileName + '.map'),
         }
       }
 
-      if (options.onExtract) {
-        const shouldExtract = await options.onExtract(getExtracted)
-        if (shouldExtract === false) {
-          return
-        }
-      }
-
-      let { code, codeFileName, map, mapFileName } = getExtracted()
-      const entryChunk = bundle[entryChunkId];
-      entryChunk.code = entryChunk.code.replace(Entry_Css_Str_Tpl, codeFileName);
-      this.emitFile({
-        fileName: codeFileName,
-        type: 'asset',
-        source: code
-      })
+      let { code, codeFileName, map, mapFileName } = getExtracted();
+      // 替换
+      entryChunk.code = entryChunk.code.replace(STYLE_EXTERNALS_MODULE, `${STYLE_EXTERNALS_MODULE}?link=./${codeFileName}`);
+      this.emitFile({ fileName: codeFileName, type: 'asset', source: code })
       if (map) {
         this.emitFile({
           fileName: mapFileName,

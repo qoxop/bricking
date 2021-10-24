@@ -4,10 +4,9 @@
  */
 import path from 'path';
 import { RollupOptions, OutputOptions } from 'rollup';
-// 自定义插件
+import { STYLE_EXTERNALS_MODULE } from './constants'
 import fileUrl from './rollup-plugins/file-url';
 import runtimeCss from './rollup-plugins/runtime-css';
-// 配置信息
 import { Configs } from './types';
 
 const prodMode = process.env.NODE_ENV === 'production';
@@ -23,17 +22,20 @@ export function rollupConfig(configs: Configs, isApp = true) {
             require('@rollup/plugin-commonjs')(),
             // Css 文件处理
             runtimeCss({
-                modules: configs?.assets?.cssModules,
-                autoModules: configs?.assets?.autoCssModules,
-                relativeBase: configs.assets.relative,
+                inject: {
+                    type: 'style',
+                },
+                stylesRelative: configs.assets.relative,
+                modules: {
+                    force: configs.assets.autoCssModules,
+                    auto: configs.assets.autoCssModules,
+                    namedExports: false
+                },
                 output: assetsOutput,
-                combineExtract: isApp,
-                plugins: [
-                    require('postcss-url')({ url: 'copy', assetsPath: assetsOutput, useHash: true }),
-                    ...(configs.minimize && prodMode ? [require('cssnano')({ preset: 'default' })] : []),
-                ],
-                use: {
-                    less: { rewriteUrls: 'all' }
+                postcss: {
+                    plugins: [
+                        ...(configs.minimize && prodMode ? [require('cssnano')({ preset: 'default' })] : []),
+                    ],
                 }
             }),
             // 处理文件
@@ -50,9 +52,8 @@ export function rollupConfig(configs: Configs, isApp = true) {
             }),
             ...(configs.minimize && prodMode ? [require('rollup-plugin-terser').terser({ format: {comments: false }})] : [])
         ],
-        external: Object.keys(peerDependencies || {}).concat(configs.sdk.externals || []),
+        external: Object.keys(peerDependencies || {}).concat(configs.sdk.externals || []).concat([STYLE_EXTERNALS_MODULE]),
     };
-    console.log(Object.keys(peerDependencies || {}).concat(configs.sdk.externals || []))
     const outputConfig: OutputOptions = {
         dir: configs.output,
         format: 'system',

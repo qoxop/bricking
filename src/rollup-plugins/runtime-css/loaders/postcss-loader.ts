@@ -5,10 +5,11 @@ import findPostcssConfig from 'postcss-load-config';
 import { identifier } from 'safe-identifier';
 import postcss, { AcceptedPlugin,SourceMapOptions } from 'postcss';
 import { Chunk, ExtractedInfo, Loader, LoaderContext } from './types';
-import { getSafeId } from '../../../utils/hash';
+import { getHash } from '../../../utils/hash';
 
-type Options = {
+export type PostcssLoaderOptions = {
     output:string;
+    stylesRelative?: string;
     assetsRelative?: string;
     injectStyle?: boolean | Object;
     plugins?: AcceptedPlugin[];
@@ -40,7 +41,7 @@ function ensureClassName(name) {
     return identifier(name, false)
 }
 
-function loadConfig(id: string, config: Options['config']) {
+function loadConfig(config: PostcssLoaderOptions['config']) {
     if (config) {
         if (!fs.existsSync(config)) {
             config = path.resolve(process.cwd(), config);
@@ -55,30 +56,36 @@ function loadConfig(id: string, config: Options['config']) {
     return Promise.resolve({} as any);
 }
 
-export class LessLoader extends Loader<Options> {
-    override name: string = 'postcss';
-    override options: Options;
-    override alwaysProcess: boolean = true;
-    override extensions: string[] = ['.less', '.css'];
-    override async process(chunk: Chunk, context: LoaderContext):Promise<Chunk> {
+export class PostcssLoader extends Loader<PostcssLoaderOptions> {
+    name: string = 'postcss';
+    alwaysProcess: boolean = true;
+    extensions: string[] = ['.less', '.css'];
+    async process(chunk: Chunk, context: LoaderContext):Promise<Chunk> {
         // 参数初始化
         const {
             output,
-            assetsRelative,
+            stylesRelative = '',
+            assetsRelative = '',
             plugins = [],
             config: configPath,
             injectStyle = false,
             modules = { force: false, auto: true, namedExports: true },
             ...othersOptions
         } = this.options;
-        const config = await loadConfig(context.id, configPath);
+        const config = await loadConfig(configPath);
         const { force, auto, namedExports, ...modulesOptions } = modules;
         const useModules = force || (auto && isModuleFile(context.id))
         const modulesExported = {}; // css 模块化对象
 
         // 处理插件列表
-        const usePlugins = [ ...plugins, ...(config.plugins || [])];
+        const usePlugins = [
+            ...plugins,
+            ...(config.plugins || []),
+            // 处理 url
+            require('postcss-url')({ url: 'copy', assetsPath: assetsRelative, useHash: true })
+        ];
         if (useModules) {
+            // css module
             usePlugins.unshift(require('postcss-modules')({
                 generateScopedName: '[name]_[local]__[hash:base64:5]',
                 ...modulesOptions,
@@ -90,16 +97,12 @@ export class LessLoader extends Loader<Options> {
                 }
             }))
         }
-        if (usePlugins.length === 0) {
-            const noopPlugin = () => ({ postcssPlugin: 'postcss-noop-plugin', Once() { } })
-            usePlugins.push(noopPlugin());
-        }
 
         // 处理配置对象
         const postcssOptions = {
             ...othersOptions,
             ...(config.options || {}),
-            to: injectStyle ? context.id : path.join(output, path.parse(context.id).base),
+            to: path.join(output, path.parse(context.id).base),
             from: context.id,
         }
         postcssOptions.parser = ensurePostCSSOption(postcssOptions.parser);
@@ -133,7 +136,7 @@ export class LessLoader extends Loader<Options> {
             id: context.id,
             code: result.css,
             map: outputMap,
-            chunkName: ''
+            hash: `${getHash(result.css, context.id)}`
         }
         if (namedExports) {
             const json = modulesExported[context.id];
@@ -148,19 +151,16 @@ export class LessLoader extends Loader<Options> {
         }
         
         if (!injectStyle) {
-            const chunkName = `${assetsRelative}${getSafeId(result.css, path.parse(context.id).name)}.css`;
-            code += `export default ${JSON.stringify(modulesExported[context.id])};`;
-            extracted.chunkName = chunkName;
             return {
-                code,
+                code: code + `export default ${JSON.stringify(modulesExported[context.id])};`,
                 extracted,
                 map: outputMap,
             }
         }
-        const injectOptions = typeof injectStyle === 'object' ? { ...injectStyle, assetsRelative } : { assetsRelative };
+        const injectOptions = typeof injectStyle === 'object' ? { ...injectStyle, stylesRelative, hash: extracted.hash } : { stylesRelative, hash: extracted.hash };
         const cssVariableName = identifier('css', true);
         const module = useModules ? JSON.stringify(modulesExported[context.id]) : cssVariableName;
-        code = `import $__inject_styles from "mf-build/runtime/inject-style";\n` + code;
+        code = `import $__inject_styles from "mf-build/lib/runtime/inject-style";\n` + code;
         code += `var ${cssVariableName} = ${JSON.stringify(result.css)};\n`;
         code += `$__inject_styles(${cssVariableName}, ${JSON.stringify(injectOptions)});\n`;
         code += `export default ${module};\n`;

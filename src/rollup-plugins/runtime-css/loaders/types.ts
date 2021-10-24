@@ -5,7 +5,6 @@ export type LoaderContext = {
     id: string;
     sourceMap: string | Object | boolean;
     dependencies: Set<string>;
-    assets: Map<string, any>;
     warn: Function;
     rollupPlugin: TransformPluginContext
 }
@@ -13,7 +12,7 @@ export type ExtractedInfo = {
     id: string;
     code: string;
     map?: any;
-    chunkName: string
+    hash: string
 }
 export type Chunk = {
     code: string;
@@ -21,18 +20,16 @@ export type Chunk = {
     extracted?: ExtractedInfo;
 }
 
-export class Loader<T = any> {
-    name: string;
+export abstract class Loader<T = any> {
     options: T;
-    alwaysProcess: boolean;
-    extensions: string[];
+    abstract name: string;
+    abstract alwaysProcess: boolean;
+    abstract extensions: string[];
     constructor(options: T) {
         this.options = options;
     }
     test(filepath: string): boolean {
         return this.extensions.includes(path.extname(filepath))
     }
-    process(chunk: Chunk, context: LoaderContext):Promise<Chunk> {
-        return Promise.resolve(chunk);
-    };
+    abstract process(chunk: Chunk, context: LoaderContext):Promise<Chunk>;
 }

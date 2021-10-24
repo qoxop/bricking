@@ -1,17 +1,23 @@
+import { LessLoader } from './less-loader';
+import { PostcssLoader, PostcssLoaderOptions } from './postcss-loader';
 import { Chunk, Loader, LoaderContext } from './types'
 
-type LoadersConfig = (
-  { name: string, options?: any } |
+export type LoadersConfig =
+  { name: 'less', options?: Less.Options } |
+  { name: 'postcss', options?: PostcssLoaderOptions } |
+  { name: string, options?: PostcssLoaderOptions } |
   { loader: typeof Loader, options?: any }
-)[]
 
 export default class Loaders {
   loaders: Loader[] = [];
-  constructor(loaders: LoadersConfig) {
-    const LoaderMap: {[key: string]: typeof Loader} = {};
+  constructor(loaders: LoadersConfig[]) {
+    const LoaderMap: {[key: string]: any} = {
+      'less': LessLoader,
+      'postcss': PostcssLoader,
+    };
     this.loaders = loaders.map(item => {
       const My_Loader = ('name' in item) ? LoaderMap[item.name] : item.loader;
-      return new My_Loader(item.options);
+      return new My_Loader(item.options) as Loader;
     });
   }
   getLoader = (name: string) => this.loaders.find((loader) => loader.name === name);

@@ -2,15 +2,16 @@ import { Chunk, Loader, LoaderContext } from './types'
 import { humanlizePath } from '../../../utils/paths'
 
 export class LessLoader extends Loader<Less.Options> {
-    override name: string = 'less';
-    override options: Less.Options;
-    override alwaysProcess: boolean = false;
-    override extensions: string[] = ['.less'];
-    override async process(chunk: Chunk, context: LoaderContext):Promise<Chunk> {
+    name: string = 'less';
+    alwaysProcess: boolean = false;
+    extensions: string[] = ['.less'];
+    async process(chunk: Chunk, context: LoaderContext):Promise<Chunk> {
         const { id, sourceMap } = context;
         const less = await import('less');
         const { css, map, imports }  = await less.render(chunk.code, {
             ...this.options,
+            // @ts-ignore
+            rewriteUrls: 'all',
             javascriptEnabled: true,
             filename: id,
             sourceMap: sourceMap ? { sourceMapFileInline: sourceMap === 'inline'} : undefined,
