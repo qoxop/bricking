@@ -1,0 +1,30 @@
+import { Chunk, Loader, LoaderContext } from './types'
+import { humanlizePath } from '../../../utils/paths'
+
+export class LessLoader extends Loader<Less.Options> {
+    override name: string = 'less';
+    override options: Less.Options;
+    override alwaysProcess: boolean = false;
+    override extensions: string[] = ['.less'];
+    override async process(chunk: Chunk, context: LoaderContext):Promise<Chunk> {
+        const { id, sourceMap } = context;
+        const less = await import('less');
+        const { css, map, imports }  = await less.render(chunk.code, {
+            ...this.options,
+            javascriptEnabled: true,
+            filename: id,
+            sourceMap: sourceMap ? { sourceMapFileInline: sourceMap === 'inline'} : undefined,
+        });
+        // 添加依赖关系
+        for (const dep of imports) context.dependencies.add(dep);
+        let newMap:any = null;
+        if (map) {
+            newMap = JSON.parse(map)
+            newMap.sources = newMap.sources.map(source => humanlizePath(source))
+        }
+        return {
+            code: css,
+            map: newMap
+        }
+    };
+}
