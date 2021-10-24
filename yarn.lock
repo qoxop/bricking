@@ -183,6 +183,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/less@^3.0.3":
+  version "3.0.3"
+  resolved "https://registry.npmjs.org/@types/less/-/less-3.0.3.tgz#f9451dbb9548d25391107d65d6401a0cfb15db92"
+  integrity sha512-1YXyYH83h6We1djyoUEqTlVyQtCfJAFXELSKW2ZRtjHD4hQ82CC4lvrv5D0l0FLcKBaiPbXyi3MpMsI9ZRgKsw==
+
 "@types/md5@^2.3.1":
   version "2.3.1"
   resolved "https://registry.npmjs.org/@types/md5/-/md5-2.3.1.tgz#010bcf3bb50a2cff3a574cb1c0b4051a9c67d6bc"

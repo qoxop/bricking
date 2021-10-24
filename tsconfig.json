@@ -19,7 +19,10 @@
         "noUnusedLocals": true,
         "esModuleInterop": true,
         "declaration": true,
-        "useUnknownInCatchVariables": false
+        "useUnknownInCatchVariables": false,
+        "paths": {
+            "src/*": ["./src/*"],
+        }
     },
     "include": [
         "src/**/*"
