@@ -7,7 +7,7 @@ export class LessLoader extends Loader<Less.Options> {
     extensions: string[] = ['.less'];
     async process(chunk: Chunk, context: LoaderContext):Promise<Chunk> {
         const { id, sourceMap } = context;
-        const less = await import('less');
+        const less = require('less');
         const { css, map, imports }  = await less.render(chunk.code, {
             ...this.options,
             // @ts-ignore

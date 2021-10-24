@@ -27,7 +27,7 @@ export function rollupConfig(configs: Configs, isApp = true) {
                 },
                 stylesRelative: configs.assets.relative,
                 modules: {
-                    force: configs.assets.autoCssModules,
+                    force: configs.assets.cssModules,
                     auto: configs.assets.autoCssModules,
                     namedExports: false
                 },

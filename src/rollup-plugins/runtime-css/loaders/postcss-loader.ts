@@ -82,7 +82,7 @@ export class PostcssLoader extends Loader<PostcssLoaderOptions> {
             ...plugins,
             ...(config.plugins || []),
             // 处理 url
-            require('postcss-url')({ url: 'copy', assetsPath: assetsRelative, useHash: true })
+            require('postcss-url')({ url: 'copy', assetsPath: path.join(output, assetsRelative), useHash: true })
         ];
         if (useModules) {
             // css module
@@ -97,12 +97,11 @@ export class PostcssLoader extends Loader<PostcssLoaderOptions> {
                 }
             }))
         }
-
         // 处理配置对象
         const postcssOptions = {
             ...othersOptions,
             ...(config.options || {}),
-            to: path.join(output, path.parse(context.id).base),
+            to: path.resolve(output, path.parse(context.id).base),
             from: context.id,
         }
         postcssOptions.parser = ensurePostCSSOption(postcssOptions.parser);
@@ -114,7 +113,7 @@ export class PostcssLoader extends Loader<PostcssLoaderOptions> {
             postcssOptions.map.prev = typeof chunk.map === 'string' ? JSON.parse(chunk.map) : chunk.map
         }
 
-        const result = await postcss(plugins).process(chunk.code, postcssOptions)
+        const result = await postcss(usePlugins).process(chunk.code, postcssOptions)
         // 添加依赖文件
         for (const message of result.messages) {
             if (message.type === 'dependency') context.dependencies.add(message.file);
@@ -160,7 +159,7 @@ export class PostcssLoader extends Loader<PostcssLoaderOptions> {
         const injectOptions = typeof injectStyle === 'object' ? { ...injectStyle, stylesRelative, hash: extracted.hash } : { stylesRelative, hash: extracted.hash };
         const cssVariableName = identifier('css', true);
         const module = useModules ? JSON.stringify(modulesExported[context.id]) : cssVariableName;
-        code = `import $__inject_styles from "mf-build/lib/runtime/inject-style";\n` + code;
+        code = `import $__inject_styles from "mf-build/lib/runtimes/inject-style";\n` + code;
         code += `var ${cssVariableName} = ${JSON.stringify(result.css)};\n`;
         code += `$__inject_styles(${cssVariableName}, ${JSON.stringify(injectOptions)});\n`;
         code += `export default ${module};\n`;

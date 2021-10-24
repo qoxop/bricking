@@ -59,8 +59,8 @@ export default (options: Options): Plugin => {
     output,
     stylesRelative = 'assets/',
     assetsRelative = '',
-    sourceMap,
-    useLoaders,
+    sourceMap = false,
+    useLoaders = [],
     modules,
     postcss,
   } = options;
