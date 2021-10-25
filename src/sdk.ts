@@ -12,6 +12,7 @@ import { rollupConfig } from './rollup_config';
 import { download, getJson } from './utils/network';
 import { copy, clear, unzip } from './utils/fs-tools';
 import sdkPlugin, { InputName, GetMd5 } from './rollup-plugins/build-sdk';
+import { STYLE_EXTERNALS_MODULE } from './constants';
 
 const customConfig = getConfigs();
 
@@ -136,7 +137,7 @@ export async function buildSdk(force = false):Promise<SDKInfo> {
                     ...((minimize && !plugins.some(item => item && item.name === 'terser')) ? [require('rollup-plugin-terser').terser()] : []), // SDK 一定要压缩
                     sdkPlugin({ pkg_json: packageJson, sdk_config: sdk, callback: (info) => SDKInfo = info }),
                 ],
-                external: []
+                external: [STYLE_EXTERNALS_MODULE]
             });
             // 5. 写入文件
             await bundle.write({
