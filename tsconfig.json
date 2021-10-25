@@ -15,11 +15,9 @@
         "sourceMap": false,
         "outDir": "./lib",
         "moduleResolution": "node",
-        "noImplicitOverride": true,
         "noUnusedLocals": true,
         "esModuleInterop": true,
         "declaration": true,
-        "useUnknownInCatchVariables": false,
         "paths": {
             "src/*": ["./src/*"],
         }

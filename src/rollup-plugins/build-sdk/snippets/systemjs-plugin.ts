@@ -2,18 +2,39 @@
 
 var import_maps = {},
     dynamic_module_maps = {},
+    meta_data_maps = {},
     orgResolve = System.constructor.prototype.resolve,
     orgInstantiate = System.constructor.prototype.instantiate,
+    orgCreateContext = System.constructor.prototype.createContext,
     cssLinkModulePattern = /^___INJECT_STYLE_LINK___/;
 
 function getVarRegister(m) {
     return [ [], (_export) => ({ setters: [], execute: () => { _export(m) } }) ]
 };
 
+System.constructor.prototype.createContext = function (parentId) {
+    var meta = orgCreateContext.call(this, parentId) || {};
+    if (meta_data_maps[parentId]) {
+        meta.data = meta_data_maps[parentId];
+        delete meta_data_maps[parentId];
+    }
+    return meta
+};
+
 System.constructor.prototype.resolve = function (id, parentURL) {
-    if (import_maps[id]) return orgResolve.call(this, import_maps[id], parentURL)
-    if (dynamic_module_maps[id] || cssLinkModulePattern.test(id)) return id;
-    return orgResolve.call(this, id, parentURL);
+    var finalUrl = null;
+    if (import_maps[id]) {
+        finalUrl = orgResolve.call(this, import_maps[id], parentURL)
+    } else if (dynamic_module_maps[id] || cssLinkModulePattern.test(id)) {
+        return id;
+    } else {
+        finalUrl = orgResolve.call(this, id, parentURL);
+    }
+    if (meta_data_maps[id] && id !== finalUrl) {
+        meta_data_maps[finalUrl] = meta_data_maps[id];
+        delete meta_data_maps[id];
+    }
+    return finalUrl;
 };
 
 System.constructor.prototype.instantiate = function (url, firstParentUrl) {
@@ -53,7 +74,7 @@ System.constructor.prototype.instantiate = function (url, firstParentUrl) {
     return orgInstantiate.call(this, url, firstParentUrl)
 };
 
-g['$SystemReg'] = {
+g['$_systemjs_tools_'] = {
     obj(maps = {}, force = true) {
         Object.keys(maps).forEach(name => {
             if (force || !dynamic_module_maps[name]) {
@@ -73,6 +94,13 @@ g['$SystemReg'] = {
                 import_maps[name] = maps[name]
             }
         })
+    },
+    setMeta(id, data) {
+        if (typeof id === 'string' && typeof data === 'object') {
+            meta_data_maps[id] = data;
+        } else {
+            console.warn("setMeta error~");
+        }
     }
 };
 })(window);

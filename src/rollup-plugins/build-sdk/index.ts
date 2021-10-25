@@ -74,16 +74,16 @@ export default function(options: SDKPluginOptions):Plugin {
         load(id: string) {
             if (id === InputName && !hasRealFile) {
                 let code = `${typeof extraCodes === 'string' ? extraCodes : extraCodes.join('\n;')}\n`;
-                    code += `window['$SystemReg'].obj({ ${modules} });\n`;
+                    code += `window['$_systemjs_tools_'].obj({ ${modules} });\n`;
                     if (Object.keys(import_maps).length) {
-                        code += `window['$SystemReg'].url(${JSON.stringify(import_maps)});\n`;
+                        code += `window['$_systemjs_tools_'].url(${JSON.stringify(import_maps)});\n`;
                     }
                 return code;
             }
             return null;
         },
         async generateBundle(_, bundle) {
-            const systemjs_code = fs.readFileSync(require.resolve('systemjs/dist/system.min.js'), {encoding: 'utf8'});
+            const systemjs_code = fs.readFileSync(require.resolve('systemjs/dist/system.js'), {encoding: 'utf8'});
             const plugin_code = await compile(fs.readFileSync(require.resolve('./snippets/systemjs-plugin'), { encoding: 'utf8' }));
             const [ entryId, entryChunk] = Object.entries(bundle).find(([_, chunk]) => (chunk as OutputChunk).isEntry) as [string, OutputChunk];
 
