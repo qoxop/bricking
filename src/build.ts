@@ -16,7 +16,7 @@ import { MODULESJson } from './types';
 import { clear } from './utils/fs-tools';
 import { getConfigs } from './utils/config';
 import { rollupConfig } from './rollup_config';
-import { REAL_TIME_CODE } from './rollup-plugins/build-sdk';
+import { REAL_TIME_SDK } from './rollup-plugins/build-sdk';
 
 export const buildHtml = (options: {
     sdkInfo: SDKInfo;
@@ -37,7 +37,7 @@ export const buildHtml = (options: {
     document.body.append(systemScript);
     if (realTime) { // 实时 SDK 模块
         // sdkEntry json 
-        const combineCode = REAL_TIME_CODE(sdkEntry, path.resolve(cdn, appEntry));
+        const combineCode = REAL_TIME_SDK(sdkEntry, path.resolve(cdn, appEntry));
         const hash = createHash("sha256").update([combineCode, 't2dkoi1a'].join(":")).digest("hex").slice(0, 8);
         const truesdkEntry = NAMES.sdkEntry.replace('[hash]', hash);
         fs.writeFileSync(path.resolve(output, truesdkEntry), combineCode);
@@ -47,7 +47,7 @@ export const buildHtml = (options: {
         document.body.append(sdkScript);
     } else { // build_in SDK 模块
         const startScript = document.createElement('script');
-        startScript.innerHTML = `System.import(${JSON.stringify(sdkEntry)}).then(function() { System.import(${JSON.stringify(appEntry)}) })`;
+        startScript.innerHTML = `System.import(${JSON.stringify(sdkEntry)}).then(function(){setTimeout(function(){System.import(${JSON.stringify(appEntry)})})})`;
         document.body.append(startScript);
     }
     fs.writeFileSync(path.resolve(output, './index.html'), dom.serialize(), { encoding: 'utf-8' });

@@ -6,7 +6,7 @@
   "license": "MIT",
   "bin": "./bin/mf-build.js",
   "scripts": {
-    "build": "rm -rf ./lib && npx tsc"
+    "build": "rm -rf ./lib && npx tsc && node clear.js"
   },
   "files": [
     "lib",

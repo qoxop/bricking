@@ -19,7 +19,7 @@ export default function(cssString: string, options: { stylesRelative: string, ha
         return 'url(' + (quotes||'') + new URL(relUrl1 || relUrl2, baseUrl) + (quotes||'') + ')';
     });
     const styleEl = document.createElement('style');
-    styleEl.innerText = cssString;
+    styleEl.append(document.createTextNode(cssString));
     styleEl.id = hash;
     document.head.appendChild(styleEl);
     hashes[hash] = true;

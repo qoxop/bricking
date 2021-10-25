@@ -91,14 +91,6 @@ export default (options: Options): Plugin => {
   const extracted = new Map<string, ExtractedInfo>();
   return {
     name: 'runtime-css',
-    resolveId ( source ) {
-      if (source === '') return source;
-      return null;
-    },
-    async load(id) {
-      if (id === '') return 'code';
-      return null;
-    },
     async transform(code: string, id: string) {
       if (modifyEntry && this.getModuleInfo(id).isEntry) {
         return `import "${STYLE_EXTERNALS_MODULE}"\n${code}`;
