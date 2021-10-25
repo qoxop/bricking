@@ -30,6 +30,7 @@ export type ASSETSConfig = {
     relative: string;
     cssModules: boolean;
     autoCssModules: boolean;
+    injectType?: 'link'|'style';
 }
 export type PRODConfig = {
     cdn: string;

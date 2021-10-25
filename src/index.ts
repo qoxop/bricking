@@ -40,6 +40,7 @@ export const config: Configs = {
         relative: 'assets/',
         cssModules: false,
         autoCssModules: true,
+        injectType: 'link',
     },
     sdk: {
         type: 'local',

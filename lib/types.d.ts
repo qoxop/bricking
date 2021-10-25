@@ -28,6 +28,7 @@ export declare type ASSETSConfig = {
     relative: string;
     cssModules: boolean;
     autoCssModules: boolean;
+    injectType?: 'link' | 'style';
 };
 export declare type PRODConfig = {
     cdn: string;

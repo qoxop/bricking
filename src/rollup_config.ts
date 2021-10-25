@@ -23,7 +23,7 @@ export function rollupConfig(configs: Configs, isApp = true) {
             // Css 文件处理
             runtimeCss({
                 inject: {
-                    type: 'link',
+                    type: configs.assets.injectType,
                 },
                 stylesRelative: configs.assets.relative,
                 modules: {
