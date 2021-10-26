@@ -2,7 +2,7 @@ import path from 'path';
 import { Configs, UserOptions } from './types';
 
 const cwd = process.cwd();
-const pkgPath = path.resolve(cwd, 'package.json');
+const pkgPath = path.join(cwd, 'package.json');
 const prodMode = process.env.NODE_ENV === 'production';
 const DefaultSystemjsCdn = 'https://cdnjs.cloudflare.com/ajax/libs/systemjs/6.11.0/system.min.js';
 
@@ -15,7 +15,7 @@ const DefaultSystemjsCdn = 'https://cdnjs.cloudflare.com/ajax/libs/systemjs/6.11
 const ConfigAbsolutely = (obj: any, base: string, keys: string[]) => {
     keys.forEach(key => {
         if (!path.isAbsolute(obj[key])) {
-            obj[key] = path.resolve(base, obj[key]);
+            obj[key] = path.join(base, obj[key]);
         }
     })
 }

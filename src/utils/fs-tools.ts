@@ -9,7 +9,7 @@ export function unzip(zipPath:string, to: string): Promise<void> {
     const rootName = path.parse(zipPath).name;
     const getFilePath  = (_fileName: string) => {
         const fileName = _fileName.replace(`${rootName}/`, '');
-        const filePath = path.resolve(to, `./${fileName}`);
+        const filePath = path.join(to, `./${fileName}`);
         const dirPath = path.dirname(filePath);
         if (!fs.existsSync(dirPath)) {
             fs.mkdirSync(dirPath);
@@ -77,8 +77,8 @@ export const fileTransfer = (from: string, to: string, transform: (name: string,
     }
     const ps = [];
     for (const item of items) {
-        const fromPath = path.resolve(from, item.name);
-        const toPath = path.resolve(to, item.name);
+        const fromPath = path.join(from, item.name);
+        const toPath = path.join(to, item.name);
         if (item.isFile()) {
             ps.push(new Promise<void>((resolve, reject) => {
                 fs.readFile(fromPath, (rErr, data) => {

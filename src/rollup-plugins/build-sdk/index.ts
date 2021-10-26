@@ -43,7 +43,7 @@ System.register([__json_url__], (function (e) {
     .replace('__app_entry__', JSON.stringify(appEntry))
 }
 
-export const InputName = path.resolve(process.cwd(), `./rumtime-systemjs-sdk.js`);
+export const InputName = path.join(process.cwd(), `./rumtime-systemjs-sdk.js`);
 export const hasRealFile = fs.existsSync(InputName);
 
 export const GetMd5 = (options:Omit<SDKPluginOptions, 'callback'>) => { 

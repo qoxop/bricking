@@ -71,7 +71,7 @@ export default (options: Options): Plugin => {
     useLoaders.unshift({name: 'less'});
   }
   // add postcss loader
-  const postcssConfigPath = path.resolve(process.cwd(), 'postcss.config.js');
+  const postcssConfigPath = path.join(process.cwd(), 'postcss.config.js');
   useLoaders.push({name: 'postcss', options: {
     output,
     stylesRelative,

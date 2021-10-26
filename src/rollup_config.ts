@@ -13,7 +13,7 @@ const prodMode = process.env.NODE_ENV === 'production';
 
 export function rollupConfig(configs: Configs, isApp = true) {
     const { peerDependencies } = configs.packageJson;
-    const assetsOutput = path.resolve(configs.output, configs.assets.relative);
+    const assetsOutput = path.join(configs.output, configs.assets.relative);
     // 输入配置
     const inputConfig: RollupOptions = {
         preserveEntrySignatures: "exports-only",

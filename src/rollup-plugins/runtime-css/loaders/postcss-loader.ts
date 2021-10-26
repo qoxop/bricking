@@ -44,7 +44,7 @@ function ensureClassName(name) {
 function loadConfig(config: PostcssLoaderOptions['config']) {
     if (config) {
         if (!fs.existsSync(config)) {
-            config = path.resolve(process.cwd(), config);
+            config = path.join(process.cwd(), config);
         }
         return findPostcssConfig({}, config).catch((err) => {
             if (!err.message.includes('No PostCSS Config found')) {
@@ -101,7 +101,7 @@ export class PostcssLoader extends Loader<PostcssLoaderOptions> {
         const postcssOptions = {
             ...othersOptions,
             ...(config.options || {}),
-            to: path.resolve(output, path.parse(context.id).base),
+            to: path.join(output, path.parse(context.id).base),
             from: context.id,
         }
         postcssOptions.parser = ensurePostCSSOption(postcssOptions.parser);

@@ -3,6 +3,7 @@
  * 构建脚本
  */
 import fs from 'fs';
+import url from 'url';
 import path from 'path';
 import { rollup } from 'rollup';
 import { createHash } from "crypto";
@@ -27,9 +28,9 @@ export const buildHtml = (options: {
     const { document } = dom.window;
     let {sdkInfo: { sdkEntry, systemjs, isRemote, realTime }, appEntry, output, cdn } = options;
     if (!isRemote) {
-        sdkEntry = path.resolve(cdn, sdkEntry);
-        systemjs = path.resolve(cdn, systemjs);
-        appEntry = path.resolve(cdn, appEntry);
+        sdkEntry = url.resolve(cdn, sdkEntry);
+        systemjs = url.resolve(cdn, systemjs);
+        appEntry = url.resolve(cdn, appEntry);
     }
     // 引入 system
     const systemScript = document.createElement('script');
@@ -37,12 +38,12 @@ export const buildHtml = (options: {
     document.body.append(systemScript);
     if (realTime) { // 实时 SDK 模块
         // sdkEntry json 
-        const combineCode = REAL_TIME_SDK(sdkEntry, path.resolve(cdn, appEntry));
+        const combineCode = REAL_TIME_SDK(sdkEntry, url.resolve(cdn, appEntry));
         const hash = createHash("sha256").update([combineCode, 't2dkoi1a'].join(":")).digest("hex").slice(0, 8);
         const truesdkEntry = NAMES.sdkEntry.replace('[hash]', hash);
-        fs.writeFileSync(path.resolve(output, truesdkEntry), combineCode);
+        fs.writeFileSync(path.join(output, truesdkEntry), combineCode);
         const sdkScript = document.createElement('script');
-        sdkScript.src = path.resolve(cdn, truesdkEntry);
+        sdkScript.src = url.resolve(cdn, truesdkEntry);
         sdkScript.type = 'systemjs-module';
         document.body.append(sdkScript);
     } else { // build_in SDK 模块
@@ -50,7 +51,7 @@ export const buildHtml = (options: {
         startScript.innerHTML = `System.import(${JSON.stringify(sdkEntry)}).then(function(){setTimeout(function(){System.import(${JSON.stringify(appEntry)})})})`;
         document.body.append(startScript);
     }
-    fs.writeFileSync(path.resolve(output, './index.html'), dom.serialize(), { encoding: 'utf-8' });
+    fs.writeFileSync(path.join(output, './index.html'), dom.serialize(), { encoding: 'utf-8' });
 }
 
 export const build = async (app = false) => {
@@ -95,13 +96,13 @@ export const build = async (app = false) => {
         moduleInfo.zipPath = NAMES.packMODULES(name);
     }
     await fs.promises.writeFile(
-        path.resolve(configs.output, `./${NAMES.moduleInfo}`),
+        path.join(configs.output, `./${NAMES.moduleInfo}`),
         JSON.stringify(moduleInfo, null, '\t'),
     );
     // 6. 打 zip 包
     if (pack) {
         await require('zip-dir')(configs.output, {
-            saveTo: path.resolve(configs.output, moduleInfo.zipPath),
+            saveTo: path.join(configs.output, moduleInfo.zipPath),
         });
     }
     // 7. 构建完整应用
