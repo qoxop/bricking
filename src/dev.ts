@@ -7,7 +7,7 @@ import { watch } from 'rollup';
 import alias from '@rollup/plugin-alias';
 import livereload from 'rollup-plugin-livereload';
 import { createProxyMiddleware } from 'http-proxy-middleware';
-import { buildSdk } from './sdk';
+import { buildSdk, copySdk } from './sdk';
 import { buildHtml } from './build';
 import { clear } from './utils/fs-tools';
 import { rollupConfig } from './rollup_config';
@@ -27,6 +27,7 @@ export const start = async () => {
     await clear(`${output}/**/*`);
     // 2. 构建 SDK
     const sdkInfo = await buildSdk();
+    await copySdk();
     // 3. 生成HTML文件
     buildHtml({ output, sdkInfo, appEntry: EntryFileName, cdn: '/' });
     // 4. 监听变化，实时编译

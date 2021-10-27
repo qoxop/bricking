@@ -3,16 +3,16 @@ import express from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { getConfigs } from './utils/config';
 
-export const serve = () => {
+export const serve = (serveSdk = false) => {
     const configs = getConfigs()
     const devServe = express();
+    // @ts-ignore
     devServe.use((req, res, next) => {
-        res.setHeader('Access-Control-Allow-Credentials', 'true');
-        res.setHeader('Access-Control-Allow-Origin', req.originalUrl);
+        res.setHeader('Access-Control-Allow-Origin', '*');
         next();
     });
     // 静态资源服务
-    devServe.use(express.static(configs.output));
+    devServe.use(express.static(serveSdk && configs.sdk.type ==='local' ? configs.sdk.location : configs.output));
     // 代理设置
     if (configs.dev.proxyPath && configs.dev.proxyOption) {
         devServe.use(

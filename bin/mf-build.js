@@ -43,13 +43,9 @@ switch(command) {
         break;
     case 'serve':
         let ps = Promise.resolve();
-        if (ARGS['app']) {
-            ps = buildModules(true);
-        } else {
-            ps = buildModules(false);
-        }
+        const serveSdk = !!ARGS['sdk'];
         ps.then(() => {
-            require('../lib/serve').serve();
+            require('../lib/serve').serve(serveSdk);
         })
         break;
     default:

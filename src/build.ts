@@ -11,7 +11,7 @@ import colors from 'colors';
 import buildAppPlugin from './rollup-plugins/build-app';
 // 配置信息
 import { dom } from './html';
-import { buildSdk, SDKInfo } from './sdk';
+import { buildSdk, copySdk, SDKInfo } from './sdk';
 import NAMES from './utils/names';
 import { MODULESJson } from './types';
 import { clear } from './utils/fs-tools';
@@ -121,6 +121,7 @@ export const build = async (app = false) => {
         });
         appEntry = output.output.find(item => item.type === 'chunk' && item.isEntry).fileName
         const sdkInfo = await buildSdk();
+        await copySdk();
         buildHtml({
             sdkInfo,
             appEntry,

@@ -16,7 +16,7 @@ import { STYLE_EXTERNALS_MODULE } from './constants';
 
 const customConfig = getConfigs();
 
-const { output, packageJson, sdk, minimize, base } = customConfig;
+const { output, packageJson, sdk, minimize, base, prod } = customConfig;
 
 const DefaultSystemjsCdn = 'https://cdnjs.cloudflare.com/ajax/libs/systemjs/6.11.0/system.min.js'
 
@@ -79,8 +79,10 @@ export async function buildSdk(force = false):Promise<SDKInfo> {
         }
     } else if (sdk.type === 'remote-json') {
         const remoteSDKInfo = await getJson<SDKJson>(sdk.remote);
-        if (!remoteSDKInfo.systemjs) {
-            remoteSDKInfo.systemjs = 'system.min.js'
+        if (!remoteSDKInfo.systemjs || !remoteSDKInfo.cdnPath || ['/', ''].includes(remoteSDKInfo.cdnPath)) {
+            remoteSDKInfo.systemjs = DefaultSystemjsCdn
+        } else {
+            remoteSDKInfo.systemjs = url.resolve(remoteSDKInfo.cdnPath, remoteSDKInfo.systemjs)
         }
         if (sdk.build_in) {
             if (remoteSDKInfo.zipPath) {
@@ -135,7 +137,7 @@ export async function buildSdk(force = false):Promise<SDKInfo> {
                 plugins: [
                     ...plugins,
                     ...((minimize && !plugins.some(item => item && item.name === 'terser')) ? [require('rollup-plugin-terser').terser()] : []), // SDK 一定要压缩
-                    sdkPlugin({ pkg_json: packageJson, sdk_config: sdk, callback: (info) => SDKInfo = info }),
+                    sdkPlugin({ cdnPath: prod.cdn, pkg_json: packageJson, sdk_config: sdk, callback: (info) => SDKInfo = info }),
                 ],
                 external: [STYLE_EXTERNALS_MODULE]
             });
@@ -159,8 +161,6 @@ export async function buildSdk(force = false):Promise<SDKInfo> {
         } else {
             SDKInfo = require(resolve(sdk.location, `./${NAMES.sdkInfo}`))
         }
-        // 6. 拷贝一份到输出目录
-        await copySdk();
         return {
             isRemote: false,
             sdkEntry: SDKInfo.entry,
