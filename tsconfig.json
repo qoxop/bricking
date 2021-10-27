@@ -19,7 +19,7 @@
         "esModuleInterop": true,
         "declaration": true,
         "paths": {
-            "src/*": ["./src/*"],
+            "src/*": ["./src/*"]
         }
     },
     "include": [
