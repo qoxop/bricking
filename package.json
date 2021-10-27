@@ -1,6 +1,6 @@
 {
   "name": "mf-build",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "./lib/index.js",
   "module": "./lib/index.js",
   "license": "MIT",

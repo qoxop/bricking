@@ -48,7 +48,7 @@ export const buildHtml = (options: {
         document.body.append(sdkScript);
     } else { // build_in SDK 模块
         const startScript = document.createElement('script');
-        startScript.innerHTML = `System.import(${JSON.stringify(sdkEntry)}).then(function(){setTimeout(function(){System.import(${JSON.stringify(appEntry)})})})`;
+        startScript.innerHTML = `System.import(${JSON.stringify(sdkEntry)}).then(function(){setTimeout(function(){System.import(${JSON.stringify(appEntry)})}, 10)})`;
         document.body.append(startScript);
     }
     fs.writeFileSync(path.join(output, './index.html'), dom.serialize(), { encoding: 'utf-8' });
