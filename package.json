@@ -1,10 +1,10 @@
 {
-  "name": "mf-build",
+  "name": "bricking",
   "version": "0.0.3",
   "main": "./lib/index.js",
   "module": "./lib/index.js",
   "license": "MIT",
-  "bin": "./bin/mf-build.js",
+  "bin": "./bin/bricking.js",
   "scripts": {
     "build": "rm -rf ./lib && npx tsc && node clear.js"
   },

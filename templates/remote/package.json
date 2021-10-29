@@ -4,15 +4,15 @@
   "main": "./src/app.tsx",
   "license": "MIT",
   "scripts": {
-    "build": "mf-build build",
-    "build-all": "mf-build build --app",
-    "serve": "mf-build serve",
-    "dev": "mf-build dev"
+    "build": "bricking build",
+    "build-all": "bricking build --app",
+    "serve": "bricking serve",
+    "dev": "bricking dev"
   },
   "devDependencies": {
     "@types/react": "^17.0.28",
     "@types/react-dom": "^17.0.9",
     "@types/redux": "^3.6.0",
-    "mf-build": "*"
+    "bricking": "*"
   }
 }

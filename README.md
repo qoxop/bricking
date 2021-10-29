@@ -1,4 +1,4 @@
-# mf-build
+# bricking
 
 一个通用的 web module 构建工具，基于 rollup 进行封装，使用systemjs作为模块加载器。
 

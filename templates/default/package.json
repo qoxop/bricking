@@ -5,18 +5,18 @@
   "license": "MIT",
   "scripts": {
     "dump": "yarn install && npm-install-peers",
-    "build": "mf-build build",
-    "build-all": "mf-build build --app",
-    "build-sdk": "mf-build build --sdk",
-    "serve": "mf-build serve",
-    "dev": "mf-build dev"
+    "build": "bricking build",
+    "build-all": "bricking build --app",
+    "build-sdk": "bricking build --sdk",
+    "serve": "bricking serve",
+    "dev": "bricking dev"
   },
   "devDependencies": {
     "@types/react": "^17.0.28",
     "@types/react-dom": "^17.0.9",
     "@types/redux": "^3.6.0",
     "npm-install-peers": "^1.2.2",
-    "mf-build": "*"
+    "bricking": "*"
   },
   "peerDependencies": {
     "@qoxop/rs-tools": "^0.0.1",
