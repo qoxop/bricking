@@ -9,7 +9,7 @@ import livereload from 'rollup-plugin-livereload';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { buildHtml } from './build';
 import { clear } from '../utils/fs-tools';
-import { buildSdk, copySdk } from './sdk';
+import { buildSdk, copySdk, sdkHasChange } from './sdk';
 import { rollupConfig } from '../rollup_config';
 import { getConfigs, getAliasEntries } from '../utils/config';
 
@@ -26,6 +26,9 @@ export const start = async () => {
     // 1. 清空输出目录
     await clear(`${output}/**/*`);
     // 2. 构建 SDK
+    if (sdkHasChange()) { // SDK 必须以生产模式构建
+        throw new Error("检测到配置变化，请重新构建 SDK，运行 ` bricking build --sdk ` ");
+    }
     const sdkInfo = await buildSdk();
     await copySdk();
     // 3. 生成HTML文件
