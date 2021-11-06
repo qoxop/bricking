@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import {bindActionCreators } from 'redux'
-import { ReduxControler, useReduxController, ctrlEnhance} from '@qoxop/rs-tools';
+import { ReduxControler, useReduxController, ctrlEnhance} from 'react-ducky';
 import { actions, useModel as useTodoModel, reducer, TodoModel } from './model';
 import  { Todo, AddTodo, Filter } from './components';
 import './style.less';
@@ -12,7 +12,7 @@ class TodoController extends ReduxControler {
         super(store);
         this.actions = bindActionCreators(actions, this.dispatch);
     }
-    useInit() {
+    useHooks() {
         const { filter, todos } = useTodoModel();
         const todoArr = useMemo(() => {
             const data: TodoModel.TodoItem[] = [];

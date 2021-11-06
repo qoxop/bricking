@@ -1,4 +1,4 @@
-import { thunkMiddleware } from '@qoxop/rs-tools';
+import { thunkMiddleware } from 'react-ducky';
 import { createStore, combineReducers, applyMiddleware, compose, Reducer } from 'redux';
 
 type ArrayItem<T> = T|Array<T>;

@@ -1,12 +1,16 @@
 {
   "name": "bricking",
-  "version": "0.0.3",
-  "main": "./lib/index.js",
-  "module": "./lib/index.js",
+  "version": "0.0.4",
+  "main": "./index.js",
+  "module": "./index.js",
   "license": "MIT",
   "bin": "./bin/bricking.js",
+  "description": "一个通用的 web module 构建工具，基于 rollup 进行封装，使用systemjs作为模块加载器。",
   "scripts": {
-    "build": "rm -rf ./lib && npx tsc && node clear.js"
+    "prebuild": "rm -rf ./package",
+    "build": "npx tsc",
+    "postbuild": "node fix.js",
+    "deploy": "cd ./package && echo io"
   },
   "files": [
     "lib",

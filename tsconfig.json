@@ -13,7 +13,7 @@
         "resolveJsonModule": true,
         "preserveConstEnums": true,
         "sourceMap": false,
-        "outDir": "./lib",
+        "outDir": "./package",
         "moduleResolution": "node",
         "noUnusedLocals": true,
         "esModuleInterop": true,

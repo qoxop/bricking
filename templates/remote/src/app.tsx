@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import MyApp, { reducer } from "my-app-name";
-import { ReduxProvider } from '@qoxop/rs-tools';
+import { ReduxProvider } from 'react-ducky';
 import { store, injectReduce } from './store';
 
 injectReduce({ key: 'todo', reducer });

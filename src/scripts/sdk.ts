@@ -4,15 +4,15 @@
 import fs from 'fs';
 import url from 'url';
 import { rollup } from 'rollup';
-import NAMES from './utils/names';
-import { SDKJson } from './types';
+import NAMES from '../utils/names';
+import { SDKJson } from '../types';
 import { resolve, parse } from 'path';
-import { getConfigs } from './utils/config';
-import { rollupConfig } from './rollup_config';
-import { download, getJson } from './utils/network';
-import { copy, clear, unzip } from './utils/fs-tools';
-import sdkPlugin, { InputName, GetMd5 } from './rollup-plugins/build-sdk';
-import { STYLE_EXTERNALS_MODULE } from './constants';
+import { getConfigs } from '../utils/config';
+import { rollupConfig } from '../rollup_config';
+import { download, getJson } from '../utils/network';
+import { copy, clear, unzip } from '../utils/fs-tools';
+import sdkPlugin, { InputName, GetMd5 } from '../rollup-plugins/build-sdk';
+import { STYLE_EXTERNALS_MODULE } from '../constants';
 
 const customConfig = getConfigs();
 

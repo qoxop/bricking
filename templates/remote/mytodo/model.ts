@@ -1,4 +1,4 @@
-import { createModel, PayloadAction } from "@qoxop/rs-tools";
+import { createModel, PayloadAction } from "react-ducky";
 
 
 export namespace TodoModel {

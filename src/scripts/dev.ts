@@ -7,11 +7,11 @@ import { watch } from 'rollup';
 import alias from '@rollup/plugin-alias';
 import livereload from 'rollup-plugin-livereload';
 import { createProxyMiddleware } from 'http-proxy-middleware';
-import { buildSdk, copySdk } from './sdk';
 import { buildHtml } from './build';
-import { clear } from './utils/fs-tools';
-import { rollupConfig } from './rollup_config';
-import { getConfigs, getAliasEntries } from './utils/config';
+import { clear } from '../utils/fs-tools';
+import { buildSdk, copySdk } from './sdk';
+import { rollupConfig } from '../rollup_config';
+import { getConfigs, getAliasEntries } from '../utils/config';
 
 const customConfig = getConfigs();
 

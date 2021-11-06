@@ -8,16 +8,16 @@ import path from 'path';
 import { rollup } from 'rollup';
 import { createHash } from "crypto";
 import colors from 'colors';
-import buildAppPlugin from './rollup-plugins/build-app';
+import buildAppPlugin from '../rollup-plugins/build-app';
 // 配置信息
-import { dom } from './html';
+import { dom } from '../html';
+import NAMES from '../utils/names';
+import { MODULESJson } from '../types';
+import { clear } from '../utils/fs-tools';
+import { getConfigs } from '../utils/config';
+import { rollupConfig } from '../rollup_config';
 import { buildSdk, copySdk, SDKInfo } from './sdk';
-import NAMES from './utils/names';
-import { MODULESJson } from './types';
-import { clear } from './utils/fs-tools';
-import { getConfigs } from './utils/config';
-import { rollupConfig } from './rollup_config';
-import { REAL_TIME_SDK } from './rollup-plugins/build-sdk';
+import { REAL_TIME_SDK } from '../rollup-plugins/build-sdk';
 
 export const buildHtml = (options: {
     sdkInfo: SDKInfo;

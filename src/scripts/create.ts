@@ -2,9 +2,10 @@
  * 创建模版
  */
 import path from 'path';
-import { bufferString, fileTransfer } from './utils/fs-tools';
+import { ROOT_PATH } from '../constants';
+import { bufferString, fileTransfer } from '../utils/fs-tools';
 
-const templatesDir = path.join(__dirname, '../templates');
+const templatesDir = path.join(ROOT_PATH, './templates');
 
 const DefaultTemplate = {
     name: 'my-app-name',

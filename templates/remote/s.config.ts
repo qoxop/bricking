@@ -12,6 +12,6 @@ export default mfConfig({
     sdk: {
         type: 'remote-json',
         remote: 'http://files.codcats.com/mf/SDK.json',
-        externals: ["@qoxop/rs-tools", "immer", "react", "react-dom", "redux"]
+        externals: ["react-ducky", "immer", "react", "react-dom", "redux"]
     }
 })
