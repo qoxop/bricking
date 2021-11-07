@@ -14,35 +14,6 @@ export type SDKPluginOptions = {
     callback: (info: SDKJson) => void;
 }
 
-export const REAL_TIME_SDK = (jsonUrl: string, appEntry:string) => {
-    return (`
-System.register([__json_url__], (function (e) {
-    "use strict";
-    var m;
-    return {
-        setters: [function (e) {
-            m = e.default;
-        }],
-        execute: function () {
-            if (!m.entry) {
-                throw new Error("模块入口不存在");
-            }
-            var cdn = __json_url_path__;
-            if (/^https?/.test(m.cdnPath || '')) {
-                cdn = m.cdnPath;
-            }
-            var sdkEntry = cdn.replace(/\\\/$/, '') + '/' + m.entry.replace(/^\\.?\\//, '');
-            System.import(sdkEntry).then(function () {
-                System.import(__app_entry__);
-            })
-        }
-    }
-}));
-`).replace('__json_url__', JSON.stringify(jsonUrl))
-    .replace('__json_url_path__', JSON.stringify(path.dirname(jsonUrl)))
-    .replace('__app_entry__', JSON.stringify(appEntry))
-}
-
 export const InputName = path.join(process.cwd(), `./rumtime-systemjs-sdk.js`);
 export const hasRealFile = fs.existsSync(InputName);
 

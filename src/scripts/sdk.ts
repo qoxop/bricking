@@ -47,7 +47,7 @@ export const sdkHasChange = () => {
         }
         return false;
     }
-    return true;
+    return false;
 }
 
 const urlResolve = (source:string, subPath: string) => {

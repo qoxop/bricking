@@ -17,9 +17,9 @@ import { clear } from '../utils/fs-tools';
 import { getConfigs } from '../utils/config';
 import { rollupConfig } from '../rollup_config';
 import { buildSdk, copySdk, SDKInfo } from './sdk';
-import { REAL_TIME_SDK } from '../rollup-plugins/build-sdk';
+import { compile } from '../utils/compile';
 
-export const buildHtml = (options: {
+export const buildHtml = async (options: {
     sdkInfo: SDKInfo;
     appEntry: string;
     output: string;
@@ -27,31 +27,54 @@ export const buildHtml = (options: {
 }) => {
     const { document } = dom.window;
     let {sdkInfo: { sdkEntry, systemjs, isRemote, realTime }, appEntry, output, cdn } = options;
+    const needInjectLib = !/build-in$/.test(systemjs);
+    const codePath = needInjectLib ?
+        require.resolve('../rollup-plugins/build-sdk/snippets/dynamic-sdk') :
+        require.resolve('../rollup-plugins/build-sdk/snippets/dynamic-sdk-with-lib');
+    
+    // 变基
     if (!isRemote) {
         sdkEntry = url.resolve(cdn, sdkEntry);
         systemjs = url.resolve(cdn, systemjs);
-        appEntry = url.resolve(cdn, appEntry);
     }
-    // 引入 system
-    if (!/build-in/.test(systemjs)) {
+    appEntry = url.resolve(cdn, appEntry);
+
+    // 插入 systemjs
+    if (needInjectLib) {
         const systemScript = document.createElement('script');
         systemScript.src = systemjs;
         document.body.append(systemScript);
     }
     if (realTime) { // 实时 SDK 模块
-        // sdkEntry json 
-        const combineCode = REAL_TIME_SDK(sdkEntry, url.resolve(cdn, appEntry));
-        const hash = createHash("sha256").update([combineCode, 't2dkoi1a'].join(":")).digest("hex").slice(0, 8);
+        // 读取替换
+        const tsCodeStr = fs.readFileSync(codePath, { encoding: 'utf8' })
+            .replace('__dynamic_sdk_json__', JSON.stringify(sdkEntry))
+            .replace('__app_entry__', JSON.stringify(appEntry));
+        // 编译
+        const esCodeStr = await compile(tsCodeStr);
+        // 写入
+        const hash = createHash("sha256").update([esCodeStr, 't2dkoi1a'].join(":")).digest("hex").slice(0, 8);
         const truesdkEntry = NAMES.sdkEntry.replace('[hash]', hash);
-        fs.writeFileSync(path.join(output, truesdkEntry), combineCode);
+        fs.writeFileSync(path.join(output, truesdkEntry), esCodeStr);
+        // 插入
         const sdkScript = document.createElement('script');
         sdkScript.src = url.resolve(cdn, truesdkEntry);
-        sdkScript.type = 'systemjs-module';
+        if (needInjectLib) {
+            sdkScript.type = 'systemjs-module';
+        }
         document.body.append(sdkScript);
     } else { // build_in SDK 模块
-        const startScript = document.createElement('script');
-        startScript.innerHTML = `System.import(${JSON.stringify(sdkEntry)}).then(function(){setTimeout(function(){System.import(${JSON.stringify(appEntry)})}, 10)})`;
-        document.body.append(startScript);
+        if (needInjectLib) {
+            const startScript = document.createElement('script');
+            startScript.innerHTML = `System.import(${JSON.stringify(sdkEntry)}).then(function(){setTimeout(function(){System.import(${JSON.stringify(appEntry)})}, 10)})`;
+            document.body.append(startScript);
+        } else {
+            const [sdkScript, appScript] = [document.createElement('script'), document.createElement('script')];
+            sdkScript.src = sdkEntry;
+            document.body.append(sdkScript);
+            appScript.innerHTML = `System.import(${JSON.stringify(appEntry)})`;
+            document.body.append(appScript);
+        }
     }
     fs.writeFileSync(path.join(output, './index.html'), dom.serialize(), { encoding: 'utf-8' });
 }

@@ -23,6 +23,8 @@ export const serve = (serveSdk = false) => {
     // 启动开发服务器
     devServe.listen(configs.dev.port, () => {
         console.log(colors.green('\nServing!\n'), colors.grey(`- Local: http://${configs.dev.host}:${configs.dev.port}\n`));
-        require('child_process').exec(`${process.platform === 'win32' ? 'start' : 'open'} http://${configs.dev.host}:${configs.dev.port}`);
+        setTimeout(() => {
+            require('child_process').exec(`${process.platform === 'win32' ? 'start' : 'open'} http://${configs.dev.host}:${configs.dev.port}`);
+        }, 2000);
     });
 }

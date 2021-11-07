@@ -1,6 +1,6 @@
 {
   "name": "bricking",
-  "version": "0.0.4",
+  "version": "0.0.7",
   "main": "./index.js",
   "module": "./index.js",
   "license": "MIT",

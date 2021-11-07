@@ -71,6 +71,8 @@ export const start = async () => {
     // 8. 启动开发服务器
     devServe.listen(dev.port, () => {
         console.log(colors.green('\nServing!\n'), colors.grey(`- Local: http://${dev.host}:${dev.port}\n`));
-        require('child_process').exec(`${process.platform === 'win32' ? 'start' : 'open'} http://${dev.host}:${dev.port}`);
+        setTimeout(() => {
+            require('child_process').exec(`${process.platform === 'win32' ? 'start' : 'open'} http://${dev.host}:${dev.port}`);
+        }, 2000);
     });
 }
