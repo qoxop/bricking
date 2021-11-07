@@ -41,7 +41,7 @@ export type SDKJson = {
     md5: string;
     files: string[];
     entry: string;
-    systemjs: string;
+    systemjs: string|'build-in';
     cdnPath?: string;
     zipPath?: string;
 }

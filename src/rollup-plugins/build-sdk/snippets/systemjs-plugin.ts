@@ -81,7 +81,7 @@ g['$_systemjs_tools_'] = {
                 var module = maps[name];
                 if (module) {
                     if (typeof module === 'object' && !('default' in module)) {
-                            module.default = Object.assign({}, module);
+                        module.default = Object.assign({}, module);
                     }
                     dynamic_module_maps[name] = module;
                 }

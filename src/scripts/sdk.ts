@@ -62,7 +62,7 @@ const urlResolve = (source:string, subPath: string) => {
 
 export type SDKInfo = {
     sdkEntry: string;
-    systemjs: string;
+    systemjs: string|'build-in';
     isRemote: boolean;
     realTime?: boolean;
 }

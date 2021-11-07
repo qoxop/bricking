@@ -33,9 +33,11 @@ export const buildHtml = (options: {
         appEntry = url.resolve(cdn, appEntry);
     }
     // 引入 system
-    const systemScript = document.createElement('script');
-    systemScript.src = systemjs;
-    document.body.append(systemScript);
+    if (!/build-in/.test(systemjs)) {
+        const systemScript = document.createElement('script');
+        systemScript.src = systemjs;
+        document.body.append(systemScript);
+    }
     if (realTime) { // 实时 SDK 模块
         // sdkEntry json 
         const combineCode = REAL_TIME_SDK(sdkEntry, url.resolve(cdn, appEntry));
