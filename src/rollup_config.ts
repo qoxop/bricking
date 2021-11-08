@@ -17,6 +17,7 @@ export function rollupConfig(configs: Configs, isApp = true) {
     // 输入配置
     const inputConfig: RollupOptions = {
         preserveEntrySignatures: "exports-only",
+        context: 'window',
         plugins: [
             require('@rollup/plugin-node-resolve').default(),
             require('@rollup/plugin-commonjs')(),
