@@ -11,6 +11,7 @@ import { getSafeId } from '../../utils/hash';
 import { normalizePath } from '../../utils/paths';
 import { STYLE_EXTERNALS_MODULE } from '../../constants';
 import { ExtractedInfo, LoaderContext } from './loaders/types';
+import url from 'url';
 
 /**
  * Recursively get the correct import order from rollup
@@ -173,7 +174,7 @@ export default (options: Options): Plugin => {
         return {
           code,
           map: sourceMap === true && concat.sourceMap,
-          codeFileName: path.join(options.stylesRelative, fileName),
+          codeFileName: url.resolve(options.stylesRelative, fileName),
           mapFileName: path.join(options.stylesRelative, fileName + '.map'),
         }
       }
