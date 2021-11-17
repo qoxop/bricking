@@ -50,6 +50,7 @@ export function rollupConfig(configs: Configs, isApp = true) {
             // 编译 ts
             require('@rollup/plugin-typescript')({
                 tsconfig: configs.tsconfig,
+                ...(prodMode ? {} : { inlineSourceMap: true, inlineSources: true }),
             }),
             ...(configs.minimize && prodMode ? [require('rollup-plugin-terser').terser({ format: {comments: false }})] : [])
         ],
@@ -58,6 +59,7 @@ export function rollupConfig(configs: Configs, isApp = true) {
     const outputConfig: OutputOptions = {
         dir: configs.output,
         format: 'system',
+        sourcemap: prodMode ? false : 'inline',
     }
     return { inputConfig, outputConfig }
 }

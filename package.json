@@ -1,16 +1,15 @@
 {
   "name": "bricking",
-  "version": "0.0.9",
+  "version": "0.1.2",
   "main": "./index.js",
   "module": "./index.js",
   "license": "MIT",
   "bin": "./bin/bricking.js",
   "description": "一个通用的 web module 构建工具，基于 rollup 进行封装，使用systemjs作为模块加载器。",
   "scripts": {
-    "prebuild": "rm -rf ./package",
+    "prebuild": "yarn install && rm -rf ./package",
     "build": "npx tsc",
-    "postbuild": "node fix.js",
-    "deploy": "cd ./package && echo io"
+    "postbuild": "node fix.js"
   },
   "dependencies": {
     "@rollup/plugin-alias": "^3.1.5",

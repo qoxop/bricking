@@ -1,12 +1,9 @@
 /**
  * 开发脚本
  */
-import colors from 'colors';
-import express from 'express';
 import { watch } from 'rollup';
 import alias from '@rollup/plugin-alias';
 import livereload from 'rollup-plugin-livereload';
-import { createProxyMiddleware } from 'http-proxy-middleware';
 import { buildHtml } from './build';
 import { clear } from '../utils/fs-tools';
 import { buildSdk, copySdk, sdkHasChange } from './sdk';
@@ -17,7 +14,7 @@ const customConfig = getConfigs();
 
 const { inputConfig, outputConfig } = rollupConfig(customConfig);
 
-const { tsconfig, base, output, dev, bootstrap } = customConfig;
+const { tsconfig, base, output, bootstrap } = customConfig;
 
 const EntryFileName = 'app.js';
 
@@ -47,32 +44,17 @@ export const start = async () => {
             exclude: ['node_modules/**']
         }
     });
+    
+
+    let started = false
     watcher.on('event', (event) => {
         if (event.code === 'BUNDLE_END') {
             event.result.close();
         }
+        if (event.code === 'END' && !started) {
+            require('./serve').serve(false);
+            started = true;
+        }
     });
-    const devServe = express();
-    // 5. 跨域设置
-    devServe.use((req, res, next) => {
-        res.setHeader('Access-Control-Allow-Credentials', 'true');
-        res.setHeader('Access-Control-Allow-Origin', req.originalUrl);
-        next();
-    });
-    // 6. 静态资源服务
-    devServe.use(express.static(output));
-    // 7. 代理设置
-    if (dev.proxyPath && dev.proxyOption) {
-        devServe.use(
-            dev.proxyPath,
-            createProxyMiddleware(dev.proxyOption)
-        );
-    }
-    // 8. 启动开发服务器
-    devServe.listen(dev.port, () => {
-        console.log(colors.green('\nServing!\n'), colors.grey(`- Local: http://${dev.host}:${dev.port}\n`));
-        setTimeout(() => {
-            require('child_process').exec(`${process.platform === 'win32' ? 'start' : 'open'} http://${dev.host}:${dev.port}`);
-        }, 2000);
-    });
+    
 }

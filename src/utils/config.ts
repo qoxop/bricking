@@ -19,8 +19,15 @@ export const getAliasEntries = (tsconfig: string, base: string) => {
     }
     const entries = {};
     Object.entries(tsPaths).forEach(([key, value]) => {
-        if (!/\*/.test(key) && value[0] && /\.tsx?$/.test(value[0])) {
-            entries[key] = path.join(base, value[0]);
+        let relativePath = value[0];
+        if (/\/\*$/.test(key)) {
+            key = key.replace(/\/\*$/, '');
+        }
+        if (/\/\*$/.test(relativePath)) {
+            relativePath = relativePath.replace(/\/\*$/, '');
+        }
+        if (!entries[key]) {
+            entries[key] = path.join(base, relativePath);
         }
     });
     return entries;
