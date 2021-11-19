@@ -13,7 +13,7 @@ import buildAppPlugin from '../rollup-plugins/build-app';
 import { dom } from '../html';
 import NAMES from '../utils/names';
 import { MODULESJson } from '../types';
-import { clear } from '../utils/fs-tools';
+import { clear, doZip } from '../utils/fs-tools';
 import { getConfigs } from '../utils/config';
 import { rollupConfig } from '../rollup_config';
 import { buildSdk, copySdk, SDKInfo } from './sdk';
@@ -126,9 +126,8 @@ export const build = async (app = false) => {
     );
     // 6. 打 zip 包
     if (pack) {
-        await require('zip-dir')(configs.output, {
-            saveTo: path.join(configs.output, moduleInfo.zipPath),
-        });
+        const prefix = typeof pack === 'string' ? pack : configs.name;
+        await doZip(configs.output, prefix.replace(/^\//, ''), path.join(configs.output, moduleInfo.zipPath));
     }
     // 7. 构建完整应用
     if (app) {

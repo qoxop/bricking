@@ -4,8 +4,42 @@ import path from 'path';
 import colors from 'colors';
 import _copy from 'copy';
 import yauzl from 'yauzl';
+import yazl from 'yazl';
 
-export function unzip(zipPath:string, to: string): Promise<void> {
+
+function fileIterator(dir: string, base: string, callback: (paths: { absolute: string; relative: string }, buff: Buffer) => void) {
+    const files = fs.readdirSync(dir, { withFileTypes: true }) || [];
+    files.forEach(item => {
+        const absolute = path.join(dir, item.name);
+        const relative = path.join(base, item.name)
+        if (item.isFile()) {
+            const buff = fs.readFileSync(path.join(dir, item.name));
+            return callback({ absolute, relative }, buff);
+        }
+        if (item.isDirectory()) {
+            fileIterator(absolute, relative, callback);
+        }
+    });
+}
+
+export function doZip(dir: string, prefix: string, output: string) {
+    return new Promise<void>((resolve, reject) => {
+        const zipFile = new yazl.ZipFile();
+        zipFile.outputStream.pipe(fs.createWriteStream(output)).on("close", () => {
+            console.log('📦 打包成功～')
+            resolve()
+        }).on('error', (err) => {
+            console.error('📦 打包出错～');
+            reject(err);
+        });
+        fileIterator(dir, prefix, ({ relative }, buff) => {
+            zipFile.addBuffer(buff, relative);
+        });
+        zipFile.end();
+    });
+}
+
+export function unZip(zipPath:string, to: string): Promise<void> {
     const rootName = path.parse(zipPath).name;
     const getFilePath  = (_fileName: string) => {
         const fileName = _fileName.replace(`${rootName}/`, '');

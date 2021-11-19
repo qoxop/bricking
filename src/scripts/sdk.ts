@@ -10,7 +10,7 @@ import { resolve, parse } from 'path';
 import { getConfigs } from '../utils/config';
 import { rollupConfig } from '../rollup_config';
 import { download, getJson } from '../utils/network';
-import { copy, clear, unzip } from '../utils/fs-tools';
+import { copy, clear, unZip, doZip } from '../utils/fs-tools';
 import sdkPlugin, { InputName, GetMd5 } from '../rollup-plugins/build-sdk';
 import { STYLE_EXTERNALS_MODULE } from '../constants';
 
@@ -97,7 +97,7 @@ export async function buildSdk(force = false):Promise<SDKInfo> {
                     }
                     await download(downloadUrl, zipFilePath);
                 }
-                await unzip(zipFilePath, output);
+                await unZip(zipFilePath, output);
                 return {
                     // 本地相对路径
                     isRemote: false,
@@ -154,9 +154,7 @@ export async function buildSdk(force = false):Promise<SDKInfo> {
             });
             // 6. 打包zip包📦
             if (sdk.pack) {
-                await require('zip-dir')(location, {
-                    saveTo: resolve(sdk.location, SDKInfo.zipPath),
-                });
+                await doZip(sdk.location, '', resolve(sdk.location, SDKInfo.zipPath))
             }
         } else {
             SDKInfo = require(resolve(sdk.location, `./${NAMES.sdkInfo}`))

@@ -35,7 +35,7 @@ export type ASSETSConfig = {
 export type PRODConfig = {
     cdn: string;
     version: string;
-    pack: boolean;
+    pack: boolean | string;
 }
 export type SDKJson = {
     md5: string;
