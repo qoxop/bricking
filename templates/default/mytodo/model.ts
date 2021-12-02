@@ -11,12 +11,12 @@ export namespace TodoModel {
 }
 
 export interface InitialState {
-    todos: { [k: string]: TodoModel.TodoItem },
+    todos: TodoModel.TodoItem[],
     filter: TodoModel.FilterType,
 }
 
 const initialState:InitialState = {
-    todos: {},
+    todos: [],
     filter: 'all',
 }
 
@@ -26,16 +26,16 @@ const { actions, reducer, getState, useModel } =  createModel({
     reducers: {
         addTodo(state, action: PayloadAction<TodoModel.TodoItem>) {
             const { payload } = action;
-            state.todos[payload.id] = payload;
+            state.todos.push(payload);
         },
         toggleTodo(state, action: PayloadAction<string>) {
             const { payload } = action;
-            const finished = state.todos[payload].finished;
-            state.todos[payload].finished = !finished;
+            const todo = state.todos.find(item => item.id === payload)
+            todo.finished = !todo.finished;
         },
         delTodo(state, action: PayloadAction<string>) {
             const { payload } = action;
-            delete state.todos[payload];
+            state.todos = state.todos.filter(item => item.id !== payload);
         },
         setFilter(state, action: PayloadAction<TodoModel.FilterType>) {
             state.filter = action.payload;

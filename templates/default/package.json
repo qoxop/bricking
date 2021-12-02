@@ -6,8 +6,7 @@
   "scripts": {
     "dump": "yarn install && npm-install-peers",
     "build": "bricking build",
-    "build-all": "bricking build --app",
-    "build-sdk": "bricking build --sdk",
+    "sdk": "bricking build --sdk",
     "serve": "bricking serve",
     "dev": "bricking dev"
   },
@@ -15,11 +14,11 @@
     "@types/react": "^17.0.28",
     "@types/react-dom": "^17.0.9",
     "@types/redux": "^3.6.0",
-    "npm-install-peers": "^1.2.2",
-    "bricking": "*"
+    "bricking": "*",
+    "npm-install-peers": "^1.2.2"
   },
   "peerDependencies": {
-    "react-ducky": "^0.0.1",
+    "react-ducky": "^0.0.8",
     "immer": "^9.0.6",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
