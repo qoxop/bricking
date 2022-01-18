@@ -16,7 +16,6 @@
 
 ## 二、使用文档
 
-[接入文档](https://confluence.myscrm.cn/pages/viewpage.action?pageId=23664798)
 
 ## 三、为什么要进行微模块化改造
 
