@@ -43,5 +43,3 @@ Extractor.invoke(
 );
 
 del.sync(tempdir);
-
-
