@@ -10,13 +10,13 @@ import yazl from 'yazl';
 
 /**
  * 遍历目录中的文件
- * @param absoluteDir 需要进行遍历的目录的绝对路径
- * @param relativeDir 相对路径(保存其路径结构)
+ * @param absoluteDir - 需要进行遍历的目录的绝对路径
+ * @param relativeDir - 相对路径(保存其路径结构)
  *  ./
  *  ./a
  *  ./a/b
  *  ./a/b/c
- * @param callback 回调函数
+ * @param callback - 回调函数
  */
 function fileIterator(
     absoluteDir: string,
@@ -39,9 +39,9 @@ function fileIterator(
 
 /**
  * 文件转化并传输
- * @param from 来源
- * @param to 目的地
- * @param transform 转化方法
+ * @param from - 来源
+ * @param to - 目的地
+ * @param transform - 转化方法
  * @returns 
  */
 function filesTransfer(
@@ -51,7 +51,7 @@ function filesTransfer(
 ): Promise<any> {
     const items = fs.readdirSync(from, { withFileTypes: true });
     if (!fs.existsSync(to)) fs.mkdirSync(to);
-    const ps = [];
+    const ps:Promise<any>[] = [];
     for (const item of items) {
         const fromPath = path.join(from, item.name);
         const toPath = path.join(to, item.name);

@@ -4,7 +4,7 @@ import { JSDOM } from 'jsdom';
 
 /**
  * 获取工作目录下的 index.html 文档对象
- * @param workspace
+ * @param workspace - 工作空间
  * @returns 
  */
 const getIndexDom = (workspace?: string) => new JSDOM(fs.readFileSync(path.join(workspace || process.cwd(), 'index.html'), 'utf8'));
@@ -21,9 +21,9 @@ type Script = {
 }
 /**
  * 在文档对象上插入脚本标签
- * @param dom
- * @param scripts
- * @param output 
+ * @param dom - jsdom 对象
+ * @param scripts - 脚本信息
+ * @param output - 输出路径
  * @returns
  */
 function injectScripts(dom: any, scripts: Script[], output?: string, ) {
@@ -37,7 +37,7 @@ function injectScripts(dom: any, scripts: Script[], output?: string, ) {
             script.innerHTML = item.content;
         }
         if (item.props) {
-            Object.keys(item.props).forEach(key => script.setAttribute(key, item.props[key]));
+            Object.keys(item.props).forEach(key => script.setAttribute(key, (item.props as any)[key]));
         }
         document.body.append(script);
     });
@@ -49,4 +49,8 @@ function injectScripts(dom: any, scripts: Script[], output?: string, ) {
 export {
     getIndexDom,
     injectScripts,
+}
+
+export type {
+    Script
 }

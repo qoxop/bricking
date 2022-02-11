@@ -8,7 +8,7 @@ import https from 'https';
 
 /**
  * JSON 文件信息获取，支持本地、http、https
- * @param jsonUrl
+ * @param jsonUrl json 文件的url
  * @returns 
  */
 function getJson<T = any>(jsonUrl: string):Promise<T> {
@@ -32,7 +32,7 @@ function getJson<T = any>(jsonUrl: string):Promise<T> {
                 try {
                     const parsedData = JSON.parse(rawData);
                     resolve(parsedData);
-                } catch (e) {
+                } catch (e:any) {
                     reject(e.message);
                 }
             });
@@ -43,8 +43,8 @@ function getJson<T = any>(jsonUrl: string):Promise<T> {
 
 /**
  * 文件下载
- * @param downloadUrl 
- * @param to 
+ * @param downloadUrl 下载链接
+ * @param to 存放的目录
  * @returns 
  */
 function download(downloadUrl:string, to: string): Promise<string> {
@@ -55,7 +55,7 @@ function download(downloadUrl:string, to: string): Promise<string> {
         const url = new URL(downloadUrl);
         const client = /https/.test(url.protocol) ? https : http;
         const req = client.request(url, req => {
-            const chunks = [];
+            const chunks:any[] = [];
             req.on('data', (data) => chunks.push(data));
             req.on('end', () => {
                 fs.writeFile(to, Buffer.concat(chunks), err => {

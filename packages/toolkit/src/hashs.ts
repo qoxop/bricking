@@ -8,23 +8,23 @@ import { fileIterator } from "./files"
 
 /**
  * 获取数据的 hash 值
- * @param data
- * @param other 
+ * @param data 数据
+ * @param other 其他
  * @returns 
  */
 const getHash = (data: any, ...other:any[]) => createHash("sha256").update([data, 'yt7RWop1a',...other].join(":")).digest("hex").slice(0, 8);
 
 /**
  * 安全地获取 ID 字符串
- * @param data 
- * @param id 
+ * @param data 数据
+ * @param id id字符串
  * @returns 
  */
 const getSafeId = (data: any, id: string) => makeLegalIdentifier(`${id}_${getHash(data, id)}`);
 
 /**
  * 获取整个目录的 MD5 值
- * @param dir
+ * @param dir 目录路径
  * @returns
  */
 const getDirMd5 = (dir: string) => {
