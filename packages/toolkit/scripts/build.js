@@ -3,6 +3,8 @@ const { Extractor, ExtractorConfig } = require("@microsoft/api-extractor");
 const ts = require('typescript');
 const del = require('del')
 
+del(path.resolve(__dirname, '../dist'));
+
 // bundle
 require("esbuild").build({
     entryPoints: [path.resolve(__dirname,'../index.ts')],
