@@ -1,4 +1,6 @@
-// type Storage = typeof localStorage | typeof sessionStorage
+/**
+ * 用于替代原生的 Storage，增加隔离功能和自动解析功能
+ */
 declare const process: {
     env: any,
     [k: string]: any

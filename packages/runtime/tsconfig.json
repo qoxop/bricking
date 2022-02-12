@@ -1,17 +1,15 @@
 {
-    "include": [
-        "src",
-    ],
+    "included": ["**/*"],
     "compilerOptions": {
         "outDir": "dist",
-        "module": "CommonJS",
+        "module": "ES6",
         "moduleResolution": "Node",
         "strict": true,
         "declaration": true,
-        "sourceMap": true,
+        "sourceMap": false,
         "noUnusedLocals": true,
         "esModuleInterop": true,
-        "skipLibCheck": true,
-        "noImplicitAny": false
+        "noImplicitAny": false,
+        "lib": ["ES2018", "dom"]
     }
 }

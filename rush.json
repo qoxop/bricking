@@ -392,6 +392,11 @@
     {
       "packageName": "@bricking/toolkit",
       "projectFolder": "packages/toolkit"
+    },
+    {
+      "packageName": "@bricking/runtime",
+      "projectFolder": "packages/runtime",
+      "publishFolder": "dist"
     }
     // {
     //   /**
