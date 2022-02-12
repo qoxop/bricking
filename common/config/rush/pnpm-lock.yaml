@@ -5,6 +5,17 @@ importers:
   .:
     specifiers: {}
 
+  ../../packages/runtime:
+    specifiers:
+      '@types/systemjs': ^6.1.1
+      systemjs: ^6.12.1
+      typescript: ^4.5.5
+    dependencies:
+      '@types/systemjs': 6.1.1
+      systemjs: 6.12.1
+    devDependencies:
+      typescript: 4.5.5
+
   ../../packages/toolkit:
     specifiers:
       '@microsoft/api-extractor': ^7.19.4
@@ -175,6 +186,10 @@ packages:
 
   /@types/node/17.0.17:
     resolution: {integrity: sha512-e8PUNQy1HgJGV3iU/Bp2+D/DXh3PYeyli8LgIwsQcs1Ar1LoaWHSIT6Rw+H2rNJmiq6SNWiDytfx8+gYj7wDHw==}
+
+  /@types/systemjs/6.1.1:
+    resolution: {integrity: sha512-d1M6eDKBGWx7RbYy295VEFoOF9YDJkPI959QYnmzcmeaV+SP4D0xV7dEh3sN5XF3GvO3PhGzm+17Z598nvHQuQ==}
+    dev: false
 
   /abab/2.0.5:
     resolution: {integrity: sha512-9IK9EadsbHo6jLWIpxpR6pL0sazTXV6+SQv25ZB+F7Bj9mJNaOc4nCRabwd5M/JwmUa8idz6Eci6eKfJryPs6Q==}
@@ -1853,6 +1868,10 @@ packages:
 
   /symbol-tree/3.2.4:
     resolution: {integrity: sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==}
+    dev: false
+
+  /systemjs/6.12.1:
+    resolution: {integrity: sha512-hqTN6kW+pN6/qro6G9OZ7ceDQOcYno020zBQKpZQLsJhYTDMCMNfXi/Y8duF5iW+4WWZr42ry0MMkcRGpbwG2A==}
     dev: false
 
   /terser/5.10.0:
