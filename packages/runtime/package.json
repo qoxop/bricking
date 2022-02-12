@@ -1,0 +1,15 @@
+{
+  "name": "@bricking/runtime",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc "
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/systemjs": "^6.1.1",
+    "systemjs": "^6.12.1"
+  }
+}

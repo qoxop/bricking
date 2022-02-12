@@ -1,0 +1,17 @@
+{
+    "include": [
+        "src",
+    ],
+    "compilerOptions": {
+        "outDir": "dist",
+        "module": "CommonJS",
+        "moduleResolution": "Node",
+        "strict": true,
+        "declaration": true,
+        "sourceMap": true,
+        "noUnusedLocals": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "noImplicitAny": false
+    }
+}

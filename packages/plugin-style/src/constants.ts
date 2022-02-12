@@ -1,0 +1,5 @@
+const STYLE_EXTERNALS_MODULE = '___INJECT_STYLE_LINK___';
+
+export {
+    STYLE_EXTERNALS_MODULE
+}
