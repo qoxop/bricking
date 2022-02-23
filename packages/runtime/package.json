@@ -3,17 +3,18 @@
   "version": "1.0.0",
   "description": "bricking 运行时",
   "main": "index.js",
+  "typings": "index.d.ts",
+  "publishConfig": {
+    "directory": "dist"
+  },
   "scripts": {
-    "build": "run-s prepare && tsc",
-    "prepare": "del dist && cpy 'src/global.d.ts' 'package.json' dist"
+    "build": "run-s prebuild && tsc",
+    "prebuild": "del dist && cpy 'src/global.d.ts' 'package.json' dist"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@types/systemjs": "^6.1.1",
     "systemjs": "^6.12.1"
-  },
-  "devDependencies": {
-    "typescript": "^4.5.5"
   }
 }

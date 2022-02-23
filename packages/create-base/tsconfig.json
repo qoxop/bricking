@@ -1,0 +1,20 @@
+{
+    "included": ["**/**/*"],
+    "compilerOptions": {
+        "outDir": "dist",
+        "target": "ES2018",
+        "module": "CommonJS",
+        "moduleResolution": "Node",
+        "strict": true,
+        "declaration": true,
+        "sourceMap": false,
+        "noUnusedLocals": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "noImplicitAny": false
+    },
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}

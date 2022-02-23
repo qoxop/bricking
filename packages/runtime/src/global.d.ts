@@ -2,14 +2,16 @@
 
 declare type TPromiseFn<MT = any> = () => Promise<MT>;
 declare type TImportMaps = Record<string, string>;
-declare type TCustomModuleMaps = Record<string, any|TPromiseFn>;
+declare type TCustomModuleMaps = Record<string, any>;
+declare type TDynamicModuleMaps = Record<string, TPromiseFn>;
 declare type TMetaDataMaps = Record<string, any>;
 
 /**
  * 模块管理对象
  */
 declare type IModuleManager = {
-    inject(maps: TCustomModuleMaps, force?: boolean): void;
+    set(maps: TCustomModuleMaps, force?: boolean): void;
+    setDynamic(maps: TDynamicModuleMaps, force?: boolean): void;
     extendImportMaps(maps: TImportMaps, force?: boolean): void;
     setMetadata(id: string, data: Record<string, any>): void;
     CSS_LINK_MODULE_PATTERN: RegExp;

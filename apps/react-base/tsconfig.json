@@ -1,0 +1,16 @@
+{
+    "included": ["**/*"],
+    "compilerOptions": {
+        "baseUrl": ".",
+        "outDir": "dist",
+        "module": "ES6",
+        "moduleResolution": "Node",
+        "strict": true,
+        "declaration": true,
+        "sourceMap": false,
+        "noUnusedLocals": true,
+        "esModuleInterop": true,
+        "noImplicitAny": false,
+        "lib": ["ES2018", "dom"]
+    }
+}

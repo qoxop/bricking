@@ -3,6 +3,8 @@
  */
 import "systemjs/dist/system.min.js";
 
+const is_async_flag = 'Symbol' in window ? Symbol('is_async_flag') : '$__is_async_flag__';
+
 // create module manager
 const moduleManager = (() => {
     /** 拓展 systemjs 的 import-maps */
@@ -67,7 +69,7 @@ const moduleManager = (() => {
     System.constructor.prototype.instantiate = function (url: string, firstParentUrl?: string) {
         if (CUSTOM_MODULE_MAPS && CUSTOM_MODULE_MAPS[url]) {
             return new Promise(function (resolve, reject) {
-                if (typeof CUSTOM_MODULE_MAPS[url] === 'function') { // 异步模块
+                if (CUSTOM_MODULE_MAPS[url][is_async_flag]) { // 异步模块
                     CUSTOM_MODULE_MAPS[url]().then((m: any) => resolve(getVarRegister(m))).catch(reject);
                 } else { // 同步模块
                     resolve(getVarRegister(CUSTOM_MODULE_MAPS[url]));
@@ -103,7 +105,7 @@ const moduleManager = (() => {
 
     const register = {
         /** 注入自定义模块 */
-        inject(maps:TCustomModuleMaps, force = true) {
+        set(maps:TCustomModuleMaps, force = true) {
             Object.keys(maps).forEach(name => {
                 if (force || !CUSTOM_MODULE_MAPS[name]) {
                     var module = maps[name];
@@ -116,7 +118,18 @@ const moduleManager = (() => {
                 }
             })
         },
-        /** 拓展 systemjs 的 importmap  */
+        setDynamic(maps: TDynamicModuleMaps, force = true) {
+            Object.keys(maps).forEach(name => {
+                if (force || !CUSTOM_MODULE_MAPS[name]) {
+                    var module = maps[name];
+                    if (module) {
+                        module[is_async_flag] = true;
+                        CUSTOM_MODULE_MAPS[name] = module;
+                    }
+                }
+            })
+        },
+        /** 拓展 systemjs 的 import map  */
         extendImportMaps(maps:TImportMaps, force = true) {
             Object.keys(maps).forEach(name => {
                 if (force || !IMPORT_MAPS[name]) {

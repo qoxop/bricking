@@ -4,17 +4,12 @@
   "description": "",
   "main": "dist/index.js",
   "typings": "dist/index.d.js",
+  "files": ["dist"],
   "scripts": {
     "build": "node ./scripts/build.js"
   },
-  "files": ["dist"],
-  "author": "",
+  "author": "张集伟",
   "license": "ISC",
-  "devDependencies": {
-    "@microsoft/api-extractor": "^7.19.4",
-    "@types/node": "^17.0.16",
-    "esbuild": "^0.14.21"
-  },
   "dependencies": {
     "@rollup/pluginutils": "^4.1.2",
     "cpy": "^8.1.2",
