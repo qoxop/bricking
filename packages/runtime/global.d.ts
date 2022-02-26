@@ -1,15 +1,13 @@
-/// <reference types="@types/systemjs" />
-
-declare type TPromiseFn<MT = any> = () => Promise<MT>;
-declare type TImportMaps = Record<string, string>;
-declare type TCustomModuleMaps = Record<string, any>;
-declare type TDynamicModuleMaps = Record<string, TPromiseFn>;
-declare type TMetaDataMaps = Record<string, any>;
+type TPromiseFn<MT = any> = () => Promise<MT>;
+type TImportMaps = Record<string, string>;
+type TCustomModuleMaps = Record<string, any>;
+type TDynamicModuleMaps = Record<string, TPromiseFn>;
+type TMetaDataMaps = Record<string, any>;
 
 /**
  * 模块管理对象
  */
-declare type IModuleManager = {
+type IModuleManager = {
     set(maps: TCustomModuleMaps, force?: boolean): void;
     setDynamic(maps: TDynamicModuleMaps, force?: boolean): void;
     extendImportMaps(maps: TImportMaps, force?: boolean): void;
@@ -18,7 +16,10 @@ declare type IModuleManager = {
     CSS_LINK_MODULE_STRING: string;
 }
 
-declare const $bricking: {
+/**
+ * Bricking 对象
+ */
+type TBricking = {
     /**
      * 运行时插入 css 代码
      * @param cssString - Css 代码字符串
@@ -36,4 +37,14 @@ declare const $bricking: {
         }
     ) => true | undefined;
     readonly mm: IModuleManager;
+    readonly createStorage: (store: Storage, prefixKey: string) => {
+        getItem(key: string): string | null;
+        setItem(key: string, value: string): void;
+        getObj<T extends Object>(key: string): T | null;
+        setObj<T extends Object>(key: string, value: T): void;
+        removeItem(key: string): void;
+        clear(): void;
+    }
 };
+
+interface Window { $bricking: TBricking; }

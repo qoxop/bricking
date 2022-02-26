@@ -8,10 +8,9 @@
     "directory": "dist"
   },
   "scripts": {
-    "build": "run-s prebuild && tsc",
-    "prebuild": "del dist && cpy 'src/global.d.ts' 'package.json' dist"
+    "build": "node ./scripts/build.js"
   },
-  "author": "",
+  "author": "张集伟",
   "license": "ISC",
   "dependencies": {
     "@types/systemjs": "^6.1.1",

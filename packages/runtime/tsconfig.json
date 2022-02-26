@@ -1,5 +1,6 @@
 {
-    "included": ["**/*"],
+    "include": ["src/*", "index.ts", "global.d.ts"],
+    "exclude": ["node_module", "dist"],
     "compilerOptions": {
         "outDir": "dist",
         "module": "ES6",
@@ -10,6 +11,7 @@
         "noUnusedLocals": true,
         "esModuleInterop": true,
         "noImplicitAny": false,
-        "lib": ["ES2018", "dom"]
+        "lib": ["ES2018", "dom"],
+        "typeRoots": ["node_module/@types"]
     }
 }
