@@ -1,4 +1,5 @@
 /// <reference types="systemjs" />
+import 'systemjs/dist/system.js';
 
 const is_async_flag = 'Symbol' in window ? Symbol('is_async_flag') : '$__is_async_flag__';
 
