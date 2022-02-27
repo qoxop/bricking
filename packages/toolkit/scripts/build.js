@@ -15,13 +15,13 @@ require("esbuild").build({
     outfile: path.resolve(__dirname, '../dist/index.js'),
 });
 
-const tempdir = path.posix.resolve(__dirname, '../temp');
+const tempDir = path.posix.resolve(__dirname, '../temp');
 
 // generate .d.ts
 ts.createProgram({
     rootNames: [path.resolve(__dirname, '../index.ts')],
     options: {
-        outDir: tempdir,
+        outDir: tempDir,
         emitDeclarationOnly: true,
         esModuleInterop: true,
         declaration: true,
@@ -42,4 +42,4 @@ Extractor.invoke(
     }
 );
 
-del.sync(tempdir);
+del.sync(tempDir);

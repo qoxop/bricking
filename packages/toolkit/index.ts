@@ -5,6 +5,7 @@ import * as btkFunc from './src/functions';
 import * as btkHash from './src/hashs';
 import * as btkNetwork from './src/networks';
 import * as btkPath from './src/paths';
+import * as btkType from './src/type';
 
 export {
     btkCompile,
@@ -14,4 +15,5 @@ export {
     btkHash,
     btkNetwork,
     btkPath,
+    btkType,
 }
