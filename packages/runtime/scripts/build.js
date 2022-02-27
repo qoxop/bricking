@@ -1,6 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 const del = require("del");
+const ts = require('typescript');
 
 const DistDir = path.resolve(__dirname, '../dist/');
 
@@ -9,23 +10,23 @@ del.sync(DistDir);
 if (!fs.existsSync(DistDir)) fs.mkdirSync(DistDir);
 
 // bundle
-require("esbuild").build({
-    entryPoints: [path.resolve(__dirname,'../index.ts')],
-    bundle: true,
-    platform: 'browser',
-    target: 'esnext',
-    format: 'esm',
-    minify: true,
-    outfile: path.resolve(__dirname, '../dist/index.js'),
-});
+ts.createProgram({
+    rootNames: [path.resolve(__dirname, '../index.ts')],
+    options: {
+        outDir: DistDir,
+        emitDeclarationOnly: false,
+        esModuleInterop: true,
+        declaration: true,
+        skipLibCheck: true
+    }
+}).emit();
 
 // create package.json
 const packageJson = require('../package.json');
 delete packageJson.publishConfig;
 delete packageJson.scripts;
-delete packageJson.dependencies.systemjs;
 fs.writeFileSync(
-    path.resolve(__dirname, '../dist/package.json'),
+    path.resolve(DistDir, './package.json'),
     JSON.stringify(packageJson, null, '\t')
 );
 
@@ -35,6 +36,6 @@ const globalDeclareTypes = `declare global {\n
 ${tabLine(fs.readFileSync(path.resolve(__dirname, '../global.d.ts'),'utf8'))}
 \n}`
 fs.writeFileSync(
-    path.resolve(__dirname, '../dist/index.d.ts'),
+    path.resolve(DistDir, './index.d.ts'),
     `/// <reference types="systemjs" />\n\nimport "systemjs";\n\n${globalDeclareTypes}`
 );

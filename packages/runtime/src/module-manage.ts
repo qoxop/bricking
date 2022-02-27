@@ -1,5 +1,5 @@
 /// <reference types="systemjs" />
-import 'systemjs/dist/system.js';
+import 'systemjs/dist/s.js';
 
 const is_async_flag = 'Symbol' in window ? Symbol('is_async_flag') : '$__is_async_flag__';
 
@@ -10,7 +10,7 @@ const IMPORT_MAPS:TImportMaps = {};
 const CUSTOM_MODULE_MAPS:TCustomModuleMaps = {};
 
 /** 元数据暂存对象 */
-const META_DATA_MAPS:TMetaDataMaps = {}
+const META_DATA_MAPS:TMetaDataMaps = {};
 
 /** 原始的模块ID处理函数 */
 const ORIGIN_RESOLVE = System.constructor.prototype.resolve;
