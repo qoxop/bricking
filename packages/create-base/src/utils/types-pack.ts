@@ -2,31 +2,35 @@ import fs from "fs";
 import path from "path";
 import { btkType, btkFile } from "@bricking/toolkit/dist";
 
-import { paths } from "../../src/paths";
 import { excludePackages } from "./constants";
-import { getUserOptions } from "../../src/options";
+import { getUserOptions } from "../options";
+import { getPackageJson, paths } from "../paths";
+
+
 
 export default () => {
-    const cwd = process.cwd();
     const { bundle } = getUserOptions();
-    let { defines = {}, output = './types' } = bundle.moduleDefines;
+    let hasIndex = false;
+    let { 
+        defines = {},
+        output = './types'
+    } = bundle.moduleDefines;
+
     if (!path.isAbsolute(output)) {
-        output = path.resolve(cwd, output);
+        output = path.resolve(paths.workspace, output);
     }
     btkFile.del.sync(output);
-    let hasIndex = false;
+
     Object.entries(defines).forEach(([key, value]) => {
         hasIndex = key === 'index';
         btkType.createTypeDefine({
-            input: path.isAbsolute(value) ? value : path.resolve(cwd, value),
+            input: path.isAbsolute(value) ? value : path.resolve(paths.workspace, value),
             output: path.resolve(output, `${key}.d.ts`),
-            cwd,
+            cwd: paths.workspace,
         })
     });
-    if (!fs.existsSync(paths.packageJson)) {
-        throw new Error(`${paths.packageJson} 不存在～`);
-    }
-    const packageObj = require(paths.packageJson);
+    
+    const packageObj = getPackageJson();
     delete packageObj.scripts;
     delete packageObj.publishConfig;
     delete packageObj.devDependencies;
@@ -48,6 +52,9 @@ export default () => {
 
     if (hasIndex) {
         packageObj.types = 'index.d.ts';
+    }
+    if (!fs.existsSync(output)) {
+        fs.mkdirSync(output, { recursive: true });
     }
     fs.writeFileSync(
         path.resolve(output, './package.json'),

@@ -7,6 +7,7 @@ import path from 'path';
 import copy from 'cpy';
 import yauzl from 'yauzl';
 import yazl from 'yazl';
+import tar from 'tar';
 
 /**
  * 遍历目录中的文件
@@ -93,12 +94,31 @@ class Zipper {
     /**
      * 输出 zip 包
      */
-    finish = () => {
-        return new Promise<void>((resolve, reject) => {
-            this.zipFile.outputStream.pipe(fs.createWriteStream(this.output))
+    finish = (buffArr?: any[]) => {
+        return new Promise<void|Buffer>((resolve, reject) => {
+            if (buffArr && buffArr instanceof Array) {
+                this.zipFile.outputStream.on("data", (buf) => buffArr.push(buf));
+                this.zipFile.outputStream.on("end", () => resolve(Buffer.concat(buffArr)));
+            } else {
+                this.zipFile.outputStream.pipe(fs.createWriteStream(this.output))
                 .on("close", resolve)
                 .on('error', reject);
+            }
             this.zipFile.end();
+        });
+    }
+    static tarFolder<T extends string | any[]>(folder: string, dist: T) {
+        return new Promise((resolve, reject) => {
+            if (typeof dist === 'string') {
+                tar.c({ gzip: true, file: dist, }, [folder])
+                    .then(resolve)
+                    .catch(reject);
+            } else {
+                tar.c({ gzip: true }, [folder])
+                    .on("data", (buff) => dist.push(buff))
+                    .on("end", () => resolve(Buffer.concat(dist)))
+                    .on("error", reject);
+            }
         });
     }
     /**

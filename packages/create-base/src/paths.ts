@@ -26,7 +26,7 @@ const paths = {
 };
 
 const getCustomWebpackPath = () => {
-    let { bundle: { webpack: customWebpackPath }} = getUserOptions();
+    let { bundle: { webpack: customWebpackPath }} = userOptions;
     if (!customWebpackPath) {
         return false;
     }
@@ -42,10 +42,19 @@ const getPackageJson = () => {
     }
     return require(paths.packageJson);
 }
+const reloadOptions = () => {
+    const cacheKey = require.resolve(paths.brickingrc);
+    if (require.cache[cacheKey]) {
+        delete require.cache[cacheKey];
+        require(paths.brickingrc);
+    }
+    return getUserOptions();
+}
 
 export {
     paths,
     workspace,
+    reloadOptions,
     getPackageJson,
-    getCustomWebpackPath
+    getCustomWebpackPath,
 }

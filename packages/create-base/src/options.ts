@@ -68,7 +68,8 @@ const { getUserOptions, updateOptions } = (() => {
     const updateOptions = (options: PartialAll<typeof userOptions>) => {
         const origin = defaultOption();
         deepMerge(origin, options, 4);
-        return userOptions = origin;
+        userOptions = origin;
+        return userOptions;
     }
     return {
         getUserOptions: () => userOptions,

@@ -1,8 +1,7 @@
 /**
  * 入口代码生成
  */
-import { getPackageJson, paths } from '../paths';
-import { getUserOptions } from '../options';
+import { getPackageJson, reloadOptions } from '../paths';
 import { excludePackages } from './constants';
 
 module.exports = function(source) {
@@ -51,12 +50,3 @@ module.exports = function(source) {
     console.log(source);
     return source;
 };
-
-
-const reloadOptions = () => {
-    const cacheKey = require.resolve(paths.brickingrc,);
-    if (require.cache[cacheKey]) {
-        delete require.cache[cacheKey];
-    }
-    return getUserOptions();
-}
