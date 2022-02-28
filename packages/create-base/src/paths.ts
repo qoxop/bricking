@@ -3,23 +3,49 @@
  */
 import * as fs from 'fs';
 import * as path from 'path';
-
 import { getUserOptions } from './options';
 
-const userOptions = getUserOptions()
-const workspace = fs.realpathSync(userOptions.cwd);
-const resolvePath = relativePath => path.resolve(workspace, relativePath);
+const workspace = process.cwd();
 
-export const paths = {
+const userOptions = getUserOptions();
+
+const resolvePath = (relativePath: string) => path.resolve(workspace, relativePath);
+
+const paths = {
     workspace,
     tsconfig: resolvePath('tsconfig.json'),
     jsconfig: resolvePath('jsconfig.json'),
-    packageJson: resolvePath('package.json'),
-    baseIndexTs: resolvePath('index.ts'),
     outputPath: resolvePath(userOptions.output),
-    webpackCache: resolvePath('node_modules/.cache'),
+    packageJson: resolvePath('package.json'),
     babelConfig: resolvePath('babel.config.js'),
-    postcssConfig: resolvePath('postcss.config.js'),
+    baseIndexTs: resolvePath(userOptions?.bundle?.entry || 'index.ts'),
+    webpackCache: resolvePath('node_modules/.cache'),
     browserslist: resolvePath('.browserslistrc'),
-    baseOptions: resolvePath('.baseOptions.ts'),
+    postcssConfig: resolvePath('postcss.config.js'),
+    brickingrc: process.env.BRICKING_RC,
+};
+
+const getCustomWebpackPath = () => {
+    let { bundle: { webpack: customWebpackPath }} = getUserOptions();
+    if (!customWebpackPath) {
+        return false;
+    }
+    if (!path.isAbsolute(customWebpackPath)) {
+        customWebpackPath = path.resolve(workspace, customWebpackPath);
+    }
+    return fs.existsSync(customWebpackPath) ? customWebpackPath : false;
+}
+
+const getPackageJson = () => {
+    if (!fs.existsSync(paths.packageJson)) {
+        throw new Error(`${paths.packageJson} 不存在 ～`);
+    }
+    return require(paths.packageJson);
+}
+
+export {
+    paths,
+    workspace,
+    getPackageJson,
+    getCustomWebpackPath
 }

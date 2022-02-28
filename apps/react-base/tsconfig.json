@@ -1,16 +1,23 @@
 {
-    "included": ["**/*"],
+    "included": ["src/**/*", "*.ts"],
     "compilerOptions": {
         "baseUrl": ".",
         "outDir": "dist",
-        "module": "ES6",
+        "module": "esnext",
         "moduleResolution": "Node",
+        "emitDeclarationOnly": true,
         "strict": true,
         "declaration": true,
         "sourceMap": false,
         "noUnusedLocals": true,
         "esModuleInterop": true,
         "noImplicitAny": false,
-        "lib": ["ES2018", "dom"]
-    }
+        "jsx":"react",
+        "lib": ["ES2018", "dom"],
+        "typeRoots": ["node_module/@bricking/runtime", "node_module/@types"],
+    },
+    "exclude": [
+        "node_module",
+        "build"
+    ]
 }

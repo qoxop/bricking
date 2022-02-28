@@ -1,6 +1,7 @@
 {
-    "included": ["**/**/*"],
+    "included": ["src/**/*"],
     "compilerOptions": {
+        "baseUrl": ".",
         "outDir": "dist",
         "target": "ES2018",
         "module": "CommonJS",
@@ -11,7 +12,8 @@
         "noUnusedLocals": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
-        "noImplicitAny": false
+        "noImplicitAny": false,
+        "typeRoots": ["node_module/@types"]
     },
     "exclude": [
         "node_modules",

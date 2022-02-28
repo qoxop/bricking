@@ -7,7 +7,7 @@ type PartialAll<T> = {
 const deepMerge = (origin, target, deep = 1) => {
     if (origin) {
         Object.keys(target).forEach(key => {
-            if (deep < 2 || !origin[key] || typeof Object[key] !== 'object') {
+            if (deep < 2 || !origin[key] || typeof origin[key] !== 'object') {
                 origin[key] = target[key];
             } else if (typeof origin[key] === 'object') {
                 deepMerge(origin[key], target[key], deep - 1);
@@ -17,7 +17,6 @@ const deepMerge = (origin, target, deep = 1) => {
 }
 
 const defaultOption = () => ({
-    cwd: process.cwd(),
     output: 'dist' as string,
     compile: {
         useSourceMap: false as boolean,
@@ -30,7 +29,7 @@ const defaultOption = () => ({
         useReactRefresh: true,
         useSvgr: true,
     },
-    vue: {
+    vue: { // TODO 支持 vue.js
 
     },
     devServer: {
@@ -40,28 +39,47 @@ const defaultOption = () => ({
         proxy: {} as Configuration['proxy'],
     },
     bundle: {
+        /** 自定义的 webpack 配置路径 */
         webpack: '',
-        autoCode: true,
-        moduleRecord: {} as Record<string, string | {path: string, sync?: boolean}>,
+        /** 是否打包构建产物 */
+        pack: false,
+        entry: '' as (string | undefined),
+        packageName: '',
+        /** 依赖配置 */
         dependencies: {
-            sync: [] as string[],
-            exclude: [] as string [],
+            /** 是否将依赖自动注入运行时 */
+            autoInject: true,
+            /** 标识哪些依赖是不需要打入运行时的 */
+            exclude: [],
+        } as { autoInject: boolean, exclude?: string[] },
+        /** 自定义模块配置 */
+        moduleDefines: {
+            /** 是否自动注入自定义的模块 */
+            autoInject: true,
+            /** 自定义模块的模块名与路径映射 */
+            defines: {} as Record<string, string>,
+            output: './types',
         }
     }
 });
 
-/**
- * 用户配置
- */
-let userOptions = defaultOption();
+const { getUserOptions, updateOptions } = (() => {
+    let userOptions = defaultOption();
+    const updateOptions = (options: PartialAll<typeof userOptions>) => {
+        const origin = defaultOption();
+        deepMerge(origin, options, 4);
+        return userOptions = origin;
+    }
+    return {
+        getUserOptions: () => userOptions,
+        updateOptions,
+    }
+})();
 
-export const getUserOptions = () => userOptions;
-
-export const updateOptions = (options: PartialAll<typeof userOptions>) => {
-    const origin = defaultOption();
-    deepMerge(origin, options, 2);
-    return userOptions = origin;
+export {
+    getUserOptions,
+    updateOptions,
 }
 
-export type TUserOptions = typeof userOptions;
+export type TUserOptions = ReturnType<typeof getUserOptions>;
 

@@ -1,5 +1,4 @@
 {
-	
 	"devDependencies": {
 		"@microsoft/api-extractor": "^7.19.4",
 		"@types/node": "^17.0.16",

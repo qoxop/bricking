@@ -1,19 +1,22 @@
 import * as fs from 'fs';
-import * as path from 'path';
+import WebpackBar from 'webpackbar';
 import TerserPlugin from 'terser-webpack-plugin';
 import NpmImportPlugin from 'less-plugin-npm-import';
+import { merge as webpackMerge } from 'webpack-merge';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import { Configuration, DefinePlugin, ProvidePlugin, RuleSetRule } from 'webpack';
-
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 
+
 import { getUserOptions } from './options';
-import { paths } from './paths';
+import { getCustomWebpackPath, paths } from './paths';
+import BrickingPackPlugin from './utils/pack-plugin';
+
+const RS = require.resolve;
 
 const {
-    // cwd,
     react = {} as any,
     compile: compileOptions,
     devServer: devServerOptions
@@ -26,11 +29,11 @@ const lessRegex = /\.less$/;
 const getCssUse = (isEnvDevelopment: boolean, importLoaders = 2) => ([
     (
         isEnvDevelopment ? 
-        { loader: require.resolve('style-loader') } :
+        { loader: RS('style-loader') } :
         { loader: MiniCssExtractPlugin.loader }
     ),
     {
-        loader: 'css-loader',
+        loader: RS('css-loader'),
         options: {
             importLoaders,
             modules: {
@@ -42,15 +45,15 @@ const getCssUse = (isEnvDevelopment: boolean, importLoaders = 2) => ([
         }
     },
     {
-        loader: 'postcss-loader',
+        loader: RS('postcss-loader'),
         options: {
             sourceMap: compileOptions.useSourceMap,
             postcssOptions: {
                 ident: 'postcss',
                 config: fs.existsSync(paths.postcssConfig),
                 plugins: [
-                    'postcss-flexbugs-fixes',
-                    ['postcss-preset-env', {
+                    RS('postcss-flexbugs-fixes'),
+                    [RS('postcss-preset-env'), {
                         autoprefixer: {
                             flexbox: 'no-2009',
                         },
@@ -63,48 +66,45 @@ const getCssUse = (isEnvDevelopment: boolean, importLoaders = 2) => ([
 ] as RuleSetRule['use']);
 
 
-export const getBabelOptions = (isEnvProduction: boolean, isAppScript: boolean) => {
+export const getBabelOptions = (isEnvProduction: boolean) => {
     if (fs.existsSync(paths.babelConfig)) {
         return require(paths.babelConfig);
     }
     return {
         presets: [
-            ['@babel/preset-env', { 
+            [RS('@babel/preset-env'), { 
                 useBuiltIns: 'entry',
                 corejs: 3,
                 exclude: ['transform-typeof-symbol'],
             }],
-            isAppScript && ['@babel/preset-react', {
+            [RS('@babel/preset-react'), {
                 development: !isEnvProduction,
-                useBuiltIns: true,
+                // useBuiltIns: true,
                 runtime: 'classic',
             }],
-            isAppScript && ['@babel/preset-typescript', {
+            [RS('@babel/preset-typescript'), {
                 allowNamespaces: true
             }].filter(Boolean),
         ],
         plugins: [
             !isEnvProduction &&
-            isAppScript &&
             react.useReactRefresh &&
-                 require.resolve('react-refresh/babel'),
-            isAppScript && ["@babel/plugin-proposal-decorators", { 
-                decoratorsBeforeExport: true,
+                 RS('react-refresh/babel'),
+            [RS("@babel/plugin-proposal-decorators"), { 
                 legacy: true,
             }],
-            isAppScript && ["@babel/plugin-proposal-class-properties", {
+            [RS("@babel/plugin-proposal-class-properties"), {
                 loose: true,
             }],
-            isAppScript && ["@babel/plugin-proposal-private-methods", {
+            [RS("@babel/plugin-proposal-private-methods"), {
                 loose: true,
             }],
-            isAppScript && ['@babel/plugin-proposal-private-property-in-object', {
+            [RS('@babel/plugin-proposal-private-property-in-object'), {
                 loose: true,
             }],
-            ['@babel/plugin-transform-runtime', {
+            [RS('@babel/plugin-transform-runtime'), {
                 corejs: false,
                 helpers: true,
-                version: require('@babel/runtime/package.json').version,
                 regenerator: true,
             }],
         ].filter(Boolean),
@@ -117,15 +117,18 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
     const isEnvProduction = webpackEnv === 'production';
     const isEnvProductionProfile =
         isEnvProduction && process.argv.includes('--profile');
-    return {
+    const baseConfig= {
         target: fs.existsSync(paths.browserslist) ? ['web', 'browserslist'] : 'web',
         mode: webpackEnv,
         bail: isEnvProduction,
         devtool: isEnvProduction
             ? (compileOptions.useSourceMap ? 'source-map' : false)
             : isEnvDevelopment && 'cheap-module-source-map',
-        entry: paths.baseOptions,
+        entry: {
+            bricking: paths.brickingrc
+        },
         output: {
+            clean: true,
             publicPath: 'auto',
             path: paths.outputPath,
             pathinfo: isEnvDevelopment,
@@ -133,8 +136,8 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
                 ? 'base-js-[name].[contenthash:8].js'
                 : 'base-js-bundle.js',
             chunkFilename: isEnvProduction
-                ? 'base-js-[name].[contenthash:8].chunk.js'
-                : 'base-js-[name].chunk.js',
+                ? 'chunk-js-[name].[contenthash:8].js'
+                : 'chunk-js-[name].chunk.js',
             assetModuleFilename: 'media/[hash][ext][query]'
         },
         cache: {
@@ -142,7 +145,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
             cacheDirectory: paths.webpackCache,
             store: 'pack',
             buildDependencies: {
-                config: [__filename, path.resolve(paths.workspace, './tsconfig.json'), path.resolve(paths.workspace, './package.json')],
+                config: [__filename, paths.tsconfig, paths.packageJson],
                 tsconfig: [paths.tsconfig, paths.jsconfig, paths.packageJson].filter(f => fs.existsSync(f))
             },
         },
@@ -183,7 +186,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
             plugins: [new TsconfigPathsPlugin({ configFile: paths.tsconfig})],
             extensions: ['.ts', '.tsx', '.js', '.jsx'],
             modules: ['node_modules'],
-            symlinks: false,
+            symlinks: true,
             alias: { ...compileOptions.alias }
         },
         module: {
@@ -191,14 +194,14 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
             rules: [
                 {
                     enforce: 'pre',
-                    test: paths.baseOptions,
-                    use: [{ loader: require.resolve('./utils/entry-loader') }]
+                    test: paths.brickingrc,
+                    use: [{ loader: RS('./utils/entry-loader') }]
                 },
                 compileOptions.useSourceMap && {
                     enforce: 'pre',
                     exclude: /@babel(?:\/|\\{1,2})runtime/,
                     test: /\.(js|mjs|jsx|ts|tsx|css)$/,
-                    loader: require.resolve('source-map-loader'),
+                    loader: RS('source-map-loader'),
                 },
                 {
                     oneOf: [
@@ -207,6 +210,9 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
                             test: [/\.avif$/],
                             type: 'asset',
                             mimetype: 'image/avif',
+                            generator: {
+                                filename: 'img-[hash][ext]',
+                            },
                             parser: {
                               dataUrlCondition: {
                                 maxSize: compileOptions.imageInlineSizeLimit,
@@ -217,6 +223,9 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
                         {
                             test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
                             type: 'asset',
+                            generator: {
+                                filename: 'img-[hash][ext]',
+                            },
                             parser: {
                               dataUrlCondition: {
                                 maxSize: compileOptions.imageInlineSizeLimit,
@@ -228,7 +237,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
                             test: /\.svg$/,
                             use: [
                               react?.useSvgr && {
-                                loader: require.resolve('@svgr/webpack'),
+                                loader: RS('@svgr/webpack'),
                                 options: {
                                   prettier: false,
                                   svgo: false,
@@ -240,9 +249,9 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
                                 },
                               },
                               {
-                                loader: require.resolve('file-loader'),
+                                loader: RS('file-loader'),
                                 options: {
-                                  name: 'media/[name].[hash].[ext]',
+                                  name: 'svg-[name].[hash].[ext]',
                                 },
                               },
                             ].filter(Boolean),
@@ -254,9 +263,9 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
                         {
                             test: /\.(js|mjs|jsx|ts|tsx)$/,
                             exclude: /(node_modules|bower_components)/,
-                            loader: require.resolve('babel-loader'),
+                            loader: RS('babel-loader'),
                             options: {
-                                ...getBabelOptions(isEnvProduction, true),
+                                ...getBabelOptions(isEnvProduction),
                                 cacheDirectory: true,
                                 cacheCompression: false,
                                 compact: isEnvProduction,
@@ -266,12 +275,12 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
                         {
                             test: /\.(js|mjs)$/,
                             exclude: /@babel(?:\/|\\{1,2})runtime/,
-                            loader: require.resolve('babel-loader'),
+                            loader: RS('babel-loader'),
                             options: {
                                 babelrc: false,
                                 configFile: false,
                                 compact: false,
-                                ...getBabelOptions(isEnvProduction, false),
+                                ...getBabelOptions(isEnvProduction),
                                 cacheDirectory: true,
                                 cacheCompression: false,
                                 sourceMaps: compileOptions.useSourceMap,
@@ -283,21 +292,21 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
                             test: cssRegex,
                             use: getCssUse(isEnvDevelopment, 1),
                             sideEffects: true,
-                          },
-                          // 支持 sass
-                          {
+                        },
+                        // 支持 sass
+                        {
                             test: sassRegex,
                             use: [
                                 ...getCssUse(isEnvDevelopment, 3) as any[],
                                 {
-                                    loader: require.resolve('resolve-url-loader'),
+                                    loader: RS('resolve-url-loader'),
                                     options: {
                                       sourceMap: compileOptions.useSourceMap,
                                       root: paths.workspace,
                                     },
                                 },
                                 {
-                                    loader: require.resolve('sass-loader'),
+                                    loader: RS('sass-loader'),
                                     options: {
                                         sourceMap: compileOptions.useSourceMap,
                                     },
@@ -310,14 +319,14 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
                             use: [
                                 ...getCssUse(isEnvDevelopment, 3) as any[],
                                 {
-                                    loader: require.resolve('resolve-url-loader'),
+                                    loader: RS('resolve-url-loader'),
                                     options: {
                                       sourceMap: compileOptions.useSourceMap,
                                       root: paths.workspace,
                                     },
                                 },
                                 {
-                                    loader: require.resolve('less-loader'),
+                                    loader: RS('less-loader'),
                                     options: {
                                         sourceMap: compileOptions.useSourceMap,
                                         lessOptions: {
@@ -335,12 +344,16 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
                             // 其他的未匹配到的，全部归为资源模块
                             exclude: [/^$/, /\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
                             type: 'asset/resource',
+                            generator: {
+                                filename: 'asset-[hash][ext]',
+                            },
                         }
                     ]
                 },
             ].filter(Boolean) as any [],
         },
         plugins: [
+            new WebpackBar(),
             new DefinePlugin({
                 process: {
                     env: {
@@ -358,9 +371,21 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
                 chunkFilename: 'base-css-[id].[contenthash:8].chunk.css',
                 ignoreOrder: true
             }),
+            new BrickingPackPlugin(),
         ].filter(Boolean) as any[],
+    };
+    const customConfigPath = getCustomWebpackPath();
+    if (customConfigPath) {
+        const mergeConf = require(customConfigPath);
+        if (typeof mergeConf === 'function') {
+            return mergeConf(baseConfig);
+        } else if (mergeConf && typeof mergeConf === 'object') {
+            return webpackMerge(mergeConf)
+        }
     }
+    return baseConfig as any;
 }
+
 export const devServerConfig:Configuration['devServer'] = {
     port: devServerOptions.port,
     host: '0.0.0.0',
@@ -375,7 +400,4 @@ export const devServerConfig:Configuration['devServer'] = {
     devMiddleware: {
         writeToDisk: true,
     },
-    
-    // open: true,
-    // openPage: `http://${UserOptions.dev.hostname}:${UserOptions.dev.port}`,
 }

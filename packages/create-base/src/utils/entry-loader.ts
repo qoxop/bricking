@@ -1,95 +1,62 @@
 /**
  * 入口代码生成
  */
-import * as fs from 'fs';
-import * as path from 'path';
-import { paths } from '../paths';
+import { getPackageJson, paths } from '../paths';
 import { getUserOptions } from '../options';
+import { excludePackages } from './constants';
 
 module.exports = function(source) {
-    console.log(source)
-    const {
-        cwd,
-        bundle: {
-            dependencies: { exclude, sync },
-            moduleRecord,
-        }
-    } = reloadOptions();
-    console.log(cwd);
-    if (!fs.existsSync(paths.packageJson))  {
-        throw new Error(`${paths.packageJson} 不存在～`);
-    }
-    const {
-        dependencies,
-        name: baseName,
-    } = require(paths.packageJson);
-    const customModuleNames = Object.keys(moduleRecord);
-    const npmModuleNames = Object
-        .keys(dependencies || {})
-        .filter(key => !exclude.includes(key) && !/^@types\//.test(key));
+    const { bundle } = reloadOptions();
+    const depsExclude = (bundle?.dependencies?.exclude || [])?.concat(excludePackages);
+    const autoInjectDeps = bundle?.dependencies?.autoInject;
+    const defines = bundle?.moduleDefines?.defines || {};
+    const autoInjectDefines =  bundle?.moduleDefines?.autoInject || {};
 
-    // require('xx')
-    const syncImports:string[] = [];
-    // () => import('xx')
-    const asyncImports:string[] = [];
+    if (!autoInjectDefines && !bundle.entry) {
+        throw new Error(`需要指定入口文件 ～`);
+    }
+    source = `import "@bricking/runtime";\n`;
 
-    customModuleNames.forEach(name => {
-        const moduleName = name === 'index' ?
-            baseName :
-            `${baseName}/${name}`;
-        const requireInfo = typeof moduleRecord[name] === 'string' ?
-            { path: moduleRecord[name], sync: false } :
-            moduleRecord[name] as any;
-        const absolutePath = path.isAbsolute(requireInfo.path) ?
-            requireInfo.path:
-            path.resolve(cwd, requireInfo.path);
-        if (requireInfo.sync || name === 'index') {
-            syncImports.push(`"${moduleName}": require("${absolutePath}")`);
+    const { dependencies, name: baseName } = getPackageJson();
+    const pkgName = bundle.packageName || baseName;
+
+    let indexInjected = false;
+    if (bundle.entry) {
+        if (bundle.entry === defines['index']) { // TODO 处理后缀
+            source += `import * as baseEntry from "${bundle.entry}";\n`;
+            source += `\nwindow.$bricking.mm.set({ "${pkgName}": baseEntry })\n`;
+            indexInjected = true;
         } else {
-            asyncImports.push(`"${moduleName}": () => import("${absolutePath}")`);
+            source += `import "${bundle.entry}";\n`;
         }
-    });
-    npmModuleNames.forEach(name => {
-        if (sync.includes(name)) {
-            syncImports.push(`"${name}": require("${name}")`);
-        } else {
-            asyncImports.push(`"${name}": () => import("${name}")`);
-        }
-    });
-    let entryCode = `import "@bricking/runtime";\n`;
-    if (!customModuleNames.includes('index') && fs.existsSync(paths.baseIndexTs)) {
-        entryCode += `import "${paths.baseIndexTs}";\n`
     }
-    if (syncImports.length) {
-        entryCode += `\n\n window.$bricking.mm.set({${syncImports.join(',')}});`;
+    if (defines['index'] && !indexInjected) {
+        source += `\nwindow.$bricking.mm.set({ "${pkgName}": require("${defines['index']}") })\n`;
     }
-    if (asyncImports.length) {
-        entryCode += `\n\n window.$bricking.mm.setDynamic({${asyncImports.join(',')}});`
+
+    if (autoInjectDefines) {
+        const definesImports = Object.entries(defines)
+            .filter(([key]) => key !== 'index')
+            .map(([key, value]) => (`\t"${pkgName}/${key}": () => import("${value}"),`))
+            .join('\n');
+        source += `\nwindow.$bricking.mm.setDynamic({\n${definesImports}\n});`
     }
-    return entryCode;
+    if (autoInjectDeps) {
+        const depsImports = Object.keys(dependencies)
+            .filter(key => (!/^@types\//.test(key) && !depsExclude.includes(key)))
+            .map(key => `\t"${key}": () => import("${key}"),`)
+            .join('\n');
+        source += `\nwindow.$bricking.mm.setDynamic({\n${depsImports}\n});`
+    }
+    console.log(source);
+    return source;
 };
 
 
-const code = `
-import { updateOptions } from "@bricking/create-base";
-
-updateOptions({
-    cwd: __dirname,
-    output: 'dist',
-});
-`
-
 const reloadOptions = () => {
-    if (!fs.existsSync(paths.baseOptions)) {
-        fs.writeFileSync(
-            paths.baseOptions,
-            code
-        )
-    }
-    const cacheKey = require.resolve(paths.baseOptions,);
+    const cacheKey = require.resolve(paths.brickingrc,);
     if (require.cache[cacheKey]) {
         delete require.cache[cacheKey];
     }
-    require(paths.baseOptions);
     return getUserOptions();
 }

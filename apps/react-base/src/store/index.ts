@@ -1,5 +1,2 @@
-import Redux from 'redux'
 
-export {
-    Redux
-}
+export default 'store';

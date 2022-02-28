@@ -7,13 +7,15 @@ import { Extractor, ExtractorConfig } from "@microsoft/api-extractor";
 const extensions = ['.ts', '.tsx', '/index.ts', '/index.tsx'];
 
 export const generateDTS = (props: {
+    /** 绝对路径文件列表 */
     rootNames: string[],
-    ourDir: string
+    /** 输出目录的绝对路径 */
+    outDir: string
 }) => {
     ts.createProgram({
         rootNames: props.rootNames,
         options: {
-            outDir: props.ourDir,
+            outDir: props.outDir,
             emitDeclarationOnly: true,
             esModuleInterop: true,
             declaration: true,
@@ -22,16 +24,15 @@ export const generateDTS = (props: {
     }).emit();
 }
 
-export const rollupDTS = (props: {
-    input: string,
-    output: string
-    cwd?: string,
+export const rollupDTS = ({ input, output, cwd = process.cwd() }:{
+    /** 输入文件的绝对路径 */
+    input: string;
+    /** 输出文件的绝对路径 */
+    output: string;
+    /** 项目目录 */
+    cwd?: string;
 }) => {
-    const {
-        input,
-        output,
-        cwd = process.cwd(),
-    } = props;
+    
     Extractor.invoke(ExtractorConfig.prepare({
         configObjectFullPath:  path.resolve(cwd, './tsconfig.json'),
         packageJsonFullPath: path.resolve(cwd, './package.json'),
@@ -41,10 +42,10 @@ export const rollupDTS = (props: {
             },
             projectFolder: cwd,
             bundledPackages: [],
-            mainEntryPointFilePath: path.resolve(cwd, input),
+            mainEntryPointFilePath: input,
             dtsRollup: {
                 "enabled": true,
-                "untrimmedFilePath": path.resolve(cwd, output)
+                "untrimmedFilePath": output
             },
         }
     }), {
@@ -55,9 +56,12 @@ export const rollupDTS = (props: {
 
 
 export const createTypeDefine = (props: {
-    input: string,
-    output: string,
-    cwd?: string,
+    /** 输入文件的绝对路径 */
+    input: string;
+    /** 输出文件的绝对路径 */
+    output: string;
+    /** 项目目录 */
+    cwd?: string;
 }) => {
     let {
         input,
@@ -76,7 +80,7 @@ export const createTypeDefine = (props: {
     // 生成类型定义文件
     generateDTS({
         rootNames: [input],
-        ourDir: TempDir
+        outDir: TempDir
     });
     // 对类型定义文件进行捆绑
     rollupDTS({

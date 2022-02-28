@@ -68,5 +68,6 @@ common/autoinstallers/*/.npmrc
 .heft
 
 packages/*/dist
+apps/*/dist
 
 node_modules
