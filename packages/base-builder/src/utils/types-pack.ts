@@ -9,12 +9,12 @@ import { getPackageJson, paths } from "../paths";
 
 
 export default () => {
-    const { bundle } = getUserOptions();
+
     let hasIndex = false;
-    let { 
-        defines = {},
-        output = './types'
-    } = bundle.moduleDefines;
+
+    const { bundle } = getUserOptions();
+
+    let { defines = {}, output = './types' } = bundle.moduleDefines;
 
     if (!path.isAbsolute(output)) {
         output = path.resolve(paths.workspace, output);
@@ -36,23 +36,36 @@ export default () => {
     delete packageObj.devDependencies;
     delete packageObj.main;
 
-    const dependencies = packageObj.dependencies || {};
+    const peerDependencies = packageObj.dependencies || {};
 
-    Object.keys(dependencies).forEach(key => {
-        if (dependencies[`@types/${key}`]) {
-            delete dependencies[key];
+    // 保留 @types 包
+    Object.keys(peerDependencies).forEach(key => peerDependencies[`@types/${key}`] && (delete peerDependencies[key]));
+    // 移除内置包依赖
+    excludePackages.forEach(name => peerDependencies[name] && (delete peerDependencies[name]));
+
+    const { exclude = [] } = bundle.dependencies;
+    const innerDependencies = exclude.reduce((innerDeps, cur) => {
+        if (peerDependencies[`@types/${cur}`]) {
+            // 存在 @types 包，就只保留 @types 包
+            innerDeps[`@types/${cur}`] = peerDependencies[`@types/${cur}`];
+            delete peerDependencies[`@types/${cur}`];
+            delete peerDependencies[cur];
+        } else if (peerDependencies[cur]) {
+            // 不存在 @types 包
+            innerDeps[cur] = peerDependencies[cur];
+            delete peerDependencies[cur];
         }
-    })
-    excludePackages
-        .filter(name => name !== '@bricking/runtime')
-        .forEach(name => dependencies[name] && (delete dependencies[name]));
-
-    packageObj.peerDependencies = dependencies;
-    delete packageObj.dependencies;
+        return innerDeps;
+    }, {});
+    // 对等依赖
+    packageObj.peerDependencies = peerDependencies;
+    // 内部依赖
+    packageObj.dependencies = innerDependencies;
 
     if (hasIndex) {
         packageObj.types = 'index.d.ts';
     }
+
     if (!fs.existsSync(output)) {
         fs.mkdirSync(output, { recursive: true });
     }

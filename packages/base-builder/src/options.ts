@@ -17,7 +17,8 @@ const deepMerge = (origin, target, deep = 1) => {
 }
 
 const defaultOption = () => ({
-    output: 'dist' as string,
+    output: 'dist',
+    publicPath: '/',
     compile: {
         useSourceMap: false as boolean,
         imageInlineSizeLimit: 8000,

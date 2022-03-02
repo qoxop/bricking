@@ -1,4 +1,4 @@
-const { runBuild } = require('@bricking/create-base/build');
+const { runBuild } = require('@bricking/base-builder/build');
 
 process.env.NODE_ENV = 'production';
 

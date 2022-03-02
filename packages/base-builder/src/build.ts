@@ -2,10 +2,13 @@ import './initialize';
 import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
 
-// import typesPack from './utils/types-pack';
 import { getWebpackConfig, devServerConfig } from './config';
 
-// @ts-ignore
+/**
+ * 构建任务默认回调方法
+ * @param err
+ * @param stats
+ */
 const defaultCallback = (err, stats) => {
     if (err) throw err;
     process.stdout.write(`${stats.toString({
@@ -26,24 +29,15 @@ const runBuild = (callback = defaultCallback) => {
 };
 
 /**
- * 监听变化，实时重新编译构建
- */
-const runWatch = (callback = defaultCallback) => {
-    const compiler = webpack(getWebpackConfig(process.env.NODE_ENV));
-    compiler.watch({
-        aggregateTimeout: 600,
-        ignored: /node_modules/,
-        poll: 2000,
-    }, callback);
-}
-
-/**
  * 执行编译构建，并启动开发服务器
  */
-const runServer = async () => {
+const runServer = async (port?: string) => {
     const baseWebpackConfig = getWebpackConfig(process.env.NODE_ENV);
     const compiler = webpack(baseWebpackConfig);
-    const server = new WebpackDevServer(devServerConfig, compiler);
+    const server = new WebpackDevServer({
+        ...devServerConfig,
+        ...(port ? {port} : {})
+    }, compiler);
     console.log('Starting server...');
     await server.start();
     server.startCallback(() => {
@@ -55,6 +49,5 @@ const runServer = async () => {
 
 export {
     runBuild,
-    runWatch,
     runServer,
 }

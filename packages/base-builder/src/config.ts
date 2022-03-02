@@ -17,6 +17,7 @@ import BrickingPackPlugin from './utils/pack-plugin';
 const RS = require.resolve;
 
 const {
+    publicPath,
     react = {} as any,
     compile: compileOptions,
     devServer: devServerOptions
@@ -129,7 +130,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
         },
         output: {
             clean: true,
-            publicPath: 'auto',
+            publicPath: (publicPath === '/' || !publicPath) ? 'auto' : publicPath,
             path: paths.outputPath,
             pathinfo: isEnvDevelopment,
             filename: isEnvProduction

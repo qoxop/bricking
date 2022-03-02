@@ -2,10 +2,11 @@ import {
     Compilation,
     Compiler
 } from "webpack";
+import path from "path";
+import { btkFile, btkHash } from "@bricking/toolkit";
+
 import typesPack from "./types-pack";
 import { getUserOptions } from "../options";
-import { btkFile, btkHash } from "@bricking/toolkit/dist";
-import path from "path";
 
 /**
  * webpack 插件：用于构建 SDK
@@ -55,10 +56,10 @@ export default class BrickingPackPlugin {
                     compilation.assets[typesPackName] = new RawSource(typesPackBuff);
 
                     const infoJson = JSON.stringify({
-                        serve: '/',
                         bundle: bundleFilename,
                         typesPack: typesPackName,
                         bundlePack: bundlePackName,
+                        publicPath: this.options.publicPath || '/',
                     }, null, '\t');
                     compilation.assets['info.json'] = new RawSource(infoJson);
 

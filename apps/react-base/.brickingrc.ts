@@ -1,11 +1,15 @@
-import { updateOptions } from '@bricking/create-base/options';
+import { updateOptions } from '@bricking/base-builder/options';
 
 updateOptions({
     output: 'dist',
+    devServer: {
+        port: '9001'
+    },
     bundle: {
         pack: true,
         dependencies: {
             autoInject: true,
+            exclude: ['lodash']
         },
         moduleDefines: {
             output: 'types',
