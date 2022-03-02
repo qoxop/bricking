@@ -6,7 +6,7 @@
   "typings": "build.d.ts",
   "scripts": {
     "build": "run-s clear && tsc",
-    "clear": "del dist && cpy 'package.json' dist && cpy 'src/.bin' dist/.bin"
+    "clear": "del dist && cpy 'package.json' dist && cpy 'src/.bin/*' dist/.bin/"
   },
   "bin": {
     "base-builder": ".bin/index.js"
