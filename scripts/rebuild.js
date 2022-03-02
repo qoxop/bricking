@@ -16,7 +16,6 @@ function graphBuild(pkgGraph) {
             // 如果存在依赖，优先把依赖构建完
             if (pkg.deps?.length) build(pkg.deps);
             // 构建当前包
-            
             buildedSet.add(name);
             console.log(clc.red(`> ${name}: pnpm install  🛰  🛰`));
             spawnSync('pnpm', ['install'], { cwd: pkg.path, stdio: 'inherit' });

@@ -134,7 +134,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
             path: paths.outputPath,
             pathinfo: isEnvDevelopment,
             filename: isEnvProduction
-                ? 'base-js-[name].[contenthash:8].js'
+                ? 'base-js-bundle.[contenthash:8].js'
                 : 'base-js-bundle.js',
             chunkFilename: isEnvProduction
                 ? 'chunk-js-[name].[contenthash:8].js'

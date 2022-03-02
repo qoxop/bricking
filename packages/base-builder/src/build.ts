@@ -3,6 +3,7 @@ import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
 
 import { getWebpackConfig, devServerConfig } from './config';
+import { getUserOptions } from './options';
 
 /**
  * 构建任务默认回调方法
@@ -33,18 +34,30 @@ const runBuild = (callback = defaultCallback) => {
  */
 const runServer = async (port?: string) => {
     const baseWebpackConfig = getWebpackConfig(process.env.NODE_ENV);
-    const compiler = webpack(baseWebpackConfig);
-    const server = new WebpackDevServer({
-        ...devServerConfig,
-        ...(port ? {port} : {})
-    }, compiler);
-    console.log('Starting server...');
-    await server.start();
-    server.startCallback(() => {
-        const origin = `${devServerConfig?.https ? 'https' : 'http'}://${devServerConfig?.host}:${devServerConfig?.port}`;
-        console.log(`Successfully started server on ${origin} \n`);
-        console.log(`entry file = ${origin}/${baseWebpackConfig.output?.filename} \n`);
+    const devServer = { ...devServerConfig, ...(port ? {port} : {}) };
+    const compiler = webpack({...baseWebpackConfig, devServer });
+
+    let log:Function;
+    compiler.hooks.assetEmitted.tap('bricking-run-server', (file) => {
+        if (/^base-js-bundle\..*js$/.test(file)) {
+            log = () => {
+                const { devServer: { hostname } } = getUserOptions();
+                const origin = `${devServerConfig?.https ? 'https' : 'http'}://${hostname}:${devServerConfig?.port}`;
+                console.log('\n');
+                console.log("> \u001b[41m\u001b[37m🚀 🚀 server started ~  \u001b[39m\u001b[49m \n");
+                console.log(`> origin =  \u001b[33m\u001b[4m${origin}\u001b[24m\u001b[39m`)
+                console.log(`> entry  =  \u001b[33m\u001b[4m${origin}/${file}\u001b[24m\u001b[39m`)
+            }
+        }
     });
+    compiler.hooks.afterDone.tap('bricking-run-server', () => {
+        setTimeout(() => {
+            log && log()
+        }, 100);
+    });
+
+    const server = new WebpackDevServer(devServer, compiler);
+    server.start();
 }
 
 export {
