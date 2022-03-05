@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 type TPromiseFn<MT = any> = () => Promise<MT>;
 type TImportMaps = Record<string, string>;
 type TCustomModuleMaps = Record<string, any>;
@@ -26,7 +27,7 @@ type TBricking = {
      * @param options.relative - 资源文件与 js 文件的相对路径
      * @param options.relative - 样式代码 hash 值
      * @param options.scriptUrl - 当前脚本的 URL 值
-     * @returns 
+     * @returns
      */
     readonly injectCss:(
         cssString: string,

@@ -21,15 +21,21 @@ export type Chunk = {
 }
 
 export abstract class Loader<T = any> {
-    options: T;
+  options: T;
+
     abstract name: string;
+
     abstract alwaysProcess: boolean;
+
     abstract extensions: string[];
+
     constructor(options: T) {
-        this.options = options;
+      this.options = options;
     }
+
     test(filepath: string): boolean {
-        return this.extensions.includes(path.extname(filepath))
+      return this.extensions.includes(path.extname(filepath));
     }
+
     abstract process(chunk: Chunk, context: LoaderContext):Promise<Chunk>;
 }

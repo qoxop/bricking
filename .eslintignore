@@ -1,0 +1,8 @@
+**/*.js
+node_modules/**/*
+dist/**/*
+packages/plugin-style/**/*
+apps/**/types/**/*
+
+**/node_modules/**/*
+**/dist/**/*

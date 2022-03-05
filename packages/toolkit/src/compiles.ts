@@ -12,27 +12,29 @@ import { once } from './functions';
  * @param extraExt - 需要额外支持的文件后缀名，默认 .ts
  */
 const registerTsHooks = once((extraExt?: string[]) => {
-    addHook(
-        (code) => ts.transpileModule(code, { compilerOptions: { module: ts.ModuleKind.CommonJS }}).outputText,
-        { exts: ['.ts'].concat(extraExt ? extraExt : [])}
-    );
- })
+  addHook(
+    (code) => ts.transpileModule(code, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText,
+    { exts: ['.ts'].concat(extraExt || []) },
+  );
+});
 
 /**
  * 使用Ts编译器，将代码编译到 ES3
  * @param code - 代码字符串
- * @returns 
+ * @returns
  */
 const compileToEs3 = async (code: string) => {
-     const ES_3_Code = ts.transpileModule(code, { compilerOptions: { 
-         module: ts.ModuleKind.None,
-         target: ts.ScriptTarget.ES3,
-     }}).outputText;
-     const { code: miniCode } = await minify(ES_3_Code, {sourceMap: false});
-     return miniCode;
- }
- 
- export {
-    registerTsHooks,
-    compileToEs3
- }
+  const Es3Code = ts.transpileModule(code, {
+    compilerOptions: {
+      module: ts.ModuleKind.None,
+      target: ts.ScriptTarget.ES3,
+    },
+  }).outputText;
+  const { code: miniCode } = await minify(Es3Code, { sourceMap: false });
+  return miniCode;
+};
+
+export {
+  registerTsHooks,
+  compileToEs3,
+};

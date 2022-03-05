@@ -1,7 +1,5 @@
+import ReactDom from 'react-dom';
 
-import ReactDom from'react-dom';
-
-
-export const render = ReactDom.render;
+export const { render } = ReactDom;
 
 export default 'index';

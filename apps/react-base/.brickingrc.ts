@@ -2,6 +2,7 @@ import { updateOptions } from '@bricking/base-builder/options';
 
 updateOptions({
     output: 'dist',
+    publicPath: 'http://localhost:9001/',
     devServer: {
         port: '9001'
     },

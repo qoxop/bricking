@@ -8,12 +8,12 @@ import * as btkPath from './src/paths';
 import * as btkType from './src/type';
 
 export {
-    btkCompile,
-    btkDom,
-    btkFile,
-    btkFunc,
-    btkHash,
-    btkNetwork,
-    btkPath,
-    btkType,
-}
+  btkCompile,
+  btkDom,
+  btkFile,
+  btkFunc,
+  btkHash,
+  btkNetwork,
+  btkPath,
+  btkType,
+};
