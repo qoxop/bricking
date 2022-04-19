@@ -1,7 +1,7 @@
 /**
  * 路径工具
  */
-
+import fs from 'fs';
 import path from 'path';
 
 /**
@@ -17,6 +17,14 @@ const normalizePath = (filepath: string) => filepath && filepath.replace(/\\+/g,
  * @returns
  */
 const humanlizePath = (filepath: string) => normalizePath(path.relative(process.cwd(), filepath));
+
+/**
+ * 替换扩展名
+ * @param p 路径
+ * @param ext 扩展名
+ * @returns
+ */
+const replaceExt = (p: string, ext: string) => p.replace(/.\w+?$/, ext);
 
 /**
  * urlResolve Url 合并
@@ -35,8 +43,43 @@ const urlResolve = (source:string, subPath: string): string => {
   return new URL(subPath, source).href;
 };
 
+const extensions = ['.js', '.jsx', '.ts', '.tsx'];
+const modulePathResolve = (filepath: string, relative: string, extraExtensions: string[] = []) => {
+  const curDirPath = path.dirname(filepath);
+  const absolutePath = path.join(curDirPath, relative);
+  if (fs.existsSync(absolutePath) && fs.statSync(absolutePath).isFile()) {
+    return {
+      relativePath: relative,
+      absolutePath,
+    };
+  }
+  const totalExtensions = extensions.concat(extraExtensions);
+  // [relative][ext]
+  for (const ext of totalExtensions) {
+    const curIndexPath = `${absolutePath}${ext}`;
+    if (fs.existsSync(curIndexPath)) {
+      return {
+        relativePath: path.join(relative, `index${ext}`),
+        absolutePath: curIndexPath,
+      };
+    }
+  }
+  // [relative]/index[ext]
+  for (const ext of totalExtensions) {
+    const subIndexPath = path.join(absolutePath, `index${ext}`);
+    if (fs.existsSync(subIndexPath)) {
+      return {
+        relativePath: path.join(relative, `./index${ext}`),
+        absolutePath: subIndexPath,
+      };
+    }
+  }
+};
+
 export {
+  replaceExt,
   urlResolve,
   normalizePath,
   humanlizePath,
+  modulePathResolve,
 };

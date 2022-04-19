@@ -21,6 +21,8 @@
 		"eslint-plugin-react": "^7.29.3",
 		"eslint-plugin-react-hooks": "^4.3.0",
 		"eslint-plugin-vue": "^8.5.0",
+		"less": "^4.1.2",
+		"node-sass": "^7.0.1",
 		"npm-run-all": "^4.1.5",
 		"typescript": "^4.5.5"
 	}

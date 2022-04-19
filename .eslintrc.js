@@ -37,6 +37,12 @@ module.exports = {
         "class-methods-use-this": 0,
         "import/no-import-module-exports": 0,
         "no-nested-ternary": 0,
-        "no-console": 0
+        "no-console": 0,
+        "no-restricted-syntax": 0,
+        "react/jsx-filename-extension": 0,
+        "react/function-component-definition": 0,
+        "@typescript-eslint/ban-ts-comment": 0,
+        "object-curly-newline": 0,
+        "@typescript-eslint/no-explicit-any": 0
     }
 }

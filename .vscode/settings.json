@@ -8,5 +8,6 @@
         "pathinfo",
         "pmmmwh",
         "Svgr"
-    ]
+    ],
+    "importSorter.importStringConfiguration.tabSize": 2
 }

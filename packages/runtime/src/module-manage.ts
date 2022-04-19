@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 /// <reference types="systemjs" />
-import 'systemjs/dist/s.js';
+import 'systemjs/dist/s.min.js';
 
 const isAsyncFlag = 'Symbol' in window ? Symbol('is_async_flag') : '$__is_async_flag__';
 

@@ -7,7 +7,7 @@ import { excludePackages } from './constants';
 module.exports = (source) => {
   const { bundle } = reloadOptions();
   const depsExclude = (bundle?.dependencies?.exclude || [])?.concat(excludePackages);
-  const autoInjectDeps = bundle?.dependencies?.autoInject;
+  const autoInjectDependencies = bundle?.dependencies?.autoInject;
   const defines = bundle?.moduleDefines?.defines || {};
   const autoInjectDefines = bundle?.moduleDefines?.autoInject || {};
 
@@ -40,7 +40,7 @@ module.exports = (source) => {
       .join('\n');
     source += `\nwindow.$bricking.mm.setDynamic({\n${definesImports}\n});`;
   }
-  if (autoInjectDeps) {
+  if (autoInjectDependencies) {
     const depsImports = Object.keys(dependencies)
       .filter((key) => (!/^@types\//.test(key) && !depsExclude.includes(key)))
       .map((key) => `\t"${key}": () => import("${key}"),`)

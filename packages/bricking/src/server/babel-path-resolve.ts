@@ -1,4 +1,3 @@
-
 import * as Babel from '@babel/core';
 
 export default (babel: typeof Babel) => {

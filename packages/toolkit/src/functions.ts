@@ -6,7 +6,7 @@
  */
 export function once<Args extends unknown[] = unknown[], Rt = any>(func: (...args: Args) => Rt) {
   const runed = false;
-  let returned:unknown = null;
+  let returned:Rt;
   return (...args: Args) => {
     if (!runed) {
       returned = func(...args);

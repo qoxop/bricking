@@ -27,12 +27,14 @@ const transform = (code: string, filename: string) => new Promise<babel.BabelFil
     if (err) {
       return reject(err);
     }
-    resolve(result);
+    if (result) {
+      resolve(result);
+    }
   });
 });
 
 export default async (params: Params) => {
   const esCode = await fs.promises.readFile(params.filePath, { encoding: 'utf8' });
   const { code: systemCode } = await transform(esCode, params.filePath);
-  console.log(systemCode);
+  return systemCode;
 };
