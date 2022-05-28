@@ -1,141 +1,112 @@
 /**
  * 处理 css 以及其引用的图片等资源
+ * 将所有的样式文件进行捆绑，统一通过入口 chunk 进行引入(通过 link 方式)
  */
-import fs from 'fs';
-import url from 'url';
 import path from 'path';
+import { createFilter } from 'rollup-pluginutils';
 import Concat from 'concat-with-sourcemaps';
 import { GetModuleInfo, OutputChunk, Plugin } from 'rollup';
-import { createFilter } from 'rollup-pluginutils';
 import { btkHash, btkPath } from '@bricking/toolkit';
-import Loaders, { LoadersConfig } from './loaders/loaders';
 import { STYLE_EXTERNALS_MODULE } from './constants';
-import { ExtractedInfo, LoaderContext } from './loaders/types';
+import transformCss, { PostCSSOptions } from './transform/transform-css';
+import transformLess, { LessOption } from './transform/transform-less';
+import transformSass, { SassOptions } from './transform/transform-sass';
+import { CssLoaderProps } from './transform/types';
 
 /**
- * Recursively get the correct import order from rollup
- * We only process a file once
+ * 对模块ID按引用顺序进行排序
+ * @param id 
+ * @param getModuleInfo 
+ * @param seen 
+ * @returns
  */
 function getRecursiveImportOrder(id: string, getModuleInfo: GetModuleInfo, seen = new Set()): string[] {
-  if (seen.has(id)) {
-    return [];
-  }
+  if (seen.has(id)) return [];
   seen.add(id);
   const result = [id];
-  const info = getModuleInfo(id);
-  if (info) {
-    info.importedIds.forEach((importFile) => {
+  const moduleInfo = getModuleInfo(id);
+  if (moduleInfo) {
+    moduleInfo.importedIds.forEach((importFile) => {
       result.push(...getRecursiveImportOrder(importFile, getModuleInfo, seen));
     });
   }
   return result;
 }
 
-type HandleMode = { inject: { type: 'style'|'link', options?: any } } | { extracted: true }
-
-type Options = HandleMode & {
+const LessRegExp = /\.less$/;
+const SassRegExp = /\.s(a|c)ss$/;
+ 
+export type Options =  {
     /**
-     * 输出目录
+     * 输出文件名
+     * [hash].css
      */
-    output: string;
-    /**
-     * 编译哪些文件？
-     */
-    include?: any[];
-    /**
-     * 不编译哪些文件？
-     */
-    exclude?: any[];
-
-    sourceMap?: boolean|'inline';
-    useLoaders?: LoadersConfig[];
-    postcss: {
-        syntax?: any;
-        parser?: any;
-        stringifier?: any;
-        plugins?: any[];
-        map?: any;
-    };
-    modules: {
-        auto: boolean;
-        force: boolean;
-        namedExports: boolean | Function;
-        [key: string]: any;
-    };
+    output?: string;
+    sourceMap?: boolean;
+    less?: LessOption,
+    sass?: SassOptions,
+    postcss?: PostCSSOptions;
 }
-export default (options: Options): Plugin => {
-  const filter = createFilter(options.include, options.exclude);
-  const {
-    output,
-    stylesRelative = 'assets/',
-    assetsRelative = '',
-    sourceMap = false,
-    useLoaders = [],
-    modules,
-    postcss,
-  } = options;
-  const modifyEntry = (('inject' in options) && options.inject.type === 'link');
-  const needCombine = modifyEntry || ('extracted' in options && options.extracted);
-  // add Less loader
-  if (useLoaders.every((item) => !(('name' in item) && item.name === 'less'))) {
-    useLoaders.unshift({ name: 'less' });
-  }
-  // add postcss loader
-  const postcssConfigPath = path.join(process.cwd(), 'postcss.config.js');
-  useLoaders.push({
-    name: 'postcss',
-    options: {
-      output,
-      stylesRelative,
-      assetsRelative,
-      injectStyle: ('inject' in options) && options.inject.type === 'style' ? { ...(options.inject.options || {}) } : false,
-      modules: modules || { auto: true, force: false, namedExports: false },
-      plugins: postcss.plugins || [],
-      syntax: postcss.syntax,
-      parser: postcss.parser,
-      stringifier: postcss.stringifier,
-      config: fs.existsSync(postcssConfigPath) ? postcssConfigPath : false,
-      map: postcss.map ? postcss.map : (sourceMap ? { inline: sourceMap === 'inline' } : false),
-    },
-  });
 
-  const loaders = new Loaders(useLoaders);
-  // 引出的文件集合
-  const extracted = new Map<string, ExtractedInfo>();
+export default (options: Options): Plugin => {
+  // 设置默认选项值
+  const { output = '[hash].css', sourceMap = true, postcss, less, sass } = options;
+  // 过滤器
+  const filter = createFilter( [/\.css$/, less ? LessRegExp : '', sass ? SassRegExp : ''].filter(Boolean));
+  // css 文件集合
+  const allCssFiles = new Map<string, { id: string; css: string; map: any; }>();
+
   return {
-    name: 'runtime-css',
+    name: 'bricking-runtime-css',
     async transform(code: string, id: string) {
-      if (modifyEntry) {
-        const moduleInfo = this.getModuleInfo(id);
-        if (moduleInfo && moduleInfo.isEntry) {
-          return `import "${STYLE_EXTERNALS_MODULE}"\n${code}`;
+      const moduleInfo = this.getModuleInfo(id);
+      // 给入口文件添加导入样式的代码
+      if (moduleInfo && moduleInfo.isEntry) {
+        const concat = new Concat(true, id, '\n');
+        concat.add(null,  `import "${STYLE_EXTERNALS_MODULE}";`)
+        concat.add(id, code, this.getCombinedSourcemap().toString());
+        return {
+          code: concat.content.toString(),
+          map: concat.sourceMap,
         }
       }
       // 过滤掉不处理的类型
-      if (!filter(id) || !loaders.isSupported(id)) return null;
+      if (!filter(id)) return null;
       // 配置 loader 上下文
-      const loaderContext: LoaderContext = {
-        id,
+      const loaderProps: CssLoaderProps<any> = {
+        content: code,
+        filepath: id,
         sourceMap,
-        dependencies: new Set(),
-        warn: this.warn.bind(this),
-        rollupPlugin: this,
+        context: {
+          /** 依赖文件 */
+          dependencies: new Set<string>(),
+          /** Css 模块对象 */
+          modules: {}
+        },
+        options: {}
       };
-      // 执行处理
-      const result = await loaders.process({ code, map: undefined }, loaderContext);
-      // 获取依赖文件，加入监听列表
-      for (const dep of loaderContext.dependencies) {
-        this.addWatchFile(dep);
+      let preSourceMap = null;
+      if (LessRegExp.test(id) && less) {
+        const data = await transformLess({ ...loaderProps, options: less });
+        loaderProps.content = data.css;
+        preSourceMap = data.map;
       }
-      if (needCombine) {
-        extracted.set(id, result.extracted);
+      if (SassRegExp.test(id) && sass) {
+        const data = await transformSass({ ...loaderProps, options: sass });
+        loaderProps.content = data.css;
+        preSourceMap = data.map;
       }
-      return { code: result.code, map: result.map || { mappings: '' } };
+      const { css, map } = await transformCss({ ...loaderProps, options: postcss || {}, preSourceMap: preSourceMap });
+      allCssFiles.set(id, { id, css, map });
+      if (postcss?.module) {
+        return `export default ${JSON.stringify(loaderProps.context.modules || {})}`;
+      }
+      return ''
     },
 
-    augmentChunkHash() {
-      if (extracted.size === 0) return;
-      const extractedValue = [...extracted].reduce((object, [key, value]) => ({
+    augmentChunkHash(chunkInfo) {
+      if (allCssFiles.size === 0 || !chunkInfo.isEntry) return;
+      const extractedValue = [...allCssFiles].reduce((object, [key, value]) => ({
         ...object,
         [key]: value,
       }), {});
@@ -143,69 +114,38 @@ export default (options: Options): Plugin => {
     },
 
     async generateBundle(outputOptions, bundle) {
-      if (extracted.size === 0 || !(outputOptions.dir || outputOptions.file)) return;
-
+      if (allCssFiles.size === 0 || !(outputOptions.dir || outputOptions.file)) return;
       // 输出目录
-      const dir = outputOptions.dir || path.dirname(outputOptions.file);
+      const dir = outputOptions.dir || path.dirname(outputOptions.file as string);
       // 入口 chunk
       const [entryChunkId, entryChunk] = Object.entries(bundle).find(([_, chunk]) => chunk.type === 'chunk' && chunk.isEntry) as [string, OutputChunk];
       // 入口chunk文件(输出位置)
-      const entryFile = outputOptions.file || path.join(outputOptions.dir, entryChunkId);
-
-      const getExtracted = () => {
-        const entries = [...extracted.values()];
-        // 根据引用关系，对入口 css 进行排序
-        const { modules, facadeModuleId } = entryChunk;
-        if (modules) {
-          const moduleIds = getRecursiveImportOrder(facadeModuleId, this.getModuleInfo);
-          entries.sort((a, b) => moduleIds.indexOf(a.id) - moduleIds.indexOf(b.id));
-        }
-        // 计算 hash 值
-        const filehash = btkHash.getSafeId(entries.map((entry) => entry.hash || entry.code).join('-'), path.parse(entryFile).name);
-        const fileName = `${filehash}.css`;
-        // 拼接代码
-        const concat = new Concat(true, fileName, '\n');
-        for (const result of entries) {
-          const relative = btkPath.normalizePath(path.relative(dir, result.id));
-          const map = result.map || null;
-          if (map) {
-            map.file = fileName;
-          }
-          concat.add(relative, result.code, map);
-        }
-
-        let code = concat.content;
-        if (sourceMap === 'inline') {
-          // @ts-ignore
-          code += `\n/*# sourceMappingURL=data:application/json;base64,${Buffer.from(
-            concat.sourceMap,
-            'utf8',
-          ).toString('base64')}*/`;
-        } else if (sourceMap === true) {
-          // @ts-ignore
-          code += `\n/*# sourceMappingURL=./${fileName}.map */`;
-        }
-
-        return {
-          code,
-          map: sourceMap === true && concat.sourceMap,
-          codeFileName: url.resolve(options.stylesRelative, fileName),
-          mapFileName: path.join(options.stylesRelative, `${fileName}.map`),
-        };
-      };
-
-      const {
-        code, codeFileName, map, mapFileName,
-      } = getExtracted();
+      const entryFile = outputOptions.file || path.join(outputOptions.dir as string, entryChunkId);
+      const entries = [...allCssFiles.values()];
+      // 模块排序
+      const { modules, facadeModuleId } = entryChunk;
+      if (modules && facadeModuleId) {
+        const moduleIds = getRecursiveImportOrder(facadeModuleId, this.getModuleInfo);
+        entries.sort((a, b) => moduleIds.indexOf(a.id) - moduleIds.indexOf(b.id));
+      }
+      // 计算 hash 值
+      const filehash = btkHash.getSafeId(entries.map((entry) => entry.css).join('-'), path.parse(entryFile).name);
+      const fileName = output.replace('[hash]', filehash);
+      const mapFileName = `${fileName}.map`;
+      // 拼接代码
+      const concat = new Concat(true, fileName, '\n');
+      for (const result of entries) {
+        const relative = btkPath.normalizePath(path.relative(dir, result.id));
+        const map = result.map || null;
+        concat.add(relative, result.css, map);
+      }
+      const cssCode =  sourceMap ? concat.content.toString() + `\n/*# sourceMappingURL=./${path.basename(mapFileName)} */` :  concat.content.toString();
       // 替换
-      entryChunk.code = entryChunk.code.replace(STYLE_EXTERNALS_MODULE, `${STYLE_EXTERNALS_MODULE}?link=./${codeFileName}`);
-      this.emitFile({ fileName: codeFileName, type: 'asset', source: code });
-      if (map) {
-        this.emitFile({
-          fileName: mapFileName,
-          type: 'asset',
-          source: map,
-        });
+      entryChunk.code = entryChunk.code.replace(STYLE_EXTERNALS_MODULE, `${STYLE_EXTERNALS_MODULE}?link=./${fileName}`);
+      // 输出
+      this.emitFile({ fileName: fileName, type: 'asset', source: cssCode });
+      if (sourceMap && concat.sourceMap) {
+        this.emitFile({ fileName: mapFileName, type: 'asset', source: concat.sourceMap });
       }
     },
   };
