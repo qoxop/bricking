@@ -22,7 +22,7 @@ export default class BrickingPackPlugin {
     for (const [name, entry] of compilation.entrypoints) {
       if (name === 'bricking') {
         return entry.getFiles().find((filename) => (
-          /^base-js-bricking\.\w+\.js$/.test(filename)
+          /^base-js-bundle\.\w+\.js$/.test(filename)
                     || filename === 'base-js-bundle.js'
         ));
       }
@@ -40,7 +40,8 @@ export default class BrickingPackPlugin {
         },
         async (assets, callback) => {
           const bundleFilename = this.getBundleFilename(compilation);
-          const typesPackPath = typesPack();
+          const publicPath = this.options.publicPath || '/';
+          const typesPackPath = typesPack(`${publicPath}${/\/$/ ? '': '/'}${bundleFilename}`);
           const zipper = new Zipper(path.resolve(compiler.outputPath, './pack.zip'));
           Object.entries(assets).forEach(([name, value]) => {
             if (!/\.txt$/.test(name)) {
@@ -60,10 +61,10 @@ export default class BrickingPackPlugin {
           compilation.assets[typesPackName] = new RawSource(typesPackBuff);
 
           const infoJson = JSON.stringify({
+            publicPath,
             bundle: bundleFilename,
             typesPack: typesPackName,
             bundlePack: bundlePackName,
-            publicPath: this.options.publicPath || '/',
           }, null, '\t');
           compilation.assets['info.json'] = new RawSource(infoJson);
 

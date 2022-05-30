@@ -1,19 +1,20 @@
 {
   "name": "@bricking/base-builder",
-  "version": "0.0.1",
-  "description": "",
-  "main": "build.js",
-  "typings": "build.d.ts",
+  "version": "1.0.0",
+  "description": "Sytemjs 模块基座打包器",
+  "main": "dist/build.js",
+  "typings": "dist/build.d.ts",
   "scripts": {
-    "build": "run-s clear && tsc",
-    "clear": "del dist && cpy 'package.json' dist && cpy 'src/.bin/*' dist/.bin/"
+    "build": "del dist && tsc",
+    "prepublish": "pnpm build"
   },
   "bin": {
     "base-builder": ".bin/index.js"
   },
-  "publishConfig": {
-    "directory": "dist"
-  },
+  "files": [
+    ".bin",
+    "dist"
+  ],
   "author": "张集伟",
   "license": "ISC",
   "dependencies": {

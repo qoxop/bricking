@@ -41,7 +41,7 @@ export type Options =  {
      * 输出文件名
      * [hash].css
      */
-    output?: string;
+    filename?: string;
     sourceMap?: boolean;
     less?: LessOption,
     sass?: SassOptions,
@@ -50,7 +50,7 @@ export type Options =  {
 
 export default (options: Options): Plugin => {
   // 设置默认选项值
-  const { output = '[hash].css', sourceMap = true, postcss, less, sass } = options;
+  const { filename = '[hash].css', sourceMap = true, postcss, less, sass } = options;
   // 过滤器
   const filter = createFilter( [/\.css$/, less ? LessRegExp : '', sass ? SassRegExp : ''].filter(Boolean));
   // css 文件集合
@@ -130,7 +130,7 @@ export default (options: Options): Plugin => {
       }
       // 计算 hash 值
       const filehash = btkHash.getSafeId(entries.map((entry) => entry.css).join('-'), path.parse(entryFile).name);
-      const fileName = output.replace('[hash]', filehash);
+      const fileName = filename.replace('[hash]', filehash);
       const mapFileName = `${fileName}.map`;
       // 拼接代码
       const concat = new Concat(true, fileName, '\n');

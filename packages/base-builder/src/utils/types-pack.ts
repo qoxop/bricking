@@ -6,7 +6,7 @@ import { excludePackages } from './constants';
 import { getUserOptions } from '../options';
 import { getPackageJson, paths } from '../paths';
 
-export default () => {
+export default (remoteEntry: string) => {
   let hasIndex = false;
 
   const { bundle } = getUserOptions();
@@ -58,6 +58,7 @@ export default () => {
   packageObj.peerDependencies = peerDependencies;
   // 内部依赖
   packageObj.dependencies = innerDependencies;
+  packageObj.remoteEntry = remoteEntry;
 
   if (hasIndex) {
     packageObj.types = 'index.d.ts';

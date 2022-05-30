@@ -2,7 +2,7 @@
  * 路径工具
  */
 import fs from 'fs';
-import path from 'path';
+import path, { sep } from 'path';
 
 /**
  * normalizePath
@@ -76,10 +76,17 @@ const modulePathResolve = (filepath: string, relative: string, extraExtensions: 
   }
 };
 
+const findModulePath = (moduleName: string) => {
+  const splitString = `node_modules${sep}${moduleName}`;
+  const paths = require.resolve(moduleName).split(splitString);
+  return paths[0] + splitString;
+}
+
 export {
   replaceExt,
   urlResolve,
   normalizePath,
   humanlizePath,
+  findModulePath,
   modulePathResolve,
 };
