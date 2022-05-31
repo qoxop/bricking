@@ -1,4 +1,4 @@
-import { updateOptions } from '@bricking/base-builder/options';
+import { updateOptions } from "@bricking/base-builder";
 
 updateOptions({
     output: 'dist',

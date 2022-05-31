@@ -1,17 +1,22 @@
 {
   "name": "@bricking/runtime",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "description": "bricking 运行时",
-  "main": "index.js",
-  "typings": "index.d.ts",
-  "publishConfig": {
-    "directory": "dist"
-  },
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
     "build": "node ./scripts/build.js"
   },
+  "files": [
+    "dist",
+    "global.d.ts"
+  ],
   "author": "张集伟",
-  "license": "ISC",
+  "repository": {
+    "url": "git@github.com:qoxop/bricking.git",
+    "type": "git",
+    "directory": "packages/runtime/"
+  },
   "dependencies": {
     "@types/systemjs": "^6.1.1",
     "systemjs": "^6.12.1"

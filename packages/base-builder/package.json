@@ -2,8 +2,8 @@
   "name": "@bricking/base-builder",
   "version": "1.0.0",
   "description": "Sytemjs 模块基座打包器",
-  "main": "dist/build.js",
-  "typings": "dist/build.d.ts",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
     "build": "del dist && tsc",
     "prepublish": "pnpm build"
@@ -16,7 +16,11 @@
     "dist"
   ],
   "author": "张集伟",
-  "license": "ISC",
+  "repository": {
+    "url": "git@github.com:qoxop/bricking.git",
+    "type": "git",
+    "directory": "packages/base-builder/"
+  },
   "dependencies": {
     "@babel/core": "^7.17.4",
     "@babel/plugin-proposal-class-properties": "^7.16.7",
@@ -27,7 +31,7 @@
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
-    "@bricking/toolkit": "workspace:^0.1.1",
+    "@bricking/toolkit": "workspace:*",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.4",
     "@svgr/webpack": "^6.2.1",
     "babel-loader": "^8.2.3",
@@ -58,9 +62,7 @@
   "peerDependencies": {
     "@babel/runtime": "^7.17.2",
     "@bricking/runtime": "workspace:*",
-    "core-js": "3"
-  },
-  "optionalDependencies": {
+    "core-js": "3",
     "less": "^4.1.2",
     "sass": "^1.49.7"
   },

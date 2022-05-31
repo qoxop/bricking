@@ -14,7 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "@babel/runtime": "^7.17.2",
-    "@bricking/runtime": "workspace:^1.0.0",
+    "@bricking/runtime": "workspace:*",
     "@types/lodash": "^4.14.179",
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.11",
@@ -25,6 +25,6 @@
     "redux": "^4.1.2"
   },
   "devDependencies": {
-    "@bricking/base-builder": "workspace:^0.0.1"
+    "@bricking/base-builder": "workspace:*"
   }
 }

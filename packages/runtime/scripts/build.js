@@ -11,7 +11,7 @@ if (!fs.existsSync(DistDir)) fs.mkdirSync(DistDir);
 
 // bundle
 ts.createProgram({
-    rootNames: [path.resolve(__dirname, '../index.ts')],
+    rootNames: [path.resolve(__dirname, '../src/index.ts')],
     options: {
         outDir: DistDir,
         emitDeclarationOnly: false,
@@ -20,15 +20,6 @@ ts.createProgram({
         skipLibCheck: true
     }
 }).emit();
-
-// create package.json
-const packageJson = require('../package.json');
-delete packageJson.publishConfig;
-delete packageJson.scripts;
-fs.writeFileSync(
-    path.resolve(DistDir, './package.json'),
-    JSON.stringify(packageJson, null, '\t')
-);
 
 const tabLine = (str = '') => str.split('\n').map(line => line.trim() ? `\t${line}`: line).join('\n');
 // concat types
