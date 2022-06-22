@@ -57,7 +57,7 @@ const defaultOption = () => ({
     } as { autoInject: boolean, exclude?: string[] },
     /** 自定义模块配置 */
     moduleDefines: {
-      /** 是否自动注入自定义的模块 */
+      /** 是否自动注入自定义的模块，否则需要自行在入口文件处进行导入 */
       autoInject: true,
       /** 自定义模块的模块名与路径映射 */
       defines: {} as Record<string, string>,

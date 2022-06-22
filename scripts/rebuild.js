@@ -4,7 +4,7 @@ const clc = require("cli-color");;
 const { spawnSync } = require('child_process');
 
 const exclude = [];
-const roots = ['packages', 'apps'];
+const roots = ['packages'];
 
 
 function graphBuild(pkgGraph) {
