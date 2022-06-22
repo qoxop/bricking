@@ -17,6 +17,9 @@
     "type": "git",
     "directory": "packages/tookit/"
   },
+  "publishConfig": {
+    "access": "public"
+  },  
   "dependencies": {
     "@microsoft/api-extractor": "^7.19.4",
     "@rollup/pluginutils": "^4.1.2",
