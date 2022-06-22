@@ -1,0 +1,24 @@
+{
+  "name": "@bricking/runtime",
+  "version": "0.1.4",
+  "description": "bricking 运行时",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "build": "node ./scripts/build.js"
+  },
+  "files": [
+    "dist",
+    "global.d.ts"
+  ],
+  "author": "张集伟",
+  "repository": {
+    "url": "git@github.com:qoxop/bricking.git",
+    "type": "git",
+    "directory": "packages/runtime/"
+  },
+  "dependencies": {
+    "@types/systemjs": "^6.1.1",
+    "systemjs": "^6.12.1"
+  }
+}

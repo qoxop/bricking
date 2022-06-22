@@ -1,0 +1,34 @@
+{
+  "name": "@bricking/toolkit",
+  "version": "0.1.4",
+  "description": "bricking 通用工具集",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.js",
+  "files": [
+    "dist",
+    "api-extractor.json"
+  ],
+  "scripts": {
+    "build": "node ./scripts/build.js"
+  },
+  "author": "张集伟",
+  "repository": {
+    "url": "git@github.com:qoxop/bricking.git",
+    "type": "git",
+    "directory": "packages/tookit/"
+  },
+  "dependencies": {
+    "@microsoft/api-extractor": "^7.19.4",
+    "@rollup/pluginutils": "^4.1.2",
+    "cpy": "^8.1.2",
+    "del": "^6.0.0",
+    "jsdom": "^19.0.0",
+    "md5": "^2.3.0",
+    "pirates": "^4.0.5",
+    "tar": "^6.1.11",
+    "terser": "^5.10.0",
+    "typescript": "^4.5.5",
+    "yauzl": "^2.10.0",
+    "yazl": "^2.5.1"
+  }
+}
