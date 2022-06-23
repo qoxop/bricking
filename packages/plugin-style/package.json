@@ -1,0 +1,38 @@
+{
+  "name": "@bricking/plugin-style",
+  "version": "0.2.0",
+  "description": "rollup style plugin",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "del dist && tsc",
+    "prepublish": "pnpm build"
+  },
+  "files": [
+    "dist"
+  ],
+  "author": "张集伟",
+  "publishConfig": {
+    "access": "public"
+  },  
+  "repository": {
+    "url": "git@github.com:qoxop/bricking.git",
+    "type": "git",
+    "directory": "packages/plugin-style/"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "@bricking/toolkit": "workspace:^",
+    "concat-with-sourcemaps": "^1.1.0",
+    "postcss": "^8.3.9",
+    "postcss-modules": "^4.0.0",
+    "rollup": "^2.58.0",
+    "rollup-pluginutils": "^2.8.2"
+  },
+  "peerDependencies": {
+    "less": "^4.1.2",
+    "sass": "*"
+  },
+  "devDependencies": {
+    "typescript": "^4.5.5"
+  }
+}
