@@ -1,7 +1,9 @@
 {
 	"scripts": {
 		"rebuild": "pnpm install && node ./scripts/rebuild.js",
-		"lint": "npx eslint"
+		"lint": "npx eslint",
+		"ci:version": "pnpm changeset version",
+		"ci:publish": "pnpm run rebuild && pnpm changeset publish"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.22.0",
