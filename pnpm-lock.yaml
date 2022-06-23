@@ -6,7 +6,7 @@ importers:
     specifiers:
       '@changesets/cli': ^2.22.0
       '@microsoft/api-extractor': ^7.19.4
-      '@types/node': ^17.0.16
+      '@types/node': ^17.0.45
       '@typescript-eslint/eslint-plugin': ^5.13.0
       '@typescript-eslint/parser': ^5.13.0
       cli-color: ^2.0.1
@@ -139,6 +139,7 @@ importers:
       '@rollup/plugin-replace': ^4.0.0
       '@rollup/plugin-typescript': ^8.3.2
       '@rollup/plugin-url': ^7.0.0
+      '@types/node': ^17.0.21
       express: ^4.18.1
       http-proxy-middleware: ^2.0.6
       postcss: ^8.4.8
@@ -166,6 +167,8 @@ importers:
       tslib: 2.4.0
       typescript: 4.7.4
       yargs: 17.5.1
+    devDependencies:
+      '@types/node': 17.0.45
 
   packages/plugin-style:
     specifiers:
