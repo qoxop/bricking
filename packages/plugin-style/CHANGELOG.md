@@ -1,5 +1,13 @@
 # @bricking/plugin-style
 
+## 0.2.1
+
+### Patch Changes
+
+- c5056ecd: 修改发布命令
+- Updated dependencies [c5056ecd]
+  - @bricking/toolkit@0.2.1
+
 ## 0.2.0
 
 ### Minor Changes
