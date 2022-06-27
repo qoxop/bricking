@@ -69,5 +69,5 @@ common/autoinstallers/*/.npmrc
 
 packages/*/dist
 apps/*/dist
-.pnpm-store
+.pnpm-store/
 node_modules
