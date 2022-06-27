@@ -1,0 +1,71 @@
+{
+  "name": "@rollup/plugin-url",
+  "version": "7.0.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "Import files as data-URIs or ES Modules",
+  "license": "MIT",
+  "repository": {
+    "url": "rollup/plugins",
+    "directory": "packages/url"
+  },
+  "author": "Arpad Borsos <arpad.borsos@googlemail.com>",
+  "homepage": "https://github.com/rollup/plugins/tree/master/packages/url/#readme",
+  "bugs": "https://github.com/rollup/plugins/issues",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "ci:coverage": "nyc pnpm test && nyc report --reporter=text-lcov > coverage.lcov",
+    "ci:lint": "pnpm build && pnpm lint",
+    "ci:lint:commits": "commitlint --from=${CIRCLE_BRANCH} --to=${CIRCLE_SHA1}",
+    "ci:test": "pnpm test -- --verbose",
+    "prebuild": "del-cli dist",
+    "prepare": "if [ ! -d 'dist' ]; then pnpm build; fi",
+    "prerelease": "pnpm build",
+    "pretest": "pnpm build",
+    "release": "pnpm plugin:release --workspace-root -- --pkg $npm_package_name",
+    "test": "ava"
+  },
+  "files": [
+    "dist",
+    "types",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "rollup",
+    "plugin",
+    "url"
+  ],
+  "peerDependencies": {
+    "rollup": "^1.20.0||^2.0.0"
+  },
+  "dependencies": {
+    "@rollup/pluginutils": "^4.2.1",
+    "make-dir": "^3.1.0",
+    "mime": "^2.4.6"
+  },
+  "devDependencies": {
+    "del": "^5.1.0",
+    "globby": "^11.0.1",
+    "rollup": "^2.67.3"
+  },
+  "types": "./types/index.d.ts",
+  "ava": {
+    "babel": {
+      "compileEnhancements": false
+    },
+    "files": [
+      "!**/fixtures/**",
+      "!**/output/**",
+      "!**/helpers/**",
+      "!**/recipes/**",
+      "!**/types.ts"
+    ]
+  }
+}

@@ -1,5 +1,11 @@
 # @bricking/base-builder
 
+## 0.2.2
+
+### Patch Changes
+
+- 67121972: info.json 改名为 package.json
+
 ## 0.2.1
 
 ### Patch Changes
