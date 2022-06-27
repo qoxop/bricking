@@ -4,8 +4,7 @@
   "description": "一个基于 rollup 的 Systemjs 模块打包器",
   "main": "dist/index.js",
   "scripts": {
-    "build": "del dist && tsc",
-    "prepublish": "pnpm build"
+    "build": "del dist && tsc"
   },
   "bin": {
     "bricking": ".bin/index.js"

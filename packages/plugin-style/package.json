@@ -4,8 +4,7 @@
   "description": "rollup style plugin",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "del dist && tsc",
-    "prepublish": "pnpm build"
+    "build": "del dist && tsc"
   },
   "files": [
     "dist"

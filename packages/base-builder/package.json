@@ -5,8 +5,7 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "del dist && tsc",
-    "prepublish": "pnpm build"
+    "build": "del dist && tsc"
   },
   "bin": {
     "base-builder": ".bin/index.js"
@@ -64,7 +63,7 @@
   },
   "peerDependencies": {
     "@babel/runtime": "^7.17.2",
-    "@bricking/runtime": "workspace:*",
+    "@bricking/runtime": "0.2.1",
     "core-js": "3",
     "less": "^4.1.2",
     "sass": "^1.49.7"
