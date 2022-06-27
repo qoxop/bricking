@@ -7,6 +7,7 @@ import { btkFile, btkHash } from '@bricking/toolkit';
 
 import typesPack from './types-pack';
 import { getUserOptions } from '../options';
+import { getPackageJson } from '../paths';
 
 /**
  * webpack 插件：用于构建 SDK
@@ -59,14 +60,20 @@ export default class BrickingPackPlugin {
           const typesPackHash = btkHash.getHash(typesPackBuff);
           const typesPackName = `typesPack.${typesPackHash}.tgz`;
           compilation.assets[typesPackName] = new RawSource(typesPackBuff);
-
+          const { name, version, description = '', author = '',dependencies, peerDependencies } = getPackageJson();
           const infoJson = JSON.stringify({
+            name,
+            version,
+            author,
+            description,
+            dependencies,
+            peerDependencies,
             publicPath,
             bundle: bundleFilename,
             typesPack: typesPackName,
             bundlePack: bundlePackName,
           }, null, '\t');
-          compilation.assets['info.json'] = new RawSource(infoJson);
+          compilation.assets['package.json'] = new RawSource(infoJson);
 
           callback();
         },
