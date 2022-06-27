@@ -80,6 +80,7 @@ importers:
       react-refresh: ^0.11.0
       resolve-url-loader: ^5.0.0
       sass-loader: ^12.6.0
+      source-map-loader: ^4.0.0
       style-loader: ^3.3.1
       terser-webpack-plugin: ^5.3.1
       tsconfig-paths-webpack-plugin: ^3.5.2
@@ -117,6 +118,7 @@ importers:
       react-refresh: 0.11.0
       resolve-url-loader: 5.0.0
       sass-loader: 12.6.0_node-sass@7.0.1+webpack@5.73.0
+      source-map-loader: 4.0.0_webpack@5.73.0
       style-loader: 3.3.1_webpack@5.73.0
       terser-webpack-plugin: 5.3.3_esbuild@0.14.47+webpack@5.73.0
       tsconfig-paths-webpack-plugin: 3.5.2
@@ -9114,6 +9116,18 @@ packages:
   /source-map-js/1.0.2:
     resolution: {integrity: sha512-R0XvVJ9WusLiqTCEiGCmICCMplcCkIwwR11mOSD9CR5u+IXYdiseeEuXCVAjS54zqwkLcPNnmU4OeJ6tUrWhDw==}
     engines: {node: '>=0.10.0'}
+    dev: false
+
+  /source-map-loader/4.0.0_webpack@5.73.0:
+    resolution: {integrity: sha512-i3KVgM3+QPAHNbGavK+VBq03YoJl24m9JWNbLgsjTj8aJzXG9M61bantBTNBt7CNwY2FYf+RJRYJ3pzalKjIrw==}
+    engines: {node: '>= 14.15.0'}
+    peerDependencies:
+      webpack: ^5.72.1
+    dependencies:
+      abab: 2.0.6
+      iconv-lite: 0.6.3
+      source-map-js: 1.0.2
+      webpack: 5.73.0_esbuild@0.14.47
     dev: false
 
   /source-map-resolve/0.5.3:

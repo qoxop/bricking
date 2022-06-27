@@ -51,6 +51,7 @@
     "react-refresh": "^0.11.0",
     "resolve-url-loader": "^5.0.0",
     "sass-loader": "^12.6.0",
+    "source-map-loader": "^4.0.0",
     "style-loader": "^3.3.1",
     "terser-webpack-plugin": "^5.3.1",
     "tsconfig-paths-webpack-plugin": "^3.5.2",
@@ -67,6 +68,14 @@
     "core-js": "3",
     "less": "^4.1.2",
     "sass": "^1.49.7"
+  },
+  "peerDependenciesMeta": {
+    "sass": {
+      "optional": true
+    },
+    "less": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/node": "^17.0.21"
