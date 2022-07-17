@@ -51,7 +51,7 @@ const getPackageJson = () => {
     author = '',
     dependencies,
     peerDependencies,
-  } = getPackageJson();
+  } = require(paths.packageJson);
 
   if (deps.autoInject) {
     const { exclude = [] } = deps;
