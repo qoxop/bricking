@@ -1,5 +1,11 @@
 # @bricking/base-builder
 
+## 0.2.6
+
+### Patch Changes
+
+- 7f65dc89: 添加调试入口
+
 ## 0.2.5
 
 ### Patch Changes
