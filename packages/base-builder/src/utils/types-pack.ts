@@ -25,8 +25,7 @@ export default (remoteEntry: string) => {
     });
   });
 
-  const packageObj = getPackageJson();
-
+  const packageObj = getPackageJson() as any;
   packageObj.remoteEntry = remoteEntry;
   if (hasIndex) packageObj.types = 'index.d.ts';
 

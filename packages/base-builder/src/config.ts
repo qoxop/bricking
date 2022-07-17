@@ -24,6 +24,7 @@ import {
   paths,
 } from './paths';
 import BrickingPackPlugin from './utils/pack-plugin';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 
 const RS = require.resolve;
 
@@ -125,7 +126,7 @@ export const getBabelOptions = (isEnvProduction: boolean, isAppScript: boolean) 
   };
 };
 
-export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'production'): Configuration => {
+export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'production', devEntry?: string): Configuration => {
   const isEnvDevelopment = webpackEnv === 'development';
   const isEnvProduction = webpackEnv === 'production';
   const isEnvProductionProfile = isEnvProduction && process.argv.includes('--profile');
@@ -138,6 +139,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
       : isEnvDevelopment && 'cheap-module-source-map',
     entry: {
       bricking: paths.brickingrc,
+      ...(devEntry ? { devEntry } : {}),
     },
     output: {
       clean: true,
@@ -393,6 +395,9 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
         ignoreOrder: true,
       }),
       new BrickingPackPlugin(),
+      !!devEntry && new HtmlWebpackPlugin({
+        chunks: ['bricking', 'devEntry']
+      })
     ].filter(Boolean) as any[],
   };
   const customConfigPath = getCustomWebpackPath();

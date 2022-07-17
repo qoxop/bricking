@@ -45,6 +45,7 @@ const defaultOption = () => ({
     /** 是否打包构建产物 */
     pack: false,
     entry: '' as (string | undefined),
+    devEntry: '' as (string | undefined),
     packageName: '',
     /** 不注入运行时代码 */
     excludeRuntime: false,

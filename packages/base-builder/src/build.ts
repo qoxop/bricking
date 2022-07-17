@@ -33,7 +33,8 @@ const runBuild = (callback = defaultCallback) => {
  * 执行编译构建，并启动开发服务器
  */
 const runServer = async (port?: string) => {
-  const baseWebpackConfig = getWebpackConfig(process.env.NODE_ENV);
+  let { bundle: { devEntry } } = getUserOptions();
+  const baseWebpackConfig = getWebpackConfig(process.env.NODE_ENV, devEntry);
   const devServer = { ...devServerConfig, ...(port ? { port } : {}) };
   const compiler = webpack({ ...baseWebpackConfig, devServer });
 
