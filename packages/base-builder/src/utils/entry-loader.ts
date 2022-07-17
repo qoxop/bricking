@@ -6,6 +6,7 @@ import { excludePackages } from './constants';
 
 module.exports = (source) => {
   const { bundle } = reloadOptions();
+  // @ts-ignore
   const depsExclude = (bundle?.dependencies?.exclude || [])?.concat(excludePackages);
   const autoInjectDependencies = bundle?.dependencies?.autoInject;
   const defines = bundle?.moduleDefines?.defines || {};

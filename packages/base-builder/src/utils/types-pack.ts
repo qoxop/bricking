@@ -1,8 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import { btkType, btkFile } from '@bricking/toolkit/dist';
-
-import { excludePackages } from './constants';
 import { getUserOptions } from '../options';
 import { getPackageJson, paths } from '../paths';
 
@@ -28,41 +26,9 @@ export default (remoteEntry: string) => {
   });
 
   const packageObj = getPackageJson();
-  delete packageObj.scripts;
-  delete packageObj.publishConfig;
-  delete packageObj.devDependencies;
-  delete packageObj.main;
 
-  const peerDependencies = packageObj.dependencies || {};
-
-  // 保留 @types 包
-  Object.keys(peerDependencies).forEach((key) => peerDependencies[`@types/${key}`] && (delete peerDependencies[key]));
-  // 移除内置包依赖
-  excludePackages.forEach((name) => peerDependencies[name] && (delete peerDependencies[name]));
-
-  const { exclude = [] } = bundle.dependencies;
-  const innerDependencies = exclude.reduce((innerDeps, cur) => {
-    if (peerDependencies[`@types/${cur}`]) {
-      // 存在 @types 包，就只保留 @types 包
-      innerDeps[`@types/${cur}`] = peerDependencies[`@types/${cur}`];
-      delete peerDependencies[`@types/${cur}`];
-      delete peerDependencies[cur];
-    } else if (peerDependencies[cur]) {
-      // 不存在 @types 包
-      innerDeps[cur] = peerDependencies[cur];
-      delete peerDependencies[cur];
-    }
-    return innerDeps;
-  }, {});
-    // 对等依赖
-  packageObj.peerDependencies = peerDependencies;
-  // 内部依赖
-  packageObj.dependencies = innerDependencies;
   packageObj.remoteEntry = remoteEntry;
-
-  if (hasIndex) {
-    packageObj.types = 'index.d.ts';
-  }
+  if (hasIndex) packageObj.types = 'index.d.ts';
 
   if (!fs.existsSync(output)) {
     fs.mkdirSync(output, { recursive: true });

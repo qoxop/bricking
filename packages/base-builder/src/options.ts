@@ -54,7 +54,7 @@ const defaultOption = () => ({
       autoInject: true,
       /** 标识哪些依赖是不需要打入运行时的 */
       exclude: [],
-    } as { autoInject: boolean, exclude?: string[] },
+    } as ({ autoInject: true, exclude?: string[] } | {autoInject: false, include?: string[]}),
     /** 自定义模块配置 */
     moduleDefines: {
       /** 是否自动注入自定义的模块，否则需要自行在入口文件处进行导入 */

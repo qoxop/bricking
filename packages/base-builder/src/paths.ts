@@ -3,7 +3,9 @@
  */
 import * as fs from 'fs';
 import * as path from 'path';
+import { btkPath } from '@bricking/toolkit';
 import { getUserOptions } from './options';
+import { excludePackages } from './utils/constants';
 
 const workspace = process.cwd();
 
@@ -40,8 +42,65 @@ const getPackageJson = () => {
   if (!fs.existsSync(paths.packageJson)) {
     throw new Error(`${paths.packageJson} 不存在 ～`);
   }
-  return require(paths.packageJson);
+
+  const {bundle: { dependencies: deps }} = getUserOptions();
+  let {
+    name,
+    version,
+    description = '',
+    author = '',
+    dependencies,
+    peerDependencies,
+  } = getPackageJson();
+
+  if (deps.autoInject) {
+    const { exclude = [] } = deps;
+    // 将 dependencies 改为 peerDependencies(用作开发时类型提醒)
+    peerDependencies = dependencies || {};
+    // 保留 @types 包
+    Object.keys(peerDependencies).forEach((key) => peerDependencies[`@types/${key}`] && (delete peerDependencies[key]));
+    // 移除内置包依赖
+    excludePackages.forEach((name) => peerDependencies[name] && (delete peerDependencies[name]));
+    const innerDependencies = exclude.reduce((innerDeps, cur) => {
+      if (peerDependencies[`@types/${cur}`]) {
+        // 存在 @types 包，就只保留 @types 包
+        innerDeps[`@types/${cur}`] = peerDependencies[`@types/${cur}`];
+        delete peerDependencies[`@types/${cur}`];
+        delete peerDependencies[cur];
+      } else if (peerDependencies[cur]) {
+        // 不存在 @types 包
+        innerDeps[cur] = peerDependencies[cur];
+        delete peerDependencies[cur];
+      }
+      return innerDeps;
+    }, {});
+    // exclude 的包被认为是不被导出的但是仍然在用的依赖
+    dependencies = innerDependencies;
+    return {
+      name,
+      version,
+      description,
+      author,
+      dependencies,
+      peerDependencies,
+    };
+  } else {
+    const { include = []} = deps;
+    peerDependencies = include.reduce((pre, moduleName) => {
+       const modulePath = btkPath.findModulePath(moduleName);
+       const { version } = require(path.resolve(modulePath, 'package.json'));
+       return { ...pre, [moduleName]: version };
+    }, {});
+    return {
+      name,
+      version,
+      description,
+      author,
+      peerDependencies,
+    }
+  }
 };
+
 const reloadOptions = () => {
   const cacheKey = require.resolve(paths.brickingrc);
   if (require.cache[cacheKey]) {
