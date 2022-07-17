@@ -8,10 +8,10 @@
     "build": "del dist && tsc"
   },
   "bin": {
-    "base-builder": ".bin/index.js"
+    "base-builder": "bin/index.js"
   },
   "files": [
-    ".bin",
+    "bin",
     "dist"
   ],
   "author": "张集伟",
