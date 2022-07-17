@@ -1,5 +1,11 @@
 # @bricking/base-builder
 
+## 0.2.5
+
+### Patch Changes
+
+- 5409c49f: 修复循环引用
+
 ## 0.2.4
 
 ### Patch Changes
