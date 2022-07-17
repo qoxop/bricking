@@ -1,5 +1,11 @@
 # @bricking/base-builder
 
+## 0.2.4
+
+### Patch Changes
+
+- cd0d8a1c: 增加自定义依赖包的功能
+
 ## 0.2.3
 
 ### Patch Changes
