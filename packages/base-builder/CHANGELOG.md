@@ -1,5 +1,12 @@
 # @bricking/base-builder
 
+## 0.2.3
+
+### Patch Changes
+
+- 1e4a3b3d: 修复依赖问题
+- 20d4184d: 修改命令脚本目录
+
 ## 0.2.2
 
 ### Patch Changes
