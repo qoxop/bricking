@@ -23,8 +23,8 @@ export default class BrickingPackPlugin {
     for (const [name, entry] of compilation.entrypoints) {
       if (name === 'bricking') {
         return entry.getFiles().find((filename) => (
-          /^base-js-bundle\.\w+\.js$/.test(filename)
-                    || filename === 'base-js-bundle.js'
+          /^base-js-bricking\.\w+\.js$/.test(filename)
+                    || filename === 'base-js-bricking.js'
         ));
       }
     }

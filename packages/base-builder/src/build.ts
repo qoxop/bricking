@@ -40,7 +40,7 @@ const runServer = async (port?: string) => {
 
   let log:Function;
   compiler.hooks.assetEmitted.tap('bricking-run-server', (file) => {
-    if (/^base-js-bundle\..*js$/.test(file)) {
+    if (/^base-js-bricking\..*js$/.test(file)) {
       log = () => {
         const { devServer: { hostname } } = getUserOptions();
         const origin = `${devServerConfig?.https ? 'https' : 'http'}://${hostname}:${devServerConfig?.port}`;
