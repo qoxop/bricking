@@ -1,5 +1,11 @@
 # @bricking/base-builder
 
+## 0.2.8
+
+### Patch Changes
+
+- 23c017a0: 增加 HtmlWebpackPlugin 参数
+
 ## 0.2.7
 
 ### Patch Changes
