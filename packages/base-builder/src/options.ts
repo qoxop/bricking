@@ -1,3 +1,4 @@
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { Configuration } from 'webpack-dev-server';
 
 type PartialAll<T> = {
@@ -25,6 +26,7 @@ const defaultOption = () => ({
     alias: {} as Record<string, string>,
     definitions: {} as Record<string, string | string[]>,
     defineMapping: {} as Record<string, string>,
+    htmlOptions: {} as HtmlWebpackPlugin.Options | undefined
   },
   react: {
     useReactRefresh: true,

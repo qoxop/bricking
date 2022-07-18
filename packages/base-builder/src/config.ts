@@ -396,7 +396,10 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
       }),
       new BrickingPackPlugin(),
       !!devEntry && new HtmlWebpackPlugin({
-        chunks: ['bricking', 'devEntry']
+        ...compileOptions.htmlOptions,
+        chunks: ['bricking', 'devEntry'],
+        chunksSortMode: 'manual',
+        
       })
     ].filter(Boolean) as any[],
   };
