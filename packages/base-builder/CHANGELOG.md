@@ -1,5 +1,11 @@
 # @bricking/base-builder
 
+## 0.2.7
+
+### Patch Changes
+
+- 7a725e92: 修复多入口同名冲突
+
 ## 0.2.6
 
 ### Patch Changes
