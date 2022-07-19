@@ -84,6 +84,7 @@ export const getBabelOptions = (isEnvProduction: boolean, isAppScript: boolean) 
     return require(paths.babelConfig);
   }
   return {
+    sourceType: "unambiguous",
     presets: [
       [RS('@babel/preset-env'), {
         useBuiltIns: 'entry',
@@ -399,7 +400,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
         ...compileOptions.htmlOptions,
         chunks: ['bricking', 'devEntry'],
         chunksSortMode: 'manual',
-        
+
       })
     ].filter(Boolean) as any[],
   };
