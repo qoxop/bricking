@@ -71,3 +71,5 @@ packages/*/dist
 apps/*/dist
 .pnpm-store
 node_modules
+
+_bricking

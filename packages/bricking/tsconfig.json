@@ -11,6 +11,7 @@
     "noUnusedLocals": true,
     "esModuleInterop": true,
     "noImplicitAny": false,
+    "skipDefaultLibCheck": true,
     "lib": ["ES2018", "dom"],
     "typeRoots": ["node_modules/@types"]
   }

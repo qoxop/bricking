@@ -3,7 +3,8 @@
 		"rebuild": "pnpm install && node ./scripts/rebuild.js",
 		"lint": "npx eslint",
 		"ci:version": "pnpm changeset version",
-		"ci:publish": "pnpm run rebuild && pnpm publish -r && pnpm changeset tag"
+		"ci:publish": "pnpm run rebuild && pnpm publish -r && pnpm changeset tag",
+		"debug": "pnpm run rebuild && cpy packages _bricking && node ./scripts/debug.js"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.22.0",
@@ -24,9 +25,11 @@
 		"eslint-plugin-react": "^7.29.3",
 		"eslint-plugin-react-hooks": "^4.3.0",
 		"eslint-plugin-vue": "^8.5.0",
+		"got": "11.8.3",
 		"less": "^4.1.2",
 		"node-sass": "^7.0.1",
 		"npm-run-all": "^4.1.5",
+		"rollup": "^2.58.0",
 		"typescript": "^4.5.5"
 	}
 }
