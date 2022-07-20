@@ -87,11 +87,11 @@ export default class BrickingPackPlugin {
       if (compiler.hooks[hookName]) {
         if (compiler.hooks[hookName].tapAsync) {
           compiler.hooks[hookName].tapAsync(PLUGIN_NAME, async (...args) => {
-            await callback(...args);
-          })
+            return await callback(...args);
+          });
         } else if (compiler.hooks[hookName].tap) {
           compiler.hooks[hookName].tapAsync(PLUGIN_NAME, (...args) => {
-            callback(...args);
+            return callback(...args);
           })
         }
       }

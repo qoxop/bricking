@@ -148,10 +148,10 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
       path: paths.outputPath,
       pathinfo: isEnvDevelopment,
       filename: isEnvProduction
-        ? 'base-js-[name].[contenthash:8].js'
+        ? 'base-js-[name].[chunkhash:8].js'
         : 'base-js-[name].js',
       chunkFilename: isEnvProduction
-        ? 'chunk-js-[name].[contenthash:8].js'
+        ? 'chunk-js-[name].[chunkhash:8].js'
         : 'chunk-js-[name].chunk.js',
       assetModuleFilename: 'media/[hash][ext][query]',
     },
@@ -391,8 +391,8 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
         overlay: false,
       }),
       isEnvProduction && new MiniCssExtractPlugin({
-        filename: 'base-css-[name].[contenthash:8].css',
-        chunkFilename: 'base-css-[id].[contenthash:8].chunk.css',
+        filename: 'base-css-[name].[chunkhash:8].css',
+        chunkFilename: 'base-css-[id].[chunkhash:8].chunk.css',
         ignoreOrder: true,
       }),
       new BrickingPackPlugin(),
