@@ -17,7 +17,7 @@ module.exports = (source) => {
   }
   source = 'import "@bricking/runtime";\n';
 
-  const { dependencies, name: baseName } = getPackageJson();
+  const { peerDependencies, name: baseName } = getPackageJson();
   const pkgName = bundle.packageName || baseName;
 
   let indexInjected = false;
@@ -42,7 +42,7 @@ module.exports = (source) => {
     source += `\nwindow.$bricking.mm.setDynamic({\n${definesImports}\n});`;
   }
   if (autoInjectDependencies) {
-    const depsImports = Object.keys(dependencies)
+    const depsImports = Object.keys(peerDependencies)
       .filter((key) => (!/^@types\//.test(key) && !depsExclude.includes(key)))
       .map((key) => `\t"${key}": () => import("${key}"),`)
       .join('\n');
