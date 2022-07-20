@@ -16,7 +16,7 @@ const PLUGIN_NAME = 'BRICKING_PACK_PLUGIN';
 const { Zipper } = btkFile;
 
 export default class BrickingPackPlugin {
-  options = getUserOptions();
+  private options = getUserOptions();
 
   getBundleFilename(compilation: Compilation) {
     // eslint-disable-next-line no-restricted-syntax
@@ -33,7 +33,11 @@ export default class BrickingPackPlugin {
   apply(compiler: Compiler) {
     const { webpack } = compiler;
     const { RawSource } = webpack.sources;
+    const { thisCompilation, ...otherHooks } = this.options.compile.hooks || {}
     compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (compilation) => {
+      if (typeof thisCompilation === 'function') {
+        thisCompilation(compilation);
+      }
       compilation.hooks.processAssets.tapAsync(
         {
           name: PLUGIN_NAME,
@@ -79,5 +83,18 @@ export default class BrickingPackPlugin {
         },
       );
     });
+    Object.entries(otherHooks).forEach(([hookName, callback]) => {
+      if (compiler.hooks[hookName]) {
+        if (compiler.hooks[hookName].tapAsync) {
+          compiler.hooks[hookName].tapAsync(PLUGIN_NAME, async (...args) => {
+            await callback(...args);
+          })
+        } else if (compiler.hooks[hookName].tap) {
+          compiler.hooks[hookName].tapAsync(PLUGIN_NAME, (...args) => {
+            callback(...args);
+          })
+        }
+      }
+    })
   }
 }
