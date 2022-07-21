@@ -7,10 +7,10 @@
     "build": "del dist && tsc"
   },
   "bin": {
-    "bricking": ".bin/index.js"
+    "bricking": "bin/index.js"
   },
   "files": [
-    ".bin",
+    "bin",
     "dist"
   ],
   "author": "张集伟",
