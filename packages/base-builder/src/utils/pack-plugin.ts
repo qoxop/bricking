@@ -61,8 +61,7 @@ export default class BrickingPackPlugin {
           compilation.assets[bundlePackName] = new RawSource(bundlePackBuff);
 
           const typesPackBuff = await Zipper.tarFolder(typesPackPath, []) as Buffer;
-          const typesPackHash = btkHash.getHash(typesPackBuff);
-          const typesPackName = `typesPack.${typesPackHash}.tgz`;
+          const typesPackName = "pack.tgz";
           compilation.assets[typesPackName] = new RawSource(typesPackBuff);
           const { name, version, description = '', author = '',dependencies, peerDependencies } = getPackageJson();
           const infoJson = JSON.stringify({

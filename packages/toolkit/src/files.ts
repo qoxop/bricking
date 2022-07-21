@@ -113,14 +113,14 @@ class Zipper {
     this.zipFile.end();
   });
 
-  static tarFolder<T extends string | any[]>(folder: string, dist: T) {
+  static tarFolder<T extends string | any[]>(folder: string, dist: T, prefix: string = "package/") {
     return new Promise((resolve, reject) => {
       if (typeof dist === 'string') {
-        tar.c({ gzip: true, file: dist }, [folder])
+        tar.c({ gzip: true, file: dist, cwd: folder, prefix }, ['./'])
           .then(resolve)
           .catch(reject);
       } else {
-        tar.c({ gzip: true }, [folder])
+        tar.c({ gzip: true, cwd: folder, prefix }, ['./'])
           .on('data', (buff) => dist.push(buff))
           .on('end', () => resolve(Buffer.concat(dist)))
           .on('error', reject);
