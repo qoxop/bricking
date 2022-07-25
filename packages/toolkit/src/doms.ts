@@ -11,11 +11,11 @@ const getIndexDom = (workspace?: string) => new JSDOM(fs.readFileSync(path.join(
 
 type Script = {
     url: string,
-    type: string,
+    type?: string,
     props?: Record<string, string>
 } | {
     content: string,
-    type: string,
+    type?: string,
     props?: Record<string, string>
 }
 /**
@@ -26,10 +26,12 @@ type Script = {
  * @returns
  */
 function injectScripts(dom: any, scripts: Script[], output?: string) {
-  const { document } = dom;
+  const { window: { document} } = dom;
   scripts.forEach((item) => {
     const script = document.createElement('script');
-    script.type = item.type;
+    if (item.type) {
+      script.type = item.type;
+    }
     if ('url' in item) {
       script.src = item.url;
     } else {

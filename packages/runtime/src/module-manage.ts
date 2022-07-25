@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 /// <reference types="systemjs" />
-import 'systemjs/dist/s.min.js';
+import 'systemjs/dist/system.js';
 
 const isAsyncFlag = 'Symbol' in window ? Symbol('is_async_flag') : '$__is_async_flag__';
 
@@ -37,7 +37,7 @@ if (!System) {
 }
 
 // 自定义元数据创建钩子
-System.constructor.prototype.createContext = (parentId: string) => {
+System.constructor.prototype.createContext = function (parentId: string) {
   const meta = ORIGIN_CREATE_CONTEXT.call(this, parentId) || {};
   if (META_DATA_MAPS[parentId]) {
     meta.data = META_DATA_MAPS[parentId];
@@ -47,7 +47,7 @@ System.constructor.prototype.createContext = (parentId: string) => {
 };
 
 // 自定义 模块 id 处理钩子
-System.constructor.prototype.resolve = (id: string, parentURL?: string) => {
+System.constructor.prototype.resolve = function (id: string, parentURL?: string) {
   let finalUrl = '';
   if (IMPORT_MAPS[id]) {
     finalUrl = ORIGIN_RESOLVE.call(this, IMPORT_MAPS[id], parentURL);
@@ -63,7 +63,7 @@ System.constructor.prototype.resolve = (id: string, parentURL?: string) => {
   return finalUrl;
 };
 // 自定义模块安装钩子
-System.constructor.prototype.instantiate = (url: string, firstParentUrl?: string) => {
+System.constructor.prototype.instantiate = function (url: string, firstParentUrl?: string) {
   if (CUSTOM_MODULE_MAPS && CUSTOM_MODULE_MAPS[url]) {
     return new Promise((resolve, reject) => {
       if (CUSTOM_MODULE_MAPS[url][isAsyncFlag]) { // 异步模块
@@ -143,6 +143,7 @@ const register = {
     }
   },
 };
+
 export default Object.freeze({
   ...register,
   CSS_LINK_MODULE_PATTERN,

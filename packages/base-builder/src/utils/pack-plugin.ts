@@ -63,13 +63,12 @@ export default class BrickingPackPlugin {
           const typesPackBuff = await Zipper.tarFolder(typesPackPath, []) as Buffer;
           const typesPackName = "pack.tgz";
           compilation.assets[typesPackName] = new RawSource(typesPackBuff);
-          const { name, version, description = '', author = '',dependencies, peerDependencies } = getPackageJson();
+          const { name, version, description = '', author = '', peerDependencies } = getPackageJson();
           const infoJson = JSON.stringify({
             name,
             version,
             author,
             description,
-            dependencies,
             peerDependencies,
             publicPath,
             bundle: bundleFilename,

@@ -49,39 +49,30 @@ const getPackageJson = () => {
     version,
     description = '',
     author = '',
-    dependencies,
-    peerDependencies,
+    dependencies = {},
+    peerDependencies = {},
   } = require(paths.packageJson);
 
   if (deps.autoInject) {
     const { exclude = [] } = deps;
     // 将 dependencies 改为 peerDependencies(用作开发时类型提醒)
-    peerDependencies = dependencies || {};
-    // 保留 @types 包
-    Object.keys(peerDependencies).forEach((key) => peerDependencies[`@types/${key}`] && (delete peerDependencies[key]));
+    peerDependencies = Object.assign({}, peerDependencies, dependencies);
     // 移除内置包依赖
     excludePackages.forEach((name) => peerDependencies[name] && (delete peerDependencies[name]));
-    const innerDependencies = exclude.reduce((innerDeps, cur) => {
-      if (peerDependencies[`@types/${cur}`]) {
-        // 存在 @types 包，就只保留 @types 包
-        innerDeps[`@types/${cur}`] = peerDependencies[`@types/${cur}`];
-        delete peerDependencies[`@types/${cur}`];
-        delete peerDependencies[cur];
-      } else if (peerDependencies[cur]) {
-        // 不存在 @types 包
-        innerDeps[cur] = peerDependencies[cur];
-        delete peerDependencies[cur];
+    // 移除 exclude
+    exclude.forEach((name) => {
+      if (peerDependencies[name]) {
+        (delete peerDependencies[name])
       }
-      return innerDeps;
-    }, {});
-    // exclude 的包被认为是不被导出的但是仍然在用的依赖
-    dependencies = innerDependencies;
+      if (peerDependencies[`@types/${name}`]) {
+        delete peerDependencies[`@types/${name}`];
+      }
+    });
     return {
       name,
       version,
       description,
       author,
-      dependencies,
       peerDependencies,
     };
   } else {

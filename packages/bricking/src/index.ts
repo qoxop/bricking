@@ -32,8 +32,9 @@ export function defineBricking(options: BrickingOptions): Required<BrickingOptio
     options.assets = {
         limit: 1024 *  8,
         output: absolutely(options.output, 'dist/assets'),
-        filename: `[hash].[ext]`,
+        filename: `[hash][extname]`,
         loadPaths:  options.assets?.loadPaths ?? [],
+        ...options.assets,
     };
     options.devServe = {
         port: 3000,

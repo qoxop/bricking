@@ -1,12 +1,15 @@
-import rollup from 'rollup';
+import * as rollup from 'rollup';
 import * as path from 'path';
 import alias from '@rollup/plugin-alias';
+import jsonPlugin from '@rollup/plugin-json';
+import builtins from 'rollup-plugin-node-builtins';
+// @ts-ignore
 import bundleStyle from '@bricking/plugin-style';
 import { btkDom, btkPath } from '@bricking/toolkit';
 import livereload from 'rollup-plugin-livereload';
 import { relativeUrl } from './plugins/postcss-relative-url';
 import rollupUrl from './plugins/rollup-url';
-import config, { tsConfig, workspace } from './config';
+import config, { tsConfig, tsConfigPath, workspace } from './config';
 import { openBrowser, startServe } from './server';
 
 // 添加 postcss-relative-url 插件
@@ -57,7 +60,7 @@ const getExternals = () => {
         prev[cur.replace(/^@types\//, '')] = true;
         return prev;
     }, {});
-    return Object.keys(peerDependencies);
+    return Object.keys(peerDependencies).concat(['___INJECT_STYLE_LINK___']);
 }
 
 /**
@@ -65,9 +68,11 @@ const getExternals = () => {
  * @returns
  */
 const commonPlugin = () => ([
-    require('@rollup/plugin-node-resolve').default(),
+    require('@rollup/plugin-node-resolve').default({ browser: true }),
     require('@rollup/plugin-commonjs')(),
+    builtins({ crypto: true }),
     alias({ entries: getAliasEntries() }),
+    jsonPlugin(),
     // 打包样式文件
     bundleStyle(config.style),
     // 处理文件
@@ -75,7 +80,7 @@ const commonPlugin = () => ([
         limit: config.assets.limit,
         destDir: config.assets.output,
         include: config.assets.include,
-        exclude: config.assets.exclude,
+        exclude: config.assets.exclude || [],
         fileName: config.assets.filename,
         emitFiles: true,
     }),
@@ -88,7 +93,9 @@ const commonPlugin = () => ([
     }),
     // 编译 ts
     require('@rollup/plugin-typescript')({
-        tsconfig: tsConfig,
+        tsconfig: tsConfigPath,
+        sourceMap: true,
+        inlineSources: true,
     }),
 ]);
 
@@ -174,6 +181,11 @@ const watch =  (entry: string | Record<string, string>, output: string, importMa
             if (event.code === 'END') {
                 resolve();
             }
+            if (event.code === 'ERROR') {
+                console.error(`rollup error code: ${event.code}`);
+                console.error(event.result);
+                console.error(event.error);
+            }
         });
     })
 }
@@ -213,13 +225,12 @@ export async function runServe() {
 }
 export async function runStart() {
     await watch(config.entry, config.output);
-    const importMaps = Object.keys(config.entry).reduce((prev, cur) => ({ ...prev, [`@module/${cur}}`]: `${cur}.js`}), {});
+    const importMaps = Object.keys(config.entry).reduce((prev, cur) => ({ ...prev, [`@module/${cur}`]: `./${cur}.js`}), {});
     await watch({ 'debug-entry': config.debugEntry }, config.output, importMaps);
     const { remoteEntry } = getBasePackageJson();
     btkDom.injectScripts(btkDom.getIndexDom(), [
         {
             url: remoteEntry,
-            type: 'javascript'
         },
         {
             content: JSON.stringify({ imports: importMaps }),

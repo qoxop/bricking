@@ -17,6 +17,9 @@ export {
     tsConfig,
     packageJson,
     workspace,
+    configPath,
+    tsConfigPath,
+    packageJsonPath,
 }
 
 export default config;

@@ -78,8 +78,17 @@ const modulePathResolve = (filepath: string, relative: string, extraExtensions: 
 
 const findModulePath = (moduleName: string) => {
   const splitString = `node_modules${sep}${moduleName}`;
-  const paths = require.resolve(moduleName).split(splitString);
-  return paths[0] + splitString;
+  try {
+    const paths = require.resolve(moduleName).split(splitString);
+    return paths[0] + splitString;
+  } catch(err) {
+    const modulePath = path.resolve(process.cwd(), `./${splitString}`)
+    if (fs.existsSync(path.resolve(modulePath, 'package.json'))) {
+      return modulePath;
+    }
+    throw err;
+  }
+  
 }
 
 export {

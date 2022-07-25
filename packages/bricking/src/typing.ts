@@ -1,4 +1,5 @@
 import { Plugin } from 'rollup';
+// @ts-ignore
 import  { Options as StyleOptions } from  '@bricking/plugin-style';
 import { DevServe } from './server';
 
