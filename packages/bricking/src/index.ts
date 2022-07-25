@@ -49,7 +49,11 @@ export function defineBricking(options: BrickingOptions): Required<BrickingOptio
     if (!options.debugEntry && isDev) {
         throw new Error('options.debugEntry is require~');
     }
-    if (!(options.basePackage?.name && options.basePackage?.version)) {
+    if (!(
+        (typeof options.basePackage === 'string'  && options.basePackage) ||
+        // @ts-ignore
+        (options.basePackage?.name && options.basePackage?.version)
+    )) {
         throw new Error('options.basePackage is require~');
     }
     return options as any;

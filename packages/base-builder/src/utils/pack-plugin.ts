@@ -46,7 +46,8 @@ export default class BrickingPackPlugin {
         async (assets, callback) => {
           const bundleFilename = this.getBundleFilename(compilation);
           const publicPath = this.options.publicPath || '/';
-          const typesPackPath = typesPack(`${publicPath}${/\/$/ ? '': '/'}${bundleFilename}`);
+          const remoteEntry = `${publicPath}${/\/$/.test(publicPath) ? '': '/'}${bundleFilename}`;
+          const typesPackPath = typesPack(remoteEntry);
           const zipper = new Zipper(path.resolve(compiler.outputPath, './pack.zip'));
           Object.entries(assets).forEach(([name, value]) => {
             if (!/\.txt$/.test(name)) {
@@ -74,6 +75,7 @@ export default class BrickingPackPlugin {
             bundle: bundleFilename,
             typesPack: typesPackName,
             bundlePack: bundlePackName,
+            remoteEntry,
           }, null, '\t');
           compilation.assets['package.json'] = new RawSource(infoJson);
 

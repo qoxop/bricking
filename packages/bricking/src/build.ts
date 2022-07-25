@@ -5,12 +5,13 @@ import jsonPlugin from '@rollup/plugin-json';
 import builtins from 'rollup-plugin-node-builtins';
 // @ts-ignore
 import bundleStyle from '@bricking/plugin-style';
-import { btkDom, btkPath } from '@bricking/toolkit';
+import { btkDom } from '@bricking/toolkit';
 import livereload from 'rollup-plugin-livereload';
 import { relativeUrl } from './plugins/postcss-relative-url';
 import rollupUrl from './plugins/rollup-url';
 import config, { tsConfig, tsConfigPath, workspace } from './config';
 import { openBrowser, startServe } from './server';
+import { getBaseLibInfo } from './install';
 
 // 添加 postcss-relative-url 插件
 // @ts-ignore
@@ -22,11 +23,6 @@ config.style.postcss.plugins.push(relativeUrl({
     filename: config.assets.filename,
     loadPaths: config.assets.loadPaths
 }));
-
-const getBasePackageJson = () => {
-    const modulePath = btkPath.findModulePath(config.basePackage.name);
-    return require(`${modulePath}${path.sep}package.json`);
-}
 
 /**
  * 获取别名配置
@@ -54,9 +50,9 @@ const getAliasEntries = () => {
  * 获取外部依赖列表
  * @returns
  */
-const getExternals = () => {
-    const basePackageJson = getBasePackageJson();
-    const peerDependencies = Object.keys(basePackageJson.peerDependencies).reduce((prev, cur) => {
+const getExternals = async () => {
+    let { peerDependencies } = await getBaseLibInfo();
+    peerDependencies = Object.keys(peerDependencies).reduce((prev, cur) => {
         prev[cur.replace(/^@types\//, '')] = true;
         return prev;
     }, {});
@@ -112,7 +108,7 @@ const build = async (entry: string | Record<string, string>, output: string,  im
         input: entry,
         external: [
             ...Object.keys(importMaps || {}),
-            ...getExternals(),
+            ...(await getExternals()),
         ],
         plugins: [
             // 通用插件
@@ -142,14 +138,14 @@ const build = async (entry: string | Record<string, string>, output: string,  im
  * @param importMaps 
  * @returns 
  */
-const watch =  (entry: string | Record<string, string>, output: string, importMaps?: Record<string, string>) => {
+const watch = async (entry: string | Record<string, string>, output: string, importMaps?: Record<string, string>) => {
     const watcher = rollup.watch({
         preserveEntrySignatures: "exports-only",
         context: 'window',
         input: entry,
         external: [
             ...Object.keys(importMaps || {}),
-            ...getExternals(),
+            ...(await getExternals()),
         ],
         plugins: [
             // 通用插件
@@ -173,7 +169,7 @@ const watch =  (entry: string | Record<string, string>, output: string, importMa
             exclude: ['node_modules/**']
         },
     });
-    return new Promise<void>((resolve) => {
+    return await new Promise<void>((resolve) => {
         watcher.on('event', (event) => {
             if (event.code === 'BUNDLE_END') {
                 event.result.close();
@@ -199,7 +195,7 @@ export async function runBuild() {
     }, {});
     const { rollupOutput: debugRollupOut } = await build(config.debugEntry, config.output, importMaps);
     const debugEntryChunk = debugRollupOut.output.find(chunk => chunk.type === 'chunk' && chunk.isEntry);
-    const { remoteEntry } = getBasePackageJson();
+    const { remoteEntry } = await getBaseLibInfo();
     /**
      * 输出 html 文件
      */
@@ -227,7 +223,7 @@ export async function runStart() {
     await watch(config.entry, config.output);
     const importMaps = Object.keys(config.entry).reduce((prev, cur) => ({ ...prev, [`@module/${cur}`]: `./${cur}.js`}), {});
     await watch({ 'debug-entry': config.debugEntry }, config.output, importMaps);
-    const { remoteEntry } = getBasePackageJson();
+    const { remoteEntry } = await getBaseLibInfo();
     btkDom.injectScripts(btkDom.getIndexDom(), [
         {
             url: remoteEntry,

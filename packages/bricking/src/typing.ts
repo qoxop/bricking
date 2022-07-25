@@ -33,7 +33,7 @@ export type BrickingOptions = {
     basePackage: {
         name: string;
         version: string;
-    };
+    } | string;
     /**
      * 是否压缩
      */
