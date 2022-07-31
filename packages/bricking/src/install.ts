@@ -91,7 +91,6 @@ export async function getBaseLibInfo(): Promise<BaseLibInfo> {
       modulePath = btkPath.findModulePath(name);
       pkgInfo = require(`${modulePath}${path.sep}package.json`);
     }
-
   } catch (error) {
     // 本地依赖包不存在 -> 安装
     installBase();
@@ -104,7 +103,7 @@ export async function getBaseLibInfo(): Promise<BaseLibInfo> {
     name,
     version,
     ...pkgInfo,
-  }
+  };
 }
 
 /**
