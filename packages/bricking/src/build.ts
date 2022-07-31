@@ -169,7 +169,7 @@ const watch = async (entry: string | Record<string, string>, output: string, imp
       exclude: ['node_modules/**'],
     },
   });
-  return await new Promise<void>((resolve) => {
+  await new Promise<void>((resolve) => {
     watcher.on('event', (event) => {
       if (event.code === 'BUNDLE_END') {
         event.result.close();
@@ -188,7 +188,7 @@ const watch = async (entry: string | Record<string, string>, output: string, imp
 
 export async function runBuild() {
   const { rollupOutput } = await build(config.entry, config.output);
-  const entryChunks = rollupOutput.output.filter((chunk) => chunk.type == 'chunk' && chunk.isEntry);
+  const entryChunks = rollupOutput.output.filter((chunk) => chunk.type === 'chunk' && chunk.isEntry);
   const importMaps = entryChunks.reduce((prev, cur) => {
     prev[`@module/${cur.name}`] = `./${cur.fileName}`;
     return prev;

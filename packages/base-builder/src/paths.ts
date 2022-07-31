@@ -58,14 +58,14 @@ const getPackageJson = () => {
     // 将 dependencies 改为 peerDependencies(用作开发时类型提醒)
     peerDependencies = { ...peerDependencies, ...dependencies };
     // 移除内置包依赖
-    excludePackages.forEach((name) => peerDependencies[name] && (delete peerDependencies[name]));
+    excludePackages.forEach((_name) => peerDependencies[_name] && (delete peerDependencies[_name]));
     // 移除 exclude
-    exclude.forEach((name) => {
-      if (peerDependencies[name]) {
-        (delete peerDependencies[name]);
+    exclude.forEach((_name) => {
+      if (peerDependencies[_name]) {
+        (delete peerDependencies[_name]);
       }
-      if (peerDependencies[`@types/${name}`]) {
-        delete peerDependencies[`@types/${name}`];
+      if (peerDependencies[`@types/${_name}`]) {
+        delete peerDependencies[`@types/${_name}`];
       }
     });
     return {
@@ -79,8 +79,8 @@ const getPackageJson = () => {
   const { include = [] } = deps;
   peerDependencies = include.reduce((pre, moduleName) => {
     const modulePath = btkPath.findModulePath(moduleName);
-    const { version } = require(path.resolve(modulePath, 'package.json'));
-    return { ...pre, [moduleName]: version };
+    const { version: _version } = require(path.resolve(modulePath, 'package.json'));
+    return { ...pre, [moduleName]: _version };
   }, {});
   return {
     name,

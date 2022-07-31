@@ -7,6 +7,7 @@ type PartialAll<T> = {
 };
 
 type Hooks = {
+  // eslint-disable-next-line no-unused-vars
   [key in keyof InstanceType<typeof Compiler>['hooks']]: (...args: any[]) => any;
 }
 

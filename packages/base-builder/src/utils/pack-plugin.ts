@@ -86,7 +86,10 @@ export default class BrickingPackPlugin {
     Object.entries(otherHooks).forEach(([hookName, callback]) => {
       if (compiler.hooks[hookName]) {
         if (compiler.hooks[hookName].tapAsync) {
-          compiler.hooks[hookName].tapAsync(PLUGIN_NAME, async (...args) => await callback(...args));
+          compiler.hooks[hookName].tapAsync(PLUGIN_NAME, async (...args) => {
+            const data = await callback(...args);
+            return data;
+          });
         } else if (compiler.hooks[hookName].tap) {
           compiler.hooks[hookName].tapAsync(PLUGIN_NAME, (...args) => callback(...args));
         }

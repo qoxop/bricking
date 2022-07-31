@@ -6,3 +6,5 @@ apps/**/types/**/*
 
 **/node_modules/**/*
 **/dist/**/*
+
+_bricking/**/*

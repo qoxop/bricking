@@ -1,3 +1,4 @@
+/* eslint-disable func-names */
 /* eslint-disable no-undef */
 /// <reference types="systemjs" />
 import 'systemjs/dist/system.js';

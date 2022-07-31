@@ -115,7 +115,7 @@ export async function install() {
     version,
     peerDependencies,
   } = await getBaseLibInfo();
-  const pkgs = Object.entries(peerDependencies).map(([key, version]) => (`${key}@${version}`));
+  const pkgs = Object.entries(peerDependencies).map(([key, _version]) => (`${key}@${_version}`));
   const { command, subCommand } = await getCommands();
   spawnSync(command, [subCommand, `${name}@${version}`, ...pkgs], { stdio: 'inherit' });
 }

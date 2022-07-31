@@ -127,7 +127,7 @@ export const getBabelOptions = (isEnvProduction: boolean, isAppScript: boolean) 
   };
 };
 
-export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'production', devEntry?: string): Configuration => {
+export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'production', devEntry = ''): Configuration => {
   const isEnvDevelopment = webpackEnv === 'development';
   const isEnvProduction = webpackEnv === 'production';
   const isEnvProductionProfile = isEnvProduction && process.argv.includes('--profile');

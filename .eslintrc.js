@@ -43,6 +43,7 @@ module.exports = {
         "react/function-component-definition": 0,
         "@typescript-eslint/ban-ts-comment": 0,
         "object-curly-newline": 0,
-        "@typescript-eslint/no-explicit-any": 0
+        "@typescript-eslint/no-explicit-any": 0,
+        "no-underscore-dangle": 0
     }
 }
