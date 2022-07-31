@@ -67,11 +67,14 @@ type BaseLibInfo = {
  */
 export async function getBaseLibInfo(): Promise<BaseLibInfo> {
   if (typeof config.basePackage === 'string') {
-    const { publicPath, typesPack, ...other } = await btkNetwork.getJson<any>(config.basePackage);
+    const { name, publicPath, typesPack, ...other } = await btkNetwork.getJson<any>(config.basePackage);
+    console.log(`base-lib-name: ${name}`);
+    console.log(`base-lib-version: ${publicPath}${typesPack}`);
     return {
       ...other,
-      version: `${publicPath}/${typesPack}`,
-    }
+      name,
+      version: `${publicPath}${typesPack}`,
+    };
   }
   const { name, version } = config.basePackage;
   const { command, subCommand } = await getCommands();
@@ -95,7 +98,8 @@ export async function getBaseLibInfo(): Promise<BaseLibInfo> {
     modulePath = btkPath.findModulePath(name);
     pkgInfo = require(`${modulePath}${path.sep}package.json`);
   }
-  
+  console.log(`base-lib-name: ${name}`);
+  console.log(`base-lib-version: ${version}`);
   return {
     name,
     version,
@@ -114,5 +118,5 @@ export async function install() {
   } = await getBaseLibInfo();
   const pkgs = Object.entries(peerDependencies).map(([key, version]) => (`${key}@${version}`));
   const { command, subCommand } = await getCommands();
-  spawnSync(command, [subCommand, `${name}/${version}` ,...pkgs], { stdio: 'inherit' });
+  spawnSync(command, [subCommand, `${name}@${version}` ,...pkgs], { stdio: 'inherit' });
 }
