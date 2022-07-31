@@ -113,7 +113,7 @@ class Zipper {
     this.zipFile.end();
   });
 
-  static tarFolder<T extends string | any[]>(folder: string, dist: T, prefix: string = "package/") {
+  static tarFolder<T extends string | any[]>(folder: string, dist: T, prefix = 'package/') {
     return new Promise((resolve, reject) => {
       if (typeof dist === 'string') {
         tar.c({ gzip: true, file: dist, cwd: folder, prefix }, ['./'])

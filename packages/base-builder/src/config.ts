@@ -16,6 +16,7 @@ import {
 } from 'webpack';
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 import {
   getUserOptions,
 } from './options';
@@ -24,7 +25,6 @@ import {
   paths,
 } from './paths';
 import BrickingPackPlugin from './utils/pack-plugin';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
 
 const RS = require.resolve;
 
@@ -84,7 +84,7 @@ export const getBabelOptions = (isEnvProduction: boolean, isAppScript: boolean) 
     return require(paths.babelConfig);
   }
   return {
-    sourceType: "unambiguous",
+    sourceType: 'unambiguous',
     presets: [
       [RS('@babel/preset-env'), {
         useBuiltIns: 'entry',
@@ -401,7 +401,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
         chunks: ['bricking', 'devEntry'],
         chunksSortMode: 'manual',
 
-      })
+      }),
     ].filter(Boolean) as any[],
   };
   const customConfigPath = getCustomWebpackPath();

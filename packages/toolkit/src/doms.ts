@@ -26,7 +26,7 @@ type Script = {
  * @returns
  */
 function injectScripts(dom: any, scripts: Script[], output?: string) {
-  const { window: { document} } = dom;
+  const { window: { document } } = dom;
   scripts.forEach((item) => {
     const script = document.createElement('script');
     if (item.type) {

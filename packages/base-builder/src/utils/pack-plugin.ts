@@ -33,7 +33,7 @@ export default class BrickingPackPlugin {
   apply(compiler: Compiler) {
     const { webpack } = compiler;
     const { RawSource } = webpack.sources;
-    const { thisCompilation, ...otherHooks } = this.options.compile.hooks || {}
+    const { thisCompilation, ...otherHooks } = this.options.compile.hooks || {};
     compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (compilation) => {
       if (typeof thisCompilation === 'function') {
         thisCompilation(compilation);
@@ -46,7 +46,7 @@ export default class BrickingPackPlugin {
         async (assets, callback) => {
           const bundleFilename = this.getBundleFilename(compilation);
           const publicPath = this.options.publicPath || '/';
-          const remoteEntry = `${publicPath}${/\/$/.test(publicPath) ? '': '/'}${bundleFilename}`;
+          const remoteEntry = `${publicPath}${/\/$/.test(publicPath) ? '' : '/'}${bundleFilename}`;
           const typesPackPath = typesPack(remoteEntry);
           const zipper = new Zipper(path.resolve(compiler.outputPath, './pack.zip'));
           Object.entries(assets).forEach(([name, value]) => {
@@ -62,7 +62,7 @@ export default class BrickingPackPlugin {
           compilation.assets[bundlePackName] = new RawSource(bundlePackBuff);
 
           const typesPackBuff = await Zipper.tarFolder(typesPackPath, []) as Buffer;
-          const typesPackName = "pack.tgz";
+          const typesPackName = 'pack.tgz';
           compilation.assets[typesPackName] = new RawSource(typesPackBuff);
           const { name, version, description = '', author = '', peerDependencies } = getPackageJson();
           const infoJson = JSON.stringify({
@@ -86,15 +86,11 @@ export default class BrickingPackPlugin {
     Object.entries(otherHooks).forEach(([hookName, callback]) => {
       if (compiler.hooks[hookName]) {
         if (compiler.hooks[hookName].tapAsync) {
-          compiler.hooks[hookName].tapAsync(PLUGIN_NAME, async (...args) => {
-            return await callback(...args);
-          });
+          compiler.hooks[hookName].tapAsync(PLUGIN_NAME, async (...args) => await callback(...args));
         } else if (compiler.hooks[hookName].tap) {
-          compiler.hooks[hookName].tapAsync(PLUGIN_NAME, (...args) => {
-            return callback(...args);
-          })
+          compiler.hooks[hookName].tapAsync(PLUGIN_NAME, (...args) => callback(...args));
         }
       }
-    })
+    });
   }
 }

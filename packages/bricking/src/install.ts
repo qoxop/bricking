@@ -1,9 +1,9 @@
-import path from "path";
+import path from 'path';
 import inquirer from 'inquirer';
-import { existsSync } from "fs";
-import { spawnSync } from "child_process";
-import { btkPath, btkNetwork } from "@bricking/toolkit";
-import config from "./config";
+import { existsSync } from 'fs';
+import { spawnSync } from 'child_process';
+import { btkPath, btkNetwork } from '@bricking/toolkit';
+import config from './config';
 
 /**
  * 获取安装命令
@@ -13,8 +13,8 @@ export async function getCommands() {
   const subCommands = {
     npm: 'install',
     yarn: 'add',
-    pnpm: 'add'
-  }
+    pnpm: 'add',
+  };
   let command = '';
   if (['npm', 'pnpm', 'yarn'].includes(process.argv0)) {
     command = process.argv0;
@@ -34,25 +34,25 @@ export async function getCommands() {
       type: 'list',
       message: '请选择一个包管理器',
       choices: [{
-          name: 'yarn',
-          value: 'yarn'
-        },
-        {
-          name: 'npm',
-          value: 'npm'
-        },
-        {
-          name: 'pnpm',
-          value: 'pnpm'
-        },
+        name: 'yarn',
+        value: 'yarn',
+      },
+      {
+        name: 'npm',
+        value: 'npm',
+      },
+      {
+        name: 'pnpm',
+        value: 'pnpm',
+      },
       ],
     }]);
     command = answers.pkgManager;
   }
   return {
     command,
-    subCommand: subCommands[command]
-  }
+    subCommand: subCommands[command],
+  };
 }
 
 type BaseLibInfo = {
@@ -113,9 +113,9 @@ export async function install() {
   let {
     name,
     version,
-    peerDependencies
+    peerDependencies,
   } = await getBaseLibInfo();
   const pkgs = Object.entries(peerDependencies).map(([key, version]) => (`${key}@${version}`));
   const { command, subCommand } = await getCommands();
-  spawnSync(command, [subCommand, `${name}@${version}` ,...pkgs], { stdio: 'inherit' });
+  spawnSync(command, [subCommand, `${name}@${version}`, ...pkgs], { stdio: 'inherit' });
 }

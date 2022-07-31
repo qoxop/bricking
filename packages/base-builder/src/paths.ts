@@ -43,7 +43,7 @@ const getPackageJson = () => {
     throw new Error(`${paths.packageJson} 不存在 ～`);
   }
 
-  const {bundle: { dependencies: deps }} = getUserOptions();
+  const { bundle: { dependencies: deps } } = getUserOptions();
   let {
     name,
     version,
@@ -56,13 +56,13 @@ const getPackageJson = () => {
   if (deps.autoInject) {
     const { exclude = [] } = deps;
     // 将 dependencies 改为 peerDependencies(用作开发时类型提醒)
-    peerDependencies = Object.assign({}, peerDependencies, dependencies);
+    peerDependencies = { ...peerDependencies, ...dependencies };
     // 移除内置包依赖
     excludePackages.forEach((name) => peerDependencies[name] && (delete peerDependencies[name]));
     // 移除 exclude
     exclude.forEach((name) => {
       if (peerDependencies[name]) {
-        (delete peerDependencies[name])
+        (delete peerDependencies[name]);
       }
       if (peerDependencies[`@types/${name}`]) {
         delete peerDependencies[`@types/${name}`];
@@ -75,21 +75,20 @@ const getPackageJson = () => {
       author,
       peerDependencies,
     };
-  } else {
-    const { include = []} = deps;
-    peerDependencies = include.reduce((pre, moduleName) => {
-       const modulePath = btkPath.findModulePath(moduleName);
-       const { version } = require(path.resolve(modulePath, 'package.json'));
-       return { ...pre, [moduleName]: version };
-    }, {});
-    return {
-      name,
-      version,
-      description,
-      author,
-      peerDependencies,
-    }
   }
+  const { include = [] } = deps;
+  peerDependencies = include.reduce((pre, moduleName) => {
+    const modulePath = btkPath.findModulePath(moduleName);
+    const { version } = require(path.resolve(modulePath, 'package.json'));
+    return { ...pre, [moduleName]: version };
+  }, {});
+  return {
+    name,
+    version,
+    description,
+    author,
+    peerDependencies,
+  };
 };
 
 const reloadOptions = () => {

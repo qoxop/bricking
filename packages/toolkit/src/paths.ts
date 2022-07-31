@@ -81,15 +81,14 @@ const findModulePath = (moduleName: string) => {
   try {
     const paths = require.resolve(moduleName).split(splitString);
     return paths[0] + splitString;
-  } catch(err) {
-    const modulePath = path.resolve(process.cwd(), `./${splitString}`)
+  } catch (err) {
+    const modulePath = path.resolve(process.cwd(), `./${splitString}`);
     if (fs.existsSync(path.resolve(modulePath, 'package.json'))) {
       return modulePath;
     }
     throw err;
   }
-  
-}
+};
 
 export {
   replaceExt,
