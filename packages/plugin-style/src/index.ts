@@ -7,7 +7,7 @@ import { createFilter } from 'rollup-pluginutils';
 import Concat from 'concat-with-sourcemaps';
 import { GetModuleInfo, OutputChunk, Plugin } from 'rollup';
 import { btkHash, btkPath } from '@bricking/toolkit';
-import { STYLE_EXTERNALS_MODULE } from './constants';
+import { INJECT_REMOTE_CSS_CODE, INJECT_REMOTE_CSS_ID, REMOTE_CSS_PREFIX, STYLE_EXTERNALS_MODULE } from './constants';
 import transformCss, { PostCSSOptions } from './transform/transform-css';
 import transformLess, { LessOption } from './transform/transform-less';
 import transformSass, { SassOptions } from './transform/transform-sass';
@@ -64,15 +64,6 @@ export type Options =  {
     postcss?: PostCSSOptions;
 }
 
-const injectCodeStr = `
-export default function(href) {
-  var link = document.createElement('link');
-  link.setAttribute('href', href);
-  link.setAttribute('rel','stylesheet');
-  document.head.appendChild(link);
-}
-`
-
 /**
  * rollup 样式插件
  * 配合 @bricking/runtime 使用
@@ -84,30 +75,28 @@ export default (options: Options): Plugin => {
   const filter = createFilter([/\.css$/, LessRegExp, SassRegExp]);
   // css 文件集合
   const allCssFiles = new Map<string, { id: string; css: string; map: any; }>();
-  const RemoteCssPrefix = '$__REMOTE_CSS__@';
-  const InjectRemoteId = '$__inject_remote_css__'
   return {
     name: 'bricking-runtime-css',
     resolveId(source: string) {
       // 处理远程样式文件
       if (/^https?:\/\/.*\.css(\?.*)?$/.test(source)) {
-        return `${RemoteCssPrefix}${source}`;
+        return `${REMOTE_CSS_PREFIX}${source}`;
       }
       if(/^https?:\/\/.*\|css$/.test(source)) {
-        return `${RemoteCssPrefix}${source.replace(/\|css$/, '')}`;
+        return `${REMOTE_CSS_PREFIX}${source.replace(/\|css$/, '')}`;
       }
-      if (source === InjectRemoteId) {
-        return InjectRemoteId
+      if (source === INJECT_REMOTE_CSS_ID) {
+        return INJECT_REMOTE_CSS_ID
       }
       return null
     },
     load(id) {
       // 处理远程样式文件
-      if (id === InjectRemoteId) {
-          return injectCodeStr;
+      if (id === INJECT_REMOTE_CSS_ID) {
+          return INJECT_REMOTE_CSS_CODE;
       }
-      if (id.indexOf(RemoteCssPrefix) === 0) {
-          return `import inject from "${InjectRemoteId}";\ninject("${id.replace(RemoteCssPrefix, '')}");`;
+      if (id.indexOf(REMOTE_CSS_PREFIX) === 0) {
+          return `import inject from "${INJECT_REMOTE_CSS_ID}";\ninject("${id.replace(REMOTE_CSS_PREFIX, '')}");`;
       }
       return null;
   },
