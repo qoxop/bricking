@@ -115,6 +115,11 @@ export default (options: Options): Plugin => {
       }
       const { css, map } = await transformCss({ ...loaderProps, options: postcss || {}, preSourceMap: preSourceMap });
       allCssFiles.set(id, { id, css, map });
+      if (process.env.NODE_ENV === 'development') {
+        loaderProps.context.dependencies.forEach(item => {
+          this.addWatchFile(item);
+        });
+      }
       if (postcss?.module) {
         return `export default ${JSON.stringify(loaderProps.context.modules || {})}`;
       }

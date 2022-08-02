@@ -16,7 +16,11 @@ export default function log(options: { workspace?: string }): Plugin {
     },
     buildEnd(error) {
       if (error) {
-        console.error(error);
+        console.error(`💥 Error: ${error.message}`);
+        const { filename, line, column } = error as any;
+        if (filename && line && column) {
+          console.error(`     └─ position: ${filename}:${line}:${column}\n`);
+        }
       } else {
         restart += 1;
         if (restart > 0) {

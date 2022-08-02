@@ -150,11 +150,10 @@ const watch = async (entry: string | Record<string, string>, output: string, imp
     context: 'window',
     input: entry,
     onwarn: (warn) => {
+      console.error(`💥 Error: ${warn.message}`);
       if (warn.loc) {
         const { file, line, column } = warn.loc;
-        console.error(`💥 Error: ${warn.message}\n    └─ position: ${file}:${line}:${column}`);
-      } else {
-        console.error(warn.message);
+        console.error(`     └─ position: ${file}:${line}:${column}\n`);
       }
     },
     external: [
@@ -191,11 +190,6 @@ const watch = async (entry: string | Record<string, string>, output: string, imp
       }
       if (event.code === 'END') {
         resolve();
-      }
-      if (event.code === 'ERROR') {
-        console.error(`rollup error code: ${event.code}`);
-        console.error(event.result);
-        console.error(event.error);
       }
     });
   });
