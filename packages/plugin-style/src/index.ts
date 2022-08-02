@@ -64,6 +64,19 @@ export type Options =  {
     postcss?: PostCSSOptions;
 }
 
+const injectCodeStr = `
+export default function(href) {
+  var link = document.createElement('link');
+  link.setAttribute('href', href);
+  link.setAttribute('rel','stylesheet');
+  document.head.appendChild(link);
+}
+`
+
+/**
+ * rollup 样式插件
+ * 配合 @bricking/runtime 使用
+ */
 export default (options: Options): Plugin => {
   // 设置默认选项值
   const { filename = '[hash].css', sourceMap = true, postcss, less, sass } = options;
@@ -71,9 +84,33 @@ export default (options: Options): Plugin => {
   const filter = createFilter([/\.css$/, LessRegExp, SassRegExp]);
   // css 文件集合
   const allCssFiles = new Map<string, { id: string; css: string; map: any; }>();
-
+  const RemoteCssPrefix = '$__REMOTE_CSS__@';
+  const InjectRemoteId = '$__inject_remote_css__'
   return {
     name: 'bricking-runtime-css',
+    resolveId(source: string) {
+      // 处理远程样式文件
+      if (/^https?:\/\/.*\.css(\?.*)?$/.test(source)) {
+        return `${RemoteCssPrefix}${source}`;
+      }
+      if(/^https?:\/\/.*\|css$/.test(source)) {
+        return `${RemoteCssPrefix}${source.replace(/\|css$/, '')}`;
+      }
+      if (source === InjectRemoteId) {
+        return InjectRemoteId
+      }
+      return null
+    },
+    load(id) {
+      // 处理远程样式文件
+      if (id === InjectRemoteId) {
+          return injectCodeStr;
+      }
+      if (id.indexOf(RemoteCssPrefix) === 0) {
+          return `import inject from "${InjectRemoteId}";\ninject("${id.replace(RemoteCssPrefix, '')}");`;
+      }
+      return null;
+  },
     async transform(code: string, id: string) {
       const moduleInfo = this.getModuleInfo(id);
       // 给入口文件添加导入样式的代码
