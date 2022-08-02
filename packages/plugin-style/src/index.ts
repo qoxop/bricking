@@ -38,13 +38,29 @@ const SassRegExp = /\.s(a|c)ss$/;
  
 export type Options =  {
     /**
-     * 输出文件名
-     * [hash].css
+     * 文件命名规则，eg: `'base-dir/[name]-[hash][extname]'`
+     * - `[hash]` - 文件 hash
+     * - `[name]` - 文件名
+     * - `[extname]` - 扩展名
+     * @default '[hash][extname]'
      */
     filename?: string;
+    /**
+     * 是否开启 sourceMap
+     */
     sourceMap?: boolean;
+    /**
+     * less 配置 
+     * https://lesscss.org/usage/#less-options
+     */
     less?: LessOption,
+    /**
+     * sass 配置 
+     */
     sass?: SassOptions,
+    /**
+     * postcss 配置
+     */
     postcss?: PostCSSOptions;
 }
 
@@ -52,7 +68,7 @@ export default (options: Options): Plugin => {
   // 设置默认选项值
   const { filename = '[hash].css', sourceMap = true, postcss, less, sass } = options;
   // 过滤器
-  const filter = createFilter( [/\.css$/, less ? LessRegExp : '', sass ? SassRegExp : ''].filter(Boolean));
+  const filter = createFilter([/\.css$/, LessRegExp, SassRegExp]);
   // css 文件集合
   const allCssFiles = new Map<string, { id: string; css: string; map: any; }>();
 
@@ -62,6 +78,7 @@ export default (options: Options): Plugin => {
       const moduleInfo = this.getModuleInfo(id);
       // 给入口文件添加导入样式的代码
       if (moduleInfo && moduleInfo.isEntry) {
+        // @ts-ignore
         const concat = new Concat(true, id, '\n');
         concat.add(null,  `import "${STYLE_EXTERNALS_MODULE}";`)
         concat.add(id, code, this.getCombinedSourcemap().toString());
@@ -133,6 +150,7 @@ export default (options: Options): Plugin => {
       const fileName = filename.replace('[hash]', filehash);
       const mapFileName = `${fileName}.map`;
       // 拼接代码
+      // @ts-ignore
       const concat = new Concat(true, fileName, '\n');
       for (const result of entries) {
         const relative = btkPath.normalizePath(path.relative(dir, result.id));

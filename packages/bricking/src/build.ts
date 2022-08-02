@@ -1,28 +1,34 @@
-import * as rollup from 'rollup';
 import * as path from 'path';
+import { mkdirSync } from 'fs';
+import * as rollup from 'rollup';
 import alias from '@rollup/plugin-alias';
 import jsonPlugin from '@rollup/plugin-json';
-import builtins from 'rollup-plugin-node-builtins';
-// @ts-ignore
 import bundleStyle from '@bricking/plugin-style';
-import { btkDom } from '@bricking/toolkit';
 import livereload from 'rollup-plugin-livereload';
-import { relativeUrl } from './plugins/postcss-relative-url';
-import rollupUrl from './plugins/rollup-url';
+import builtins from 'rollup-plugin-node-builtins';
+import { btkDom, btkFile } from '@bricking/toolkit';
 import config, { tsConfig, tsConfigPath, workspace } from './config';
+import { relativeUrl } from './plugins/postcss-relative-url';
 import { openBrowser, startServe } from './server';
+import rollupUrl from './plugins/rollup-url';
+import rollupLog from './plugins/rollup-log';
+import * as logs from './utils/log';
 import { getBaseLibInfo } from './install';
 
 // 添加 postcss-relative-url 插件
 // @ts-ignore
 config.style.postcss.plugins.push(relativeUrl({
-  // @ts-ignore
-  cssOutput: path.dirname(path.resolve(config.output, config.style.filename)),
-  assetsOutput: config.assets.output,
+  cssOutput: path.dirname(path.resolve(config.output, config.style.filename as string)),
+  baseOutput: config.output,
   limit: config.assets.limit,
   filename: config.assets.filename,
   loadPaths: config.assets.loadPaths,
 }));
+
+const cleanPath = async (output: string) => {
+  await btkFile.del(output);
+  mkdirSync(output, { recursive: true });
+};
 
 /**
  * 获取别名配置
@@ -74,12 +80,12 @@ const commonPlugin = () => ([
   // 处理文件
   rollupUrl({
     limit: config.assets.limit,
-    destDir: config.assets.output,
     include: config.assets.include,
     exclude: config.assets.exclude || [],
     fileName: config.assets.filename,
-    emitFiles: true,
   }),
+  // 日志插件
+  rollupLog({ workspace }),
   // 字符串模板替换
   require('@rollup/plugin-replace')({
     values: {
@@ -119,7 +125,7 @@ const build = async (entry: string | Record<string, string>, output: string, imp
       require('rollup-plugin-terser').terser({ format: { comments: false } }),
     ],
   });
-  const rollupOutput = await bundle.generate({
+  const rollupOutput = await bundle.write({
     dir: output,
     format: 'systemjs',
     entryFileNames: '[name]-[hash].js',
@@ -143,6 +149,14 @@ const watch = async (entry: string | Record<string, string>, output: string, imp
     preserveEntrySignatures: 'exports-only',
     context: 'window',
     input: entry,
+    onwarn: (warn) => {
+      if (warn.loc) {
+        const { file, line, column } = warn.loc;
+        console.error(`💥 Error: ${warn.message}\n    └─ position: ${file}:${line}:${column}`);
+      } else {
+        console.error(warn.message);
+      }
+    },
     external: [
       ...Object.keys(importMaps || {}),
       ...(await getExternals()),
@@ -169,6 +183,7 @@ const watch = async (entry: string | Record<string, string>, output: string, imp
       exclude: ['node_modules/**'],
     },
   });
+
   await new Promise<void>((resolve) => {
     watcher.on('event', (event) => {
       if (event.code === 'BUNDLE_END') {
@@ -187,14 +202,15 @@ const watch = async (entry: string | Record<string, string>, output: string, imp
 };
 
 export async function runBuild() {
+  cleanPath(config.output);
   const { rollupOutput } = await build(config.entry, config.output);
   const entryChunks = rollupOutput.output.filter((chunk) => chunk.type === 'chunk' && chunk.isEntry);
   const importMaps = entryChunks.reduce((prev, cur) => {
     prev[`@module/${cur.name}`] = `./${cur.fileName}`;
     return prev;
   }, {});
-  const { rollupOutput: debugRollupOut } = await build(config.debugEntry, config.output, importMaps);
-  const debugEntryChunk = debugRollupOut.output.find((chunk) => chunk.type === 'chunk' && chunk.isEntry);
+  const { rollupOutput: debugRollupOut } = await build(config.browseEntry, config.output, importMaps);
+  const browseEntryChunk = debugRollupOut.output.find((chunk) => chunk.type === 'chunk' && chunk.isEntry);
   const { remoteEntry } = await getBaseLibInfo();
   /**
      * 输出 html 文件
@@ -202,7 +218,6 @@ export async function runBuild() {
   btkDom.injectScripts(btkDom.getIndexDom(), [
     {
       url: remoteEntry,
-      type: 'javascript',
     },
     {
       content: JSON.stringify({ imports: importMaps }),
@@ -210,7 +225,7 @@ export async function runBuild() {
     },
     {
       // @ts-ignore
-      url: config.publicPath ? new URL(debugEntryChunk.fileName, config.publicPath).href : `./${debugEntryChunk.fileName}`,
+      url: config.publicPath ? new URL(browseEntryChunk.fileName, config.publicPath).href : `./${browseEntryChunk.fileName}`,
       type: 'systemjs-module',
     },
   ], config.output);
@@ -220,9 +235,11 @@ export async function runServe() {
   openBrowser(`http://${config.devServe.host}:${config.devServe.port}${config.devServe.open}`);
 }
 export async function runStart() {
+  cleanPath(config.output);
+  const start = Date.now();
   await watch(config.entry, config.output);
   const importMaps = Object.keys(config.entry).reduce((prev, cur) => ({ ...prev, [`@module/${cur}`]: `./${cur}.js` }), {});
-  await watch({ 'debug-entry': config.debugEntry }, config.output, importMaps);
+  await watch({ 'browse-entry': config.browseEntry }, config.output, importMaps);
   const { remoteEntry } = await getBaseLibInfo();
   btkDom.injectScripts(btkDom.getIndexDom(), [
     {
@@ -233,9 +250,11 @@ export async function runStart() {
       type: 'systemjs-importmap',
     },
     {
-      url: './debug-entry.js',
+      url: './browse-entry.js',
       type: 'systemjs-module',
     },
   ], config.output);
+  const now = Date.now();
+  logs.keepLog(`[⌛️speed]: ${((now - start) / 1000).toFixed(2)}s`);
   await runServe();
 }

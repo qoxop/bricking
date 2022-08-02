@@ -6,6 +6,7 @@ import * as Url from 'url';
 import * as path from 'path';
 import { btkHash } from '@bricking/toolkit';
 import { Declaration, Result } from 'postcss';
+import { AssetsMap, getDataUrl } from './rollup-url';
 
 /**
  * 将资源文件全部转为相对路径引用的方式
@@ -16,9 +17,9 @@ type RelativeUrlOptions = {
      */
     cssOutput: string;
     /**
-     * 资源文件输出目录(绝对路径)
+     * js 文件输出目录(项目输出目录)
      */
-    assetsOutput?: string;
+    baseOutput: string;
     /**
      * 小于 limit 的文件转化为 base64
      */
@@ -36,9 +37,13 @@ type RelativeUrlOptions = {
 
 const WITH_QUOTES = /^['"]/;
 
-const URL_PATTERNS = [
+const URL_PATTERNS_G = [
   /(url\(\s*['"]?)([^"')]+)(["']?\s*\))/g,
   /(AlphaImageLoader\(\s*src=['"]?)([^"')]+)(["'])/g,
+];
+const URL_PATTERNS = [
+  /(url\(\s*['"]?)([^"')]+)(["']?\s*\))/,
+  /(AlphaImageLoader\(\s*src=['"]?)([^"')]+)(["'])/,
 ];
 
 const isLocalUrl = (url) => !(
@@ -58,9 +63,9 @@ const isLocalUrl = (url) => !(
 const getAssetInfo = (url: string, loadPaths: string[]) => {
   const { pathname, search = '', hash = '' } = Url.parse(url, true);
   let absolutePath = '';
+  // 寻找绝对路径
   loadPaths.some((base) => {
-    // @ts-ignore
-    const _absolutePath = path.resolve(base, pathname);
+    const _absolutePath = path.resolve(base, pathname || '');
     if (fs.existsSync(_absolutePath)) {
       absolutePath = _absolutePath;
       return true;
@@ -79,54 +84,72 @@ const handleFile = async ({
   filename,
   loadPaths,
   cssOutput,
-  assetsOutput,
+  baseOutput,
 }) => {
   // 获取资源信息，绝对路径、search 、hash
   const { absolutePath, search, hash } = getAssetInfo(url, loadPaths);
-  if (!absolutePath) return '';
-  const fstat = await fs.promises.stat(absolutePath);
-  const fdata = await fs.promises.readFile(absolutePath);
-  if (fstat.size < limit) {
-    // tranform to base64
-    return fdata.toString('base64url');
+  if (!absolutePath) {
+    // 找不到就抛出错误
+    throw new Error(`can not resolve ${url}`);
   }
-  // 大于 limit 时，计算 hash -> 使用 hash 命名文件 -> 输出到输出目录 -> 返回相对路径
-  const fHash = btkHash.getHash(fdata);
-  const fName = filename.replace(/\[hash\]/g, fHash).replace(/\[ext\]/g, path.extname(absolutePath));
-  const rUrl = path.join(path.relative(cssOutput, assetsOutput), fName);
-  // copy
-  await fs.promises.writeFile(path.resolve(assetsOutput, fName), fdata);
-  return `${/\.+\//.test(rUrl) ? '' : './'}${rUrl}${search}${hash}`;
+
+  const [fstat, buffer] = await Promise.all([
+    fs.promises.stat(absolutePath),
+    fs.promises.readFile(absolutePath),
+  ]);
+
+  // 转为 data url
+  if (!((limit && fstat.size > limit) || limit === 0)) {
+    return getDataUrl(absolutePath, buffer);
+  }
+  let outputFileName = AssetsMap.get(absolutePath);
+  if (!outputFileName) {
+    const fHash = btkHash.getHash(buffer, absolutePath);
+    const fExt = path.extname(absolutePath);
+    const fName = path.basename(absolutePath, fExt);
+
+    outputFileName = filename
+      .replace(/\[hash\]/g, fHash)
+      .replace(/\[extname\]/g, fExt)
+      .replace(/\[name\]/g, fName) as string;
+    AssetsMap.set(absolutePath, outputFileName);
+  }
+  const rUrl = path.relative(
+    cssOutput,
+    path.join(baseOutput, outputFileName),
+  );
+  return `${/\.+\//.test(rUrl) ? '' : './'}${rUrl}${search || ''}${hash || ''}`;
 };
 
 const urlDeclProcessor = (options: Required<RelativeUrlOptions>, result: Result, decl: Declaration) => {
-  const promises = [];
+  const promises: Promise<any>[] = [];
   // 源文件地址和目录
   const sourceFilename = decl.source && decl.source.input && decl.source.input.file;
-  // @ts-ignore
-  const sourceDirname = path.dirname(sourceFilename);
-  const pattern = URL_PATTERNS.find((item) => item.test(decl.value));
-  // @ts-ignore 使用 replace 进行多次匹配
-  decl.value.replace(pattern, (matched, before, url, after) => {
-    if (isLocalUrl(url)) { // 仅处理本地文件
-      // @ts-ignore
-      promises.push(handleFile({ url, ...options, loadPaths: [sourceDirname, ...options.loadPaths] }).then((newUrl) => {
-        if (!newUrl) return matched;
-        if (WITH_QUOTES.test(newUrl) && WITH_QUOTES.test(after)) {
-          before = before.slice(0, -1);
-          after = after.slice(1);
-        }
-        decl.value = decl.value.replace(matched, `${before}${newUrl}${after}`);
-      }));
-    }
-    return matched;
-  });
+  const sourceDirname = path.dirname(sourceFilename as string);
+  // 正则的 g 参数在某些 node 版本中匹配失败
+  const patternIndex = URL_PATTERNS.findIndex((item) => item.test(decl.value));
+  // 使用 replace 进行多次匹配
+  if (patternIndex > -1) {
+    decl.value.replace(URL_PATTERNS_G[patternIndex], (matched, before, url, after) => {
+      // 仅处理本地文件
+      if (isLocalUrl(url)) {
+        promises.push(handleFile({ url, ...options, loadPaths: [sourceDirname, ...options.loadPaths] }).then((newUrl) => {
+          if (!newUrl) return matched;
+          if (WITH_QUOTES.test(newUrl) && WITH_QUOTES.test(after)) {
+            before = before.slice(0, -1);
+            after = after.slice(1);
+          }
+          decl.value = decl.value.replace(matched, `${before}${newUrl}${after}`);
+        }));
+      }
+      return matched;
+    });
+  }
   return Promise.all(promises);
 };
 
 const relativeUrl = (options: RelativeUrlOptions) => {
   // init options
-  options.assetsOutput = options.assetsOutput || options.cssOutput;
   options.limit = options.limit ? options.limit : (options.limit === 0 ? Infinity : 1024 * 2);
   options.filename = options.filename || '[hash].[ext]';
   options.loadPaths = (options.loadPaths || []).map((p) => {

@@ -1,5 +1,4 @@
 import { Plugin } from 'rollup';
-// @ts-ignore
 import { Options as StyleOptions } from '@bricking/plugin-style';
 import { DevServe } from './server';
 
@@ -24,9 +23,9 @@ export type BrickingOptions = {
      */
     output?: string;
     /**
-     * 调试入口
+     * 浏览器入口
      */
-    debugEntry: string;
+    browseEntry: string;
     /**
      * 公共基础包
      */
@@ -47,10 +46,6 @@ export type BrickingOptions = {
      */
     assets?: {
         /**
-         * 静态资源输出目录(相对路径)
-         */
-        output?: string;
-        /**
          * 包含哪些文件类型
          */
         include?: string | RegExp | readonly (string | RegExp)[];
@@ -63,11 +58,11 @@ export type BrickingOptions = {
          */
         limit?: number;
         /**
-         * 文件命名规则
+         * 文件命名规则，eg: `'base-dir/[name]-[hash][extname]'`
          * - `[hash]` - 文件 hash
          * - `[name]` - 文件名
-         * - `[ext]` - 扩展名
-         * @default '[hash].[ext]'
+         * - `[extname]` - 扩展名
+         * @default '[hash][extname]'
          */
         filename?: string;
         loadPaths?: string[];

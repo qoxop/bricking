@@ -31,7 +31,6 @@ export function defineBricking(options: BrickingOptions): Required<BrickingOptio
   };
   options.assets = {
     limit: 1024 * 8,
-    output: absolutely(options.output, 'dist/assets'),
     filename: '[hash][extname]',
     loadPaths: options.assets?.loadPaths ?? [],
     ...options.assets,
@@ -46,8 +45,8 @@ export function defineBricking(options: BrickingOptions): Required<BrickingOptio
   if (!options.entry || !Object.keys(options.entry).length) {
     throw new Error('options.entry is require~');
   }
-  if (!options.debugEntry && isDev) {
-    throw new Error('options.debugEntry is require~');
+  if (!options.browseEntry && isDev) {
+    throw new Error('options.browseEntry is require~');
   }
   if (!(
     (typeof options.basePackage === 'string' && options.basePackage)

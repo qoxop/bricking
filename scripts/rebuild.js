@@ -1,4 +1,4 @@
-const clc = require("cli-color");;
+const clc = require("cli-color");
 const { spawnSync } = require('child_process');
 const { getPkgGraph } = require('./utils');
 

@@ -1,6 +1,7 @@
 import express from 'express';
 import { exec } from 'child_process';
 import { createProxyMiddleware, Options as ProxyOptions } from 'http-proxy-middleware';
+import * as logs from '../utils/log';
 
 export type DevServe = {
     port: 3000;
@@ -39,7 +40,7 @@ export const startServe = (config: DevServe, dist: string) => {
       }
       // 4. 启动开发服务器
       devServe.listen(config.port, () => {
-        console.log(`serve start on: ${config.host}:${config.port}`);
+        logs.keepLog(`[🛰 Serve]: ${config.host}:${config.port}`);
         resolve(devServe);
       });
     });

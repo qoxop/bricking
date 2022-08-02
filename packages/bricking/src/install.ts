@@ -68,8 +68,6 @@ type BaseLibInfo = {
 export async function getBaseLibInfo(): Promise<BaseLibInfo> {
   if (typeof config.basePackage === 'string') {
     const { name, publicPath, typesPack, ...other } = await btkNetwork.getJson<any>(config.basePackage);
-    console.log(`base-lib-name: ${name}`);
-    console.log(`base-lib-version: ${publicPath}${typesPack}`);
     return {
       ...other,
       name,
