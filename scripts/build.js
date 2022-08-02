@@ -16,11 +16,9 @@ function graphBuild(pkgGraph) {
             if (pkg.deps?.length) build(pkg.deps);
             // 构建当前包
             buildedSet.add(name);
-            console.log(clc.red(`> ${name}: pnpm install  🛰  🛰`));
-            spawnSync('pnpm', ['install'], { cwd: pkg.path, stdio: 'inherit' });
             console.log(clc.yellow(`> ${name}: pnpm run build 🚀 🚀`));
             spawnSync('pnpm', [ 'run', 'build', ...process.argv.slice(2)], { cwd: pkg.path, stdio: 'inherit' });
-            console.log(`======================== ${name} finish 🍺🍺  ======================== \n\n`)
+            console.log(`🍺🍺 [${name}] finish   ======================== \n`)
         })
     };
     build(Object.keys(pkgGraph));
