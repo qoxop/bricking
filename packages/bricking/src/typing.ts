@@ -85,4 +85,5 @@ export type BrickingJson = {
   };
   version: `${number}.${number}.${number}`;
   updateTime: number;
+  publicPath: string;
 }

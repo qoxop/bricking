@@ -3,6 +3,7 @@ import path from 'path';
 import del from 'del';
 import ts from 'typescript';
 import { Extractor, ExtractorConfig } from '@microsoft/api-extractor';
+import { ls } from './files';
 
 const extensions = ['.ts', '.tsx', '/index.ts', '/index.tsx'];
 
@@ -77,7 +78,7 @@ export const createTypeDefine = (props: {
   const OutputName = path.resolve(TempDir, `${path.parse(input).name}.d.ts`);
   // 生成类型定义文件
   generateDTS({
-    rootNames: [input],
+    rootNames: [input, ...ls(path.dirname(input))],
     outDir: TempDir,
   });
   // 对类型定义文件进行捆绑

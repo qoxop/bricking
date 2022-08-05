@@ -6,7 +6,7 @@ import jsonPlugin from '@rollup/plugin-json';
 import bundleStyle from '@bricking/plugin-style';
 import livereload from 'rollup-plugin-livereload';
 import builtins from 'rollup-plugin-node-builtins';
-import { btkDom, btkFile } from '@bricking/toolkit';
+import { btkDom, btkFile, btkType } from '@bricking/toolkit';
 import config, { packageJson, tsConfig, tsConfigPath, workspace } from './config';
 import { relativeUrl } from './plugins/postcss-relative-url';
 import { openBrowser, startServe } from './server';
@@ -234,6 +234,7 @@ async function setBrickingJson(
     },
     version,
     updateTime: Date.now(),
+    publicPath,
   };
   const documentPath = path.resolve(workspace, './README.md');
   if (existsSync(documentPath)) {
@@ -287,6 +288,13 @@ export async function runBuild() {
       filter: (abs) => [/\.zip$/, /\.md$/].every((item) => !item.test(abs)),
     });
   }
+  Object.entries(config.entry).forEach(([name, _path]) => {
+    btkType.createTypeDefine({
+      input: path.resolve(workspace, _path),
+      output: path.resolve(config.output, `./${name}.d.ts`),
+      cwd: workspace,
+    });
+  });
   const now = Date.now();
   logs.keepLog(`[⌛️speed]: ${((now - start) / 1000).toFixed(2)}s`);
 }

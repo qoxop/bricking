@@ -9,6 +9,26 @@ import yauzl from 'yauzl';
 import yazl from 'yazl';
 import tar from 'tar';
 
+function ls(dir: string) {
+  const arr: string[] = [];
+  const read = (d: string) => {
+    const files = fs.readdirSync(d);
+    files.forEach((file) => {
+      file = path.resolve(d, file);
+      const fStat = fs.statSync(file);
+      if (fStat.isDirectory()) {
+        read(file);
+      } else if (fStat.isFile()) {
+        arr.push(file);
+      }
+    });
+  };
+  if (fs.statSync(dir).isDirectory()) {
+    read(dir);
+  }
+  return arr;
+}
+
 /**
  * 遍历目录中的文件
  * @param absoluteDir - 需要进行遍历的目录的绝对路径
@@ -200,6 +220,7 @@ class Zipper {
 }
 
 export {
+  ls,
   copy,
   del,
   fileIterator,
