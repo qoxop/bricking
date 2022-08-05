@@ -3,11 +3,12 @@ import {
   Compiler,
 } from 'webpack';
 import path from 'path';
+import { existsSync, readFileSync } from 'fs';
 import { btkFile, btkHash } from '@bricking/toolkit';
 
 import typesPack from './types-pack';
 import { getUserOptions } from '../options';
-import { getPackageJson } from '../paths';
+import { getPackageJson, paths } from '../paths';
 
 /**
  * webpack 插件：用于构建 SDK
@@ -65,6 +66,11 @@ export default class BrickingPackPlugin {
           const typesPackName = 'pack.tgz';
           compilation.assets[typesPackName] = new RawSource(typesPackBuff);
           const { name, version, description = '', author = '', peerDependencies } = getPackageJson();
+          let document = '';
+          if (existsSync(paths.readme)) {
+            compilation.assets['README.md'] = new RawSource(readFileSync(paths.readme));
+            document = `${publicPath}${/\/$/.test(publicPath) ? '' : '/'}${'README.md'}`;
+          }
           const infoJson = JSON.stringify({
             name,
             version,
@@ -76,6 +82,7 @@ export default class BrickingPackPlugin {
             typesPack: typesPackName,
             bundlePack: bundlePackName,
             remoteEntry,
+            ...(document ? { document } : {}),
           }, null, '\t');
           compilation.assets['package.json'] = new RawSource(infoJson);
 

@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { mkdirSync } from 'fs';
+import { mkdirSync, existsSync, writeFileSync } from 'fs';
 import * as rollup from 'rollup';
 import alias from '@rollup/plugin-alias';
 import jsonPlugin from '@rollup/plugin-json';
@@ -7,13 +7,14 @@ import bundleStyle from '@bricking/plugin-style';
 import livereload from 'rollup-plugin-livereload';
 import builtins from 'rollup-plugin-node-builtins';
 import { btkDom, btkFile } from '@bricking/toolkit';
-import config, { tsConfig, tsConfigPath, workspace } from './config';
+import config, { packageJson, tsConfig, tsConfigPath, workspace } from './config';
 import { relativeUrl } from './plugins/postcss-relative-url';
 import { openBrowser, startServe } from './server';
 import rollupUrl from './plugins/rollup-url';
 import rollupLog from './plugins/rollup-log';
 import * as logs from './utils/log';
 import { getBaseLibInfo } from './install';
+import { BrickingJson } from './typing';
 
 // 添加 postcss-relative-url 插件
 // @ts-ignore
@@ -195,20 +196,13 @@ const watch = async (entry: string | Record<string, string>, output: string, imp
   });
 };
 
-export async function runBuild() {
-  cleanPath(config.output);
-  const { rollupOutput } = await build(config.entry, config.output);
-  const entryChunks = rollupOutput.output.filter((chunk) => chunk.type === 'chunk' && chunk.isEntry);
-  const importMaps = entryChunks.reduce((prev, cur) => {
-    prev[`@module/${cur.name}`] = `./${cur.fileName}`;
-    return prev;
-  }, {});
-  const { rollupOutput: debugRollupOut } = await build(config.browseEntry, config.output, importMaps);
-  const browseEntryChunk = debugRollupOut.output.find((chunk) => chunk.type === 'chunk' && chunk.isEntry);
+/**
+ * 设置 html 文件
+ * @param importMaps
+ * @param browseEntry
+ */
+async function setHtml(importMaps: Record<string, string>, browseEntry: string) {
   const { remoteEntry } = await getBaseLibInfo();
-  /**
-     * 输出 html 文件
-     */
   btkDom.injectScripts(btkDom.getIndexDom(), [
     {
       url: remoteEntry,
@@ -218,36 +212,103 @@ export async function runBuild() {
       type: 'systemjs-importmap',
     },
     {
-      // @ts-ignore
-      url: config.publicPath ? new URL(browseEntryChunk.fileName, config.publicPath).href : `./${browseEntryChunk.fileName}`,
+      url: browseEntry,
       type: 'systemjs-module',
     },
   ], config.output);
 }
+
+async function setBrickingJson(
+  importMaps: Record<string, any>,
+  imports: string[],
+) {
+  const { publicPath, output } = config;
+  const { version } = packageJson;
+  const requires = imports.filter(
+    (item) => !/^___INJECT_STYLE_LINK___/.test(item),
+  );
+  const json: BrickingJson = {
+    entry: importMaps,
+    dependence: {
+      requires,
+    },
+    version,
+    updateTime: Date.now(),
+  };
+  const documentPath = path.resolve(workspace, './README.md');
+  if (existsSync(documentPath)) {
+    await btkFile.copy(documentPath, output);
+    const documentUrl = publicPath ? new URL('./README.md', publicPath).href : './README.md';
+    json.document = documentUrl as any;
+  }
+  const { document } = await getBaseLibInfo();
+  if (document) {
+    json.dependence.document = document as any;
+  }
+  writeFileSync(
+    path.resolve(output, 'bricking.json'),
+    JSON.stringify(json, null, '\t'),
+  );
+}
+
+/**
+ * 执行构建任务
+ */
+export async function runBuild() {
+  const start = Date.now();
+  const { publicPath } = config;
+  cleanPath(config.output);
+  const { rollupOutput } = await build(config.entry, config.output);
+  const imports = rollupOutput.output
+    .map((item) => (item.type === 'chunk' ? item.imports : []))
+    .reduce((prev, cur) => (cur.forEach((imp) => prev.add(imp)), prev), new Set<string>())
+    .values();
+  const entryChunks = rollupOutput.output.filter((chunk) => chunk.type === 'chunk' && chunk.isEntry);
+  const importMaps = entryChunks.reduce((prev, cur) => {
+    if (publicPath) {
+      prev[`${cur.name}`] = new URL(`./${cur.fileName}`, publicPath).href;
+    } else {
+      prev[`${cur.name}`] = `./${cur.fileName}`;
+    }
+    return prev;
+  }, {});
+  const { rollupOutput: debugRollupOut } = await build(config.browseEntry, config.output, importMaps);
+  const browseEntryChunk = debugRollupOut.output.find((chunk) => chunk.type === 'chunk' && chunk.isEntry) as any;
+  await setBrickingJson(importMaps, Array.from(imports));
+  await setHtml(
+    importMaps,
+    publicPath ? new URL(browseEntryChunk.fileName, publicPath).href : `./${browseEntryChunk.fileName}`,
+  );
+  if (config.doPack) {
+    await btkFile.Zipper.doZip({
+      dir: config.output,
+      output: path.resolve(config.output, `./${config.doPack}.zip`),
+      prefix: '',
+      filter: (abs) => [/\.zip$/, /\.md$/].every((item) => !item.test(abs)),
+    });
+  }
+  const now = Date.now();
+  logs.keepLog(`[⌛️speed]: ${((now - start) / 1000).toFixed(2)}s`);
+}
+
+/**
+ * 启动服务器
+ */
 export async function runServe() {
   await startServe(config.devServe as any, config.output);
   openBrowser(`http://${config.devServe.host}:${config.devServe.port}${config.devServe.open}`);
 }
+
+/**
+ * 执行开发任务
+ */
 export async function runStart() {
   cleanPath(config.output);
   const start = Date.now();
   await watch(config.entry, config.output);
-  const importMaps = Object.keys(config.entry).reduce((prev, cur) => ({ ...prev, [`@module/${cur}`]: `./${cur}.js` }), {});
+  const importMaps = Object.keys(config.entry).reduce((prev, cur) => ({ ...prev, [`${cur}`]: `./${cur}.js` }), {});
   await watch({ 'browse-entry': config.browseEntry }, config.output, importMaps);
-  const { remoteEntry } = await getBaseLibInfo();
-  btkDom.injectScripts(btkDom.getIndexDom(), [
-    {
-      url: remoteEntry,
-    },
-    {
-      content: JSON.stringify({ imports: importMaps }),
-      type: 'systemjs-importmap',
-    },
-    {
-      url: './browse-entry.js',
-      type: 'systemjs-module',
-    },
-  ], config.output);
+  await setHtml(importMaps, './browse-entry.js');
   const now = Date.now();
   logs.keepLog(`[⌛️speed]: ${((now - start) / 1000).toFixed(2)}s`);
   await runServe();

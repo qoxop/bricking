@@ -44,6 +44,7 @@ module.exports = {
         "@typescript-eslint/ban-ts-comment": 0,
         "object-curly-newline": 0,
         "@typescript-eslint/no-explicit-any": 0,
-        "no-underscore-dangle": 0
+        "no-underscore-dangle": 0,
+        "no-sequences": 0
     }
 }

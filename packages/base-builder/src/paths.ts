@@ -15,6 +15,7 @@ const resolvePath = (relativePath: string) => path.resolve(workspace, relativePa
 
 const paths = {
   workspace,
+  readme: resolvePath('README.md'),
   tsconfig: resolvePath('tsconfig.json'),
   jsconfig: resolvePath('jsconfig.json'),
   outputPath: resolvePath(userOptions.output),

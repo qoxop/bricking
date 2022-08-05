@@ -60,6 +60,7 @@ type BaseLibInfo = {
   version: string,
   peerDependencies: Record<string, string>;
   remoteEntry: string;
+  document?: string;
 }
 /**
  * 获取基础包信息，如果不存在直接安装后读取本地package.json

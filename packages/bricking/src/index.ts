@@ -1,4 +1,5 @@
 import * as path from 'path';
+import { packageJsonPath } from './config';
 import { BrickingOptions } from './typing';
 
 const absolutely = (p: string|undefined, def: string) => {
@@ -29,6 +30,14 @@ export function defineBricking(options: BrickingOptions): Required<BrickingOptio
       ],
     },
   };
+  if (options.doPack === true) {
+    try {
+      const { name } = require(packageJsonPath);
+      options.doPack = name || 'bricking';
+    } catch (error) {
+      options.doPack = 'bricking';
+    }
+  }
   options.assets = {
     limit: 1024 * 8,
     filename: '[hash][extname]',
