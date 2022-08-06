@@ -1,10 +1,10 @@
 {
 	"scripts": {
-		"rebuild": "pnpm install && node ./scripts/rebuild.js",
 		"lint": "npx eslint",
-		"ci:version": "pnpm changeset version",
-		"ci:publish": "pnpm run rebuild && pnpm publish -r && pnpm changeset tag",
-		"debug": "pnpm run rebuild && cpy packages _bricking && node ./scripts/debug.js"
+		"version": "pnpm changeset version",
+		"build": "pnpm install && node ./scripts/build.js",
+		"ci:publish": "node ./scripts/release.js",
+		"debug": "pnpm run build && cpy packages _bricking && node ./scripts/debug.js"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.22.0",

@@ -26,3 +26,5 @@ Object.defineProperty(window, '$bricking', {
     return $bricking;
   },
 });
+
+export default $bricking;

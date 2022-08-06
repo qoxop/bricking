@@ -1,5 +1,5 @@
-import { updateOptions } from "./options";
+import { updateOptions } from './options';
 
 export {
-    updateOptions
-}
+  updateOptions,
+};

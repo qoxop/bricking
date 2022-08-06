@@ -1,9 +1,15 @@
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import { Compiler } from 'webpack';
 import { Configuration } from 'webpack-dev-server';
 
 type PartialAll<T> = {
-    [P in keyof T]?: T[P] extends {} ? Partial<T[P]> : T[P];
+  [P in keyof T]?: T[P] extends {} ? Partial<T[P]> : T[P];
 };
+
+type Hooks = {
+  // eslint-disable-next-line no-unused-vars
+  [key in keyof InstanceType<typeof Compiler>['hooks']]: (...args: any[]) => any;
+}
 
 const deepMerge = (origin, target, deep = 1) => {
   if (origin) {
@@ -26,7 +32,12 @@ const defaultOption = () => ({
     alias: {} as Record<string, string>,
     definitions: {} as Record<string, string | string[]>,
     defineMapping: {} as Record<string, string>,
-    htmlOptions: {} as HtmlWebpackPlugin.Options | undefined
+    htmlOptions: {} as HtmlWebpackPlugin.Options | undefined,
+    /**
+     * 参考 webpack 插件钩子文档
+     * https://webpack.js.org/api/compiler-hooks/#hooks
+     */
+    hooks: {} as Partial<Hooks>,
   },
   react: {
     useReactRefresh: true,

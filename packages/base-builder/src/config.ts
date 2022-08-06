@@ -16,6 +16,7 @@ import {
 } from 'webpack';
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 import {
   getUserOptions,
 } from './options';
@@ -24,7 +25,6 @@ import {
   paths,
 } from './paths';
 import BrickingPackPlugin from './utils/pack-plugin';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
 
 const RS = require.resolve;
 
@@ -84,7 +84,7 @@ export const getBabelOptions = (isEnvProduction: boolean, isAppScript: boolean) 
     return require(paths.babelConfig);
   }
   return {
-    sourceType: "unambiguous",
+    sourceType: 'unambiguous',
     presets: [
       [RS('@babel/preset-env'), {
         useBuiltIns: 'entry',
@@ -127,7 +127,7 @@ export const getBabelOptions = (isEnvProduction: boolean, isAppScript: boolean) 
   };
 };
 
-export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'production', devEntry?: string): Configuration => {
+export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'production', devEntry = ''): Configuration => {
   const isEnvDevelopment = webpackEnv === 'development';
   const isEnvProduction = webpackEnv === 'production';
   const isEnvProductionProfile = isEnvProduction && process.argv.includes('--profile');
@@ -148,10 +148,10 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
       path: paths.outputPath,
       pathinfo: isEnvDevelopment,
       filename: isEnvProduction
-        ? 'base-js-[name].[contenthash:8].js'
+        ? 'base-js-[name].[chunkhash:8].js'
         : 'base-js-[name].js',
       chunkFilename: isEnvProduction
-        ? 'chunk-js-[name].[contenthash:8].js'
+        ? 'chunk-js-[name].[chunkhash:8].js'
         : 'chunk-js-[name].chunk.js',
       assetModuleFilename: 'media/[hash][ext][query]',
     },
@@ -391,8 +391,8 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
         overlay: false,
       }),
       isEnvProduction && new MiniCssExtractPlugin({
-        filename: 'base-css-[name].[contenthash:8].css',
-        chunkFilename: 'base-css-[id].[contenthash:8].chunk.css',
+        filename: 'base-css-[name].[chunkhash:8].css',
+        chunkFilename: 'base-css-[id].[chunkhash:8].chunk.css',
         ignoreOrder: true,
       }),
       new BrickingPackPlugin(),
@@ -401,7 +401,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
         chunks: ['bricking', 'devEntry'],
         chunksSortMode: 'manual',
 
-      })
+      }),
     ].filter(Boolean) as any[],
   };
   const customConfigPath = getCustomWebpackPath();

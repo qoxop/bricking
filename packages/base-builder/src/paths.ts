@@ -15,6 +15,7 @@ const resolvePath = (relativePath: string) => path.resolve(workspace, relativePa
 
 const paths = {
   workspace,
+  readme: resolvePath('README.md'),
   tsconfig: resolvePath('tsconfig.json'),
   jsconfig: resolvePath('jsconfig.json'),
   outputPath: resolvePath(userOptions.output),
@@ -43,62 +44,52 @@ const getPackageJson = () => {
     throw new Error(`${paths.packageJson} 不存在 ～`);
   }
 
-  const {bundle: { dependencies: deps }} = getUserOptions();
+  const { bundle: { dependencies: deps } } = getUserOptions();
   let {
     name,
     version,
     description = '',
     author = '',
-    dependencies,
-    peerDependencies,
+    dependencies = {},
+    peerDependencies = {},
   } = require(paths.packageJson);
 
   if (deps.autoInject) {
     const { exclude = [] } = deps;
     // 将 dependencies 改为 peerDependencies(用作开发时类型提醒)
-    peerDependencies = dependencies || {};
-    // 保留 @types 包
-    Object.keys(peerDependencies).forEach((key) => peerDependencies[`@types/${key}`] && (delete peerDependencies[key]));
+    peerDependencies = { ...peerDependencies, ...dependencies };
     // 移除内置包依赖
-    excludePackages.forEach((name) => peerDependencies[name] && (delete peerDependencies[name]));
-    const innerDependencies = exclude.reduce((innerDeps, cur) => {
-      if (peerDependencies[`@types/${cur}`]) {
-        // 存在 @types 包，就只保留 @types 包
-        innerDeps[`@types/${cur}`] = peerDependencies[`@types/${cur}`];
-        delete peerDependencies[`@types/${cur}`];
-        delete peerDependencies[cur];
-      } else if (peerDependencies[cur]) {
-        // 不存在 @types 包
-        innerDeps[cur] = peerDependencies[cur];
-        delete peerDependencies[cur];
+    excludePackages.forEach((_name) => peerDependencies[_name] && (delete peerDependencies[_name]));
+    // 移除 exclude
+    exclude.forEach((_name) => {
+      if (peerDependencies[_name]) {
+        (delete peerDependencies[_name]);
       }
-      return innerDeps;
-    }, {});
-    // exclude 的包被认为是不被导出的但是仍然在用的依赖
-    dependencies = innerDependencies;
+      if (peerDependencies[`@types/${_name}`]) {
+        delete peerDependencies[`@types/${_name}`];
+      }
+    });
     return {
       name,
       version,
       description,
       author,
-      dependencies,
       peerDependencies,
     };
-  } else {
-    const { include = []} = deps;
-    peerDependencies = include.reduce((pre, moduleName) => {
-       const modulePath = btkPath.findModulePath(moduleName);
-       const { version } = require(path.resolve(modulePath, 'package.json'));
-       return { ...pre, [moduleName]: version };
-    }, {});
-    return {
-      name,
-      version,
-      description,
-      author,
-      peerDependencies,
-    }
   }
+  const { include = [] } = deps;
+  peerDependencies = include.reduce((pre, moduleName) => {
+    const modulePath = btkPath.findModulePath(moduleName);
+    const { version: _version } = require(path.resolve(modulePath, 'package.json'));
+    return { ...pre, [moduleName]: _version };
+  }, {});
+  return {
+    name,
+    version,
+    description,
+    author,
+    peerDependencies,
+  };
 };
 
 const reloadOptions = () => {

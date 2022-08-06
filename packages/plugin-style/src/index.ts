@@ -7,7 +7,7 @@ import { createFilter } from 'rollup-pluginutils';
 import Concat from 'concat-with-sourcemaps';
 import { GetModuleInfo, OutputChunk, Plugin } from 'rollup';
 import { btkHash, btkPath } from '@bricking/toolkit';
-import { STYLE_EXTERNALS_MODULE } from './constants';
+import { INJECT_REMOTE_CSS_CODE, INJECT_REMOTE_CSS_ID, REMOTE_CSS_PREFIX, STYLE_EXTERNALS_MODULE } from './constants';
 import transformCss, { PostCSSOptions } from './transform/transform-css';
 import transformLess, { LessOption } from './transform/transform-less';
 import transformSass, { SassOptions } from './transform/transform-sass';
@@ -38,30 +38,73 @@ const SassRegExp = /\.s(a|c)ss$/;
  
 export type Options =  {
     /**
-     * 输出文件名
-     * [hash].css
+     * 文件命名规则，eg: `'base-dir/[name]-[hash][extname]'`
+     * - `[hash]` - 文件 hash
+     * - `[name]` - 文件名
+     * - `[extname]` - 扩展名
+     * @default '[hash][extname]'
      */
     filename?: string;
+    /**
+     * 是否开启 sourceMap
+     */
     sourceMap?: boolean;
+    /**
+     * less 配置 
+     * https://lesscss.org/usage/#less-options
+     */
     less?: LessOption,
+    /**
+     * sass 配置 
+     */
     sass?: SassOptions,
+    /**
+     * postcss 配置
+     */
     postcss?: PostCSSOptions;
 }
 
+/**
+ * rollup 样式插件
+ * 配合 @bricking/runtime 使用
+ */
 export default (options: Options): Plugin => {
   // 设置默认选项值
   const { filename = '[hash].css', sourceMap = true, postcss, less, sass } = options;
   // 过滤器
-  const filter = createFilter( [/\.css$/, less ? LessRegExp : '', sass ? SassRegExp : ''].filter(Boolean));
+  const filter = createFilter([/\.css$/, LessRegExp, SassRegExp]);
   // css 文件集合
   const allCssFiles = new Map<string, { id: string; css: string; map: any; }>();
-
   return {
     name: 'bricking-runtime-css',
+    resolveId(source: string) {
+      // 处理远程样式文件
+      if (/^https?:\/\/.*\.css(\?.*)?$/.test(source)) {
+        return `${REMOTE_CSS_PREFIX}${source}`;
+      }
+      if(/^https?:\/\/.*\|css$/.test(source)) {
+        return `${REMOTE_CSS_PREFIX}${source.replace(/\|css$/, '')}`;
+      }
+      if (source === INJECT_REMOTE_CSS_ID) {
+        return INJECT_REMOTE_CSS_ID
+      }
+      return null
+    },
+    load(id) {
+      // 处理远程样式文件
+      if (id === INJECT_REMOTE_CSS_ID) {
+          return INJECT_REMOTE_CSS_CODE;
+      }
+      if (id.indexOf(REMOTE_CSS_PREFIX) === 0) {
+          return `import inject from "${INJECT_REMOTE_CSS_ID}";\ninject("${id.replace(REMOTE_CSS_PREFIX, '')}");`;
+      }
+      return null;
+  },
     async transform(code: string, id: string) {
       const moduleInfo = this.getModuleInfo(id);
       // 给入口文件添加导入样式的代码
       if (moduleInfo && moduleInfo.isEntry) {
+        // @ts-ignore
         const concat = new Concat(true, id, '\n');
         concat.add(null,  `import "${STYLE_EXTERNALS_MODULE}";`)
         concat.add(id, code, this.getCombinedSourcemap().toString());
@@ -98,6 +141,11 @@ export default (options: Options): Plugin => {
       }
       const { css, map } = await transformCss({ ...loaderProps, options: postcss || {}, preSourceMap: preSourceMap });
       allCssFiles.set(id, { id, css, map });
+      if (process.env.NODE_ENV === 'development') {
+        loaderProps.context.dependencies.forEach(item => {
+          this.addWatchFile(item);
+        });
+      }
       if (postcss?.module) {
         return `export default ${JSON.stringify(loaderProps.context.modules || {})}`;
       }
@@ -133,6 +181,7 @@ export default (options: Options): Plugin => {
       const fileName = filename.replace('[hash]', filehash);
       const mapFileName = `${fileName}.map`;
       // 拼接代码
+      // @ts-ignore
       const concat = new Concat(true, fileName, '\n');
       for (const result of entries) {
         const relative = btkPath.normalizePath(path.relative(dir, result.id));

@@ -1,5 +1,17 @@
 # bricking
 
+## 0.3.0
+
+### Minor Changes
+
+- d23d33a8: 修复各种问题
+
+### Patch Changes
+
+- Updated dependencies [d23d33a8]
+  - @bricking/plugin-style@0.3.0
+  - @bricking/toolkit@0.3.0
+
 ## 0.2.1
 
 ### Patch Changes

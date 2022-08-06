@@ -1,6 +1,6 @@
-import * as path from "path";
-import { btkCompile } from '@bricking/toolkit'
-import { BrickingOptions } from "./typing";
+import * as path from 'path';
+import { btkCompile } from '@bricking/toolkit';
+import { BrickingOptions } from './typing';
 
 btkCompile.registerTsHooks(['.ts', '.tsx']);
 
@@ -14,9 +14,12 @@ const tsConfig = require(tsConfigPath);
 const packageJson = require(packageJsonPath);
 
 export {
-    tsConfig,
-    packageJson,
-    workspace,
-}
+  tsConfig,
+  packageJson,
+  workspace,
+  configPath,
+  tsConfigPath,
+  packageJsonPath,
+};
 
 export default config;

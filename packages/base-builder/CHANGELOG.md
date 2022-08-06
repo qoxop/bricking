@@ -1,5 +1,17 @@
 # @bricking/base-builder
 
+## 1.0.0
+
+### Minor Changes
+
+- d23d33a8: 修复各种问题
+
+### Patch Changes
+
+- Updated dependencies [d23d33a8]
+  - @bricking/runtime@0.3.0
+  - @bricking/toolkit@0.3.0
+
 ## 0.2.8
 
 ### Patch Changes
