@@ -1,6 +1,6 @@
 {
   "name": "@bricking/base-builder",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Sytemjs 模块基座打包器",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -65,7 +65,7 @@
   },
   "peerDependencies": {
     "@babel/runtime": "^7.17.2",
-    "@bricking/runtime": "0.3.0",
+    "@bricking/runtime": "0.4.0",
     "core-js": "3",
     "less": "^4.1.2",
     "sass": "^1.49.7"

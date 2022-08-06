@@ -1,5 +1,19 @@
 # @bricking/base-builder
 
+## 2.0.0
+
+### Minor Changes
+
+- c3f6a0ac: 调整部分构建参数，优化构建体验
+
+### Patch Changes
+
+- c3f6a0ac: 优化样式插件、日志输出等
+- Updated dependencies [c3f6a0ac]
+- Updated dependencies [c3f6a0ac]
+  - @bricking/runtime@0.4.0
+  - @bricking/toolkit@0.4.0
+
 ## 1.0.0
 
 ### Minor Changes
