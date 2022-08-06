@@ -5,7 +5,7 @@ const options = { stdio: 'inherit' };
  * 更新版本
  */
 // npx changeset version
-spawnSync('npx', ['changeset', 'version'], options);
+spawnSync('pnpm', ['changeset', 'version'], options);
 // check status
 const { stdout } = spawnSync('git', ['status'], { encoding: 'utf-8', ...options });
 

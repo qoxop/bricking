@@ -83,6 +83,7 @@ export type BrickingJson = {
     document?: `${'http'|'https'}://${string}.md`;
     requires: string[];
   };
+  name: string;
   version: `${number}.${number}.${number}`;
   updateTime: number;
   publicPath: string;
