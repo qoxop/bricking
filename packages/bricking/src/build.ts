@@ -223,16 +223,17 @@ async function setBrickingJson(
   imports: string[],
 ) {
   const { publicPath, output } = config;
-  const { version } = packageJson;
+  const { version, name } = packageJson;
   const requires = imports.filter(
     (item) => !/^___INJECT_STYLE_LINK___/.test(item),
   );
   const json: BrickingJson = {
+    name,
+    version,
     entry: importMaps,
     dependence: {
       requires,
     },
-    version,
     updateTime: Date.now(),
     publicPath,
   };
@@ -247,7 +248,7 @@ async function setBrickingJson(
     json.dependence.document = document as any;
   }
   writeFileSync(
-    path.resolve(output, 'bricking.json'),
+    path.resolve(output, 'package.json'),
     JSON.stringify(json, null, '\t'),
   );
 }
