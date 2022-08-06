@@ -1,5 +1,11 @@
 # bricking
 
+## 0.4.1
+
+### Patch Changes
+
+- e5ad8f97: 重命名微模块信息输出文件
+
 ## 0.4.0
 
 ### Minor Changes
