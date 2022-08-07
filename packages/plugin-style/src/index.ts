@@ -113,6 +113,7 @@ export default (options: Options): Plugin => {
           map: concat.sourceMap,
         }
       }
+      if (id.indexOf(REMOTE_CSS_PREFIX) === 0) return null;
       // 过滤掉不处理的类型
       if (!filter(id)) return null;
       // 配置 loader 上下文
