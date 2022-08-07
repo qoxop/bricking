@@ -28,5 +28,5 @@ ${tabLine(fs.readFileSync(path.resolve(__dirname, '../global.d.ts'),'utf8'))}
 \n}`
 fs.writeFileSync(
     path.resolve(DistDir, './index.d.ts'),
-    `/// <reference types="systemjs" />\n\nimport "systemjs";\n\n${globalDeclareTypes}`
+    `/// <reference types="systemjs" />\n\nimport "systemjs";\n\n${globalDeclareTypes}\n\nexport default window.$bricking;`
 );
