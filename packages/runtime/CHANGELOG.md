@@ -1,5 +1,11 @@
 # @bricking/runtime
 
+## 0.4.1
+
+### Patch Changes
+
+- 3a7ea99e: 修复错误
+
 ## 0.4.0
 
 ### Minor Changes
