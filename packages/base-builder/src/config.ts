@@ -5,8 +5,6 @@ import NpmImportPlugin from 'less-plugin-npm-import';
 import {
   merge as webpackMerge,
 } from 'webpack-merge';
-import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import {
   Configuration,
@@ -40,10 +38,8 @@ const lessRegex = /\.less$/;
 
 const getCssUse = (isEnvDevelopment: boolean, importLoaders = 2) => ([
   (
-    isEnvDevelopment ? {
+    {
       loader: RS('style-loader'),
-    } : {
-      loader: MiniCssExtractPlugin.loader,
     }
   ),
   {
@@ -66,7 +62,8 @@ const getCssUse = (isEnvDevelopment: boolean, importLoaders = 2) => ([
         ident: 'postcss',
         config: fs.existsSync(paths.postcssConfig),
         plugins: [
-          RS('postcss-flexbugs-fixes'),
+          [RS('cssnano')],
+          [RS('postcss-flexbugs-fixes')],
           [RS('postcss-preset-env'), {
             autoprefixer: {
               flexbox: 'no-2009',
@@ -194,7 +191,6 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
             },
           },
         }),
-        new CssMinimizerPlugin(),
       ],
     },
     resolve: {
@@ -389,11 +385,6 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
       new ProvidePlugin(compileOptions.definitions),
       isEnvDevelopment && react.useReactRefresh && new ReactRefreshWebpackPlugin({
         overlay: false,
-      }),
-      isEnvProduction && new MiniCssExtractPlugin({
-        filename: 'base-css-[name].[chunkhash:8].css',
-        chunkFilename: 'base-css-[id].[chunkhash:8].chunk.css',
-        ignoreOrder: true,
       }),
       new BrickingPackPlugin(),
       !!devEntry && new HtmlWebpackPlugin({
