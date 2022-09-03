@@ -15,7 +15,7 @@ export type BrickingOptions = {
   /**
    * 模块入口文件配置
    */
-  entry: {
+  entry?: {
     [name: string]: string;
   };
   /**
