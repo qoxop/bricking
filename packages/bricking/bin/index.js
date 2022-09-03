@@ -28,10 +28,10 @@ require('yargs')
         }
     ).command(
         'install',
-        '安装基础包的对等依赖(以提供开发时的类型提醒)',
+        '安装基建包的对等依赖(以供开发时的类型提醒)',
         () => void 0,
-        () => {
-            require('../dist/install').install();
+        (args) => {
+            require('../dist/install').install((args._ || []).slice(1));
         }
     )
     .help()
