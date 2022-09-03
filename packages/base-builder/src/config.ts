@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import WebpackBar from 'webpackbar';
 import TerserPlugin from 'terser-webpack-plugin';
 import NpmImportPlugin from 'less-plugin-npm-import';
@@ -37,11 +38,9 @@ const sassRegex = /\.(scss|sass)$/;
 const lessRegex = /\.less$/;
 
 const getCssUse = (isEnvDevelopment: boolean, importLoaders = 2) => ([
-  (
-    {
-      loader: RS('style-loader'),
-    }
-  ),
+  {
+    loader: RS('style-loader'),
+  },
   {
     loader: RS('css-loader'),
     options: {
@@ -142,7 +141,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
     output: {
       clean: true,
       publicPath: 'auto',
-      path: paths.outputPath,
+      path: path.join(paths.outputPath, 'packages'),
       pathinfo: isEnvDevelopment,
       filename: isEnvProduction
         ? 'base-js-[name].[chunkhash:8].js'
