@@ -55,7 +55,7 @@
     "style-loader": "^3.3.1",
     "terser-webpack-plugin": "^5.3.1",
     "tsconfig-paths-webpack-plugin": "^3.5.2",
-    "typescript": "^4.5.5",
+    "typescript": "^4.8.2",
     "webpack": "^5.68.0",
     "webpack-dev-server": "^4.7.4",
     "webpack-merge": "^5.8.0",
@@ -64,7 +64,7 @@
   },
   "peerDependencies": {
     "@babel/runtime": "^7.17.2",
-    "@bricking/runtime": "0.4.1",
+    "@bricking/runtime": "workspace:*",
     "core-js": "3",
     "less": "^4.1.2",
     "sass": "^1.49.7"
