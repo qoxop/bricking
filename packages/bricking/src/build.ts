@@ -6,6 +6,7 @@ import jsonPlugin from '@rollup/plugin-json';
 import bundleStyle from '@bricking/plugin-style';
 import livereload from 'rollup-plugin-livereload';
 import builtins from 'rollup-plugin-node-builtins';
+import esbuild from 'rollup-plugin-esbuild';
 import { btkDom, btkFile, btkType } from '@bricking/toolkit';
 import config, { packageJson, tsConfig, tsConfigPath, workspace } from './config';
 import { relativeUrl } from './plugins/postcss-relative-url';
@@ -70,7 +71,7 @@ const getExternals = async () => {
  * 获取通用插件列表
  * @returns
  */
-const commonPlugin = () => ([
+const commonPlugin = (useEsbuild?: boolean, target?: string) => ([
   require('@rollup/plugin-node-resolve').default({ browser: true }),
   require('@rollup/plugin-commonjs')(),
   builtins({ crypto: true }),
@@ -95,11 +96,24 @@ const commonPlugin = () => ([
     preventAssignment: true,
   }),
   // 编译 ts
-  require('@rollup/plugin-typescript')({
-    tsconfig: tsConfigPath,
-    sourceMap: true,
-    inlineSources: true,
-  }),
+  useEsbuild
+    ? esbuild({
+      include: /\.[jt]sx?$/,
+      minify: process.env.NODE_ENV === 'production',
+      target: process.env.NODE_ENV === 'production' ? (target || 'es2017') : 'esnext',
+      jsx: 'transform',
+      jsxFactory: 'React.createElement',
+      jsxFragment: 'React.Fragment',
+      tsconfig: tsConfigPath,
+      loaders: {
+        '.json': 'json',
+      },
+    })
+    : require('@rollup/plugin-typescript')({
+      tsconfig: tsConfigPath,
+      sourceMap: true,
+      inlineSources: true,
+    }),
 ]);
 
 /**
@@ -109,6 +123,11 @@ const commonPlugin = () => ([
  * @param importMaps
  */
 const build = async (entry: string | Record<string, string>, output: string, importMaps?: Record<string, string>) => {
+  let useEsbuild = false;
+  const target = (tsConfig?.compilerOptions?.target || '').toLowerCase();
+  if (target && !['es3', 'es5'].includes(target)) {
+    useEsbuild = true;
+  }
   const bundle = await rollup.rollup({
     preserveEntrySignatures: 'exports-only',
     context: 'window',
@@ -119,7 +138,7 @@ const build = async (entry: string | Record<string, string>, output: string, imp
     ],
     plugins: [
       // 通用插件
-      ...commonPlugin(),
+      ...commonPlugin(useEsbuild, target),
       // 自定义插件
       ...(config.plugins || []),
       // 压缩
@@ -163,7 +182,7 @@ const watch = async (entry: string | Record<string, string>, output: string, imp
     ],
     plugins: [
       // 通用插件
-      ...commonPlugin(),
+      ...commonPlugin(true),
       // 自定义插件
       ...(config.plugins || []),
       livereload({
@@ -174,7 +193,7 @@ const watch = async (entry: string | Record<string, string>, output: string, imp
     ],
     output: {
       dir: output,
-      format: 'systemjs',
+      format: 'system',
       entryFileNames: '[name].js',
       sourcemap: true,
     },
@@ -260,20 +279,25 @@ export async function runBuild() {
   const start = Date.now();
   const { publicPath } = config;
   cleanPath(config.output);
-  const { rollupOutput } = await build(config.entry, config.output);
-  const imports = rollupOutput.output
-    .map((item) => (item.type === 'chunk' ? item.imports : []))
-    .reduce((prev, cur) => (cur.forEach((imp) => prev.add(imp)), prev), new Set<string>())
-    .values();
-  const entryChunks = rollupOutput.output.filter((chunk) => chunk.type === 'chunk' && chunk.isEntry);
-  const importMaps = entryChunks.reduce((prev, cur) => {
-    if (publicPath) {
-      prev[`${cur.name}`] = new URL(`./${cur.fileName}`, publicPath).href;
-    } else {
-      prev[`${cur.name}`] = `./${cur.fileName}`;
-    }
-    return prev;
-  }, {});
+  let imports: IterableIterator<string> = [] as any;
+  let importMaps = {};
+  // 兼容 entry 不存在的情况
+  if (config.entry) {
+    const { rollupOutput } = await build(config.entry, config.output);
+    imports = rollupOutput.output
+      .map((item) => (item.type === 'chunk' ? item.imports : []))
+      .reduce((prev, cur) => (cur.forEach((imp) => prev.add(imp)), prev), new Set<string>())
+      .values();
+    const entryChunks = rollupOutput.output.filter((chunk) => chunk.type === 'chunk' && chunk.isEntry);
+    importMaps = entryChunks.reduce((prev, cur) => {
+      if (publicPath) {
+        prev[`${cur.name}`] = new URL(`./${cur.fileName}`, publicPath).href;
+      } else {
+        prev[`${cur.name}`] = `./${cur.fileName}`;
+      }
+      return prev;
+    }, {});
+  }
   const { rollupOutput: debugRollupOut } = await build(config.browseEntry, config.output, importMaps);
   const browseEntryChunk = debugRollupOut.output.find((chunk) => chunk.type === 'chunk' && chunk.isEntry) as any;
   await setBrickingJson(importMaps, Array.from(imports));
@@ -314,8 +338,12 @@ export async function runServe() {
 export async function runStart() {
   cleanPath(config.output);
   const start = Date.now();
-  await watch(config.entry, config.output);
-  const importMaps = Object.keys(config.entry).reduce((prev, cur) => ({ ...prev, [`${cur}`]: `./${cur}.js` }), {});
+  let importMaps = {};
+  // 兼容 entry 不存在的情况
+  if (config.entry) {
+    await watch(config.entry, config.output);
+    importMaps = Object.keys(config.entry).reduce((prev, cur) => ({ ...prev, [`${cur}`]: `./${cur}.js` }), {})
+  }
   await watch({ 'browse-entry': config.browseEntry }, config.output, importMaps);
   await setHtml(importMaps, './browse-entry.js');
   const now = Date.now();
