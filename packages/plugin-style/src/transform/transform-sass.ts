@@ -17,18 +17,18 @@ export const SassRender = (options: Options) => (
     }
 ));
 
-export type SassOptions = Pick<Options,
-  'importer'
-  |'functions'
-  |'includePaths'
-  |'indentedSyntax'
-  |'indentType'
-  |'indentWidth'
-  |'linefeed'
-  |'outFile'
-  |'outputStyle'
-  |'precision'
->
+export type SassOptions = Partial<Pick<Options,
+'importer'
+|'functions'
+|'includePaths'
+|'indentedSyntax'
+|'indentType'
+|'indentWidth'
+|'linefeed'
+|'outFile'
+|'outputStyle'
+|'precision'
+>>
 
 export default async (props: CssLoaderProps<SassOptions>) => {
   const { content, filepath, context, sourceMap } = props;
