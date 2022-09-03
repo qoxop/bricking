@@ -1,3 +1,4 @@
+import * as path from 'path';
 import express from 'express';
 import { exec } from 'child_process';
 import { createProxyMiddleware, Options as ProxyOptions } from 'http-proxy-middleware';
@@ -38,7 +39,11 @@ export const startServe = (config: DevServe, dist: string) => {
           createProxyMiddleware(config.proxy),
         );
       }
-      // 4. 启动开发服务器
+      // 4. support browserHistory
+      devServe.get('*', (_, response) => {
+        response.sendFile(path.resolve(dist, 'index.html'));
+      });
+      // 5. 启动开发服务器
       devServe.listen(config.port, () => {
         logs.keepLog(`[🛰 Serve]: ${config.host}:${config.port}`);
         resolve(devServe);
