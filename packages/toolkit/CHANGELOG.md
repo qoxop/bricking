@@ -1,5 +1,11 @@
 # @bricking/toolkit
 
+## 0.4.2
+
+### Patch Changes
+
+- fix
+
 ## 0.4.1
 
 ### Patch Changes
