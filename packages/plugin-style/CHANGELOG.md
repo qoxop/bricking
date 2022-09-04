@@ -1,5 +1,13 @@
 # @bricking/plugin-style
 
+## 0.4.2
+
+### Patch Changes
+
+- 726183f5: 细节优化&文档更新
+- Updated dependencies [726183f5]
+  - @bricking/toolkit@0.4.1
+
 ## 0.4.1
 
 ### Patch Changes

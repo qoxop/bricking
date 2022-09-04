@@ -1,5 +1,11 @@
 # @bricking/toolkit
 
+## 0.4.1
+
+### Patch Changes
+
+- 726183f5: 细节优化&文档更新
+
 ## 0.4.0
 
 ### Minor Changes
