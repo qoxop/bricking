@@ -7,7 +7,7 @@ const options = { stdio: 'inherit' };
 // npx changeset version
 spawnSync('pnpm', ['changeset', 'version'], options);
 // check status
-const { stdout } = spawnSync('git', ['status'], { encoding: 'utf-8', ...options });
+const { stdout } = spawnSync('git', ['status'], { encoding: 'utf-8' });
 
 if (!/working tree clean/.test(stdout)) {
   // commit
