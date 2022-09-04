@@ -23,6 +23,8 @@ jobs:
         node-version: 16.x
         registry-url: https://registry.npmjs.org/
         cache: "pnpm"
+    - name: install dependencies
+      run: pnpm install
     - name: Check and release packages
       run: git config --global user.email "qoxop@bricking.dev" && git config --global user.name "CI" && pnpm run ci:publish
       env:
