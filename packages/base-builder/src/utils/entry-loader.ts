@@ -6,8 +6,13 @@ import { excludePackages } from './constants';
 
 module.exports = (source) => {
   const { bundle } = reloadOptions();
-  // @ts-ignore
-  const depsExclude = (bundle?.dependencies?.exclude || [])?.concat(excludePackages);
+  const depsExclude = (
+    bundle.dependencies.autoInject === true ? (
+      (bundle.dependencies.exclude || [])
+        .concat(bundle.dependencies.rewrites || [])
+        .concat(excludePackages)
+    ) : excludePackages
+  );
   const autoInjectDependencies = bundle?.dependencies?.autoInject;
   const defines = bundle?.moduleDefines?.defines || {};
   const autoInjectDefines = bundle?.moduleDefines?.autoInject || {};
@@ -15,7 +20,7 @@ module.exports = (source) => {
   if (!autoInjectDefines && !bundle.entry) {
     throw new Error('需要指定入口文件 ～');
   }
-  source = 'import "@bricking/runtime";\n';
+  source = bundle.excludeRuntime ? '' : 'import "@bricking/runtime";\n';
 
   const { peerDependencies, name: baseName } = getPackageJson();
   const pkgName = bundle.packageName || baseName;

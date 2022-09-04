@@ -32,7 +32,15 @@
     "less": "^4.1.2",
     "sass": "*"
   },
+  "peerDependenciesMeta": {
+    "less": {
+      "optional": true
+    },
+    "sass": {
+      "optional": true
+    }
+  },
   "devDependencies": {
-    "typescript": "^4.5.5"
+    "typescript": "^4.8.2"
   }
 }

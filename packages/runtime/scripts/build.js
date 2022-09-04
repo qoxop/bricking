@@ -21,12 +21,8 @@ ts.createProgram({
     }
 }).emit();
 
-const tabLine = (str = '') => str.split('\n').map(line => line.trim() ? `\t${line}`: line).join('\n');
-// concat types
-const globalDeclareTypes = `declare global {\n
-${tabLine(fs.readFileSync(path.resolve(__dirname, '../global.d.ts'),'utf8'))}
-\n}`
+// copy
 fs.writeFileSync(
     path.resolve(DistDir, './index.d.ts'),
-    `/// <reference types="systemjs" />\n\nimport "systemjs";\n\n${globalDeclareTypes}\n\nexport default window.$bricking;`
+    fs.readFileSync(path.resolve(__dirname, '../global.d.ts'),'utf8')
 );

@@ -51,9 +51,9 @@ export function defineBricking(options: BrickingOptions): Required<BrickingOptio
     ...options.devServe,
   };
   options.plugins = options.plugins ?? [];
-  if (!options.entry || !Object.keys(options.entry).length) {
-    throw new Error('options.entry is require~');
-  }
+  // if (!options.entry || !Object.keys(options.entry).length) {
+  //   throw new Error('options.entry is require~');
+  // }
   if (!options.browseEntry && isDev) {
     throw new Error('options.browseEntry is require~');
   }

@@ -1,12 +1,11 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import WebpackBar from 'webpackbar';
 import TerserPlugin from 'terser-webpack-plugin';
 import NpmImportPlugin from 'less-plugin-npm-import';
 import {
   merge as webpackMerge,
 } from 'webpack-merge';
-import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import {
   Configuration,
@@ -39,13 +38,9 @@ const sassRegex = /\.(scss|sass)$/;
 const lessRegex = /\.less$/;
 
 const getCssUse = (isEnvDevelopment: boolean, importLoaders = 2) => ([
-  (
-    isEnvDevelopment ? {
-      loader: RS('style-loader'),
-    } : {
-      loader: MiniCssExtractPlugin.loader,
-    }
-  ),
+  {
+    loader: RS('style-loader'),
+  },
   {
     loader: RS('css-loader'),
     options: {
@@ -66,7 +61,8 @@ const getCssUse = (isEnvDevelopment: boolean, importLoaders = 2) => ([
         ident: 'postcss',
         config: fs.existsSync(paths.postcssConfig),
         plugins: [
-          RS('postcss-flexbugs-fixes'),
+          [RS('cssnano')],
+          [RS('postcss-flexbugs-fixes')],
           [RS('postcss-preset-env'), {
             autoprefixer: {
               flexbox: 'no-2009',
@@ -145,7 +141,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
     output: {
       clean: true,
       publicPath: 'auto',
-      path: paths.outputPath,
+      path: path.join(paths.outputPath, 'packages'),
       pathinfo: isEnvDevelopment,
       filename: isEnvProduction
         ? 'base-js-[name].[chunkhash:8].js'
@@ -194,7 +190,6 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
             },
           },
         }),
-        new CssMinimizerPlugin(),
       ],
     },
     resolve: {
@@ -389,11 +384,6 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
       new ProvidePlugin(compileOptions.definitions),
       isEnvDevelopment && react.useReactRefresh && new ReactRefreshWebpackPlugin({
         overlay: false,
-      }),
-      isEnvProduction && new MiniCssExtractPlugin({
-        filename: 'base-css-[name].[chunkhash:8].css',
-        chunkFilename: 'base-css-[id].[chunkhash:8].chunk.css',
-        ignoreOrder: true,
       }),
       new BrickingPackPlugin(),
       !!devEntry && new HtmlWebpackPlugin({

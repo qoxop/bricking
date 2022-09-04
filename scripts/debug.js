@@ -4,7 +4,7 @@ const got = require('got');
 const path = require("path");
 const { getPkgGraph } = require('./utils');
 
-const LocalNpmRegistry = 'http://my-npm.com/'
+const LocalNpmRegistry = 'https://npm.qoxop.run/'
 const PKG_DEBUG_PATH = path.resolve(__dirname, '../_bricking');
 
 const npmrc = `
@@ -42,6 +42,8 @@ const graph = getPkgGraph(['_bricking/packages'], []);
           json.devDependencies[d_key] = newVersion
         } else if (json.dependencies[d_key]) {
           json.dependencies[d_key] = newVersion;
+        } else if (json.peerDependencies[d_key]) {
+          json.peerDependencies[d_key] = newVersion;
         }
       });
     }

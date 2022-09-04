@@ -51,13 +51,16 @@ export type Options =  {
     sourceMap?: boolean;
     /**
      * less 配置 
+     * 
      * https://lesscss.org/usage/#less-options
      */
-    less?: LessOption,
+    less?: LessOption | boolean,
     /**
      * sass 配置 
+     * 
+     * https://sass-lang.com/documentation/js-api/interfaces/Options
      */
-    sass?: SassOptions,
+    sass?: Partial<SassOptions> | boolean,
     /**
      * postcss 配置
      */
@@ -131,12 +134,12 @@ export default (options: Options): Plugin => {
       };
       let preSourceMap = null;
       if (LessRegExp.test(id) && less) {
-        const data = await transformLess({ ...loaderProps, options: less });
+        const data = await transformLess({ ...loaderProps, options: less === true ? {} : less });
         loaderProps.content = data.css;
         preSourceMap = data.map;
       }
       if (SassRegExp.test(id) && sass) {
-        const data = await transformSass({ ...loaderProps, options: sass });
+        const data = await transformSass({ ...loaderProps, options: sass === true ? {} : sass });
         loaderProps.content = data.css;
         preSourceMap = data.map;
       }
@@ -148,9 +151,16 @@ export default (options: Options): Plugin => {
         });
       }
       if (postcss?.module) {
-        return `export default ${JSON.stringify(loaderProps.context.modules || {})}`;
+        
+        return {
+          code: `export default ${JSON.stringify(loaderProps.context.modules || {})}`,
+          map: null
+        }
       }
-      return ''
+      return {
+        code: '',
+        map: null
+      }
     },
 
     augmentChunkHash(chunkInfo) {

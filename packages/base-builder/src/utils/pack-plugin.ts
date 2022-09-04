@@ -6,7 +6,7 @@ import path from 'path';
 import { existsSync, readFileSync } from 'fs';
 import { btkFile, btkHash } from '@bricking/toolkit';
 
-import typesPack from './types-pack';
+import typesPack, { updatePkgJson } from './types-pack';
 import { getUserOptions } from '../options';
 import { getPackageJson, paths } from '../paths';
 
@@ -71,7 +71,7 @@ export default class BrickingPackPlugin {
             compilation.assets['README.md'] = new RawSource(readFileSync(paths.readme));
             document = `${publicPath}${/\/$/.test(publicPath) ? '' : '/'}${'README.md'}`;
           }
-          const infoJson = JSON.stringify({
+          const infoJson = JSON.stringify(updatePkgJson({
             name,
             version,
             author,
@@ -83,14 +83,17 @@ export default class BrickingPackPlugin {
             bundlePack: bundlePackName,
             remoteEntry,
             ...(document ? { document } : {}),
-          }, null, '\t');
+          }), null, '\t');
           compilation.assets['package.json'] = new RawSource(infoJson);
-
           callback();
         },
       );
     });
     Object.entries(otherHooks).forEach(([hookName, callback]) => {
+      if (/emit/i.test(hookName) && compiler.options.mode === 'development') {
+        // 开发模式不执行 emit 钩子
+        return;
+      }
       if (compiler.hooks[hookName]) {
         if (compiler.hooks[hookName].tapAsync) {
           compiler.hooks[hookName].tapAsync(PLUGIN_NAME, async (...args) => {

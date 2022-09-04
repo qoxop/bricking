@@ -32,6 +32,7 @@
     "@rollup/plugin-replace": "^4.0.0",
     "@rollup/plugin-typescript": "^8.3.2",
     "@rollup/pluginutils": "^4.1.2",
+    "esbuild": "^0.15.6",
     "express": "^4.18.1",
     "http-proxy-middleware": "^2.0.6",
     "inquirer": "8.2.1",
@@ -39,19 +40,29 @@
     "mime": "2.6.0",
     "postcss": "^8.4.8",
     "rollup": "^2.58.0",
+    "rollup-plugin-esbuild": "^4.10.1",
     "rollup-plugin-livereload": "^2.0.5",
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-globals": "^1.4.0",
     "rollup-plugin-terser": "^7.0.2",
     "tslib": "^2.4.0",
-    "typescript": "^4.5.5",
+    "typescript": "^4.8.2",
     "yargs": "^17.3.1"
   },
   "peerDependencies": {
     "less": "^4.1.2",
     "node-sass": "*"
   },
+  "peerDependenciesMeta": {
+    "less": {
+      "optional": true
+    },
+    "node-sass": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@types/inquirer": "^9.0.1",
     "@types/node": "^17.0.21"
   }
 }

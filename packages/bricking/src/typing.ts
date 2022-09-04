@@ -15,7 +15,7 @@ export type BrickingOptions = {
   /**
    * 模块入口文件配置
    */
-  entry: {
+  entry?: {
     [name: string]: string;
   };
   /**
@@ -27,7 +27,7 @@ export type BrickingOptions = {
    */
   browseEntry: string;
   /**
-   * 公共基础包
+   * 公共基座包
    */
   basePackage: {
     name: string;
@@ -71,7 +71,7 @@ export type BrickingOptions = {
     filename?: string;
     loadPaths?: string[];
   },
-  devServe?: Partial < DevServe > ;
+  devServe?: Partial<DevServe> ;
   publicPath?: string;
   plugins?: (false | Plugin)[];
 }

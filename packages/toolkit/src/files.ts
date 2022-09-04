@@ -2,9 +2,7 @@
  * 文件处理工具
  */
 import fs from 'fs';
-import del from 'del';
 import path from 'path';
-import copy from 'cpy';
 import yauzl from 'yauzl';
 import yazl from 'yazl';
 import tar from 'tar';
@@ -96,6 +94,12 @@ function filesTransfer(
     }
   }
   return Promise.all(ps);
+}
+
+function updateJson<T = any>(jsonPath: string, callback: (json: T) => void) {
+  const json = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+  callback(json);
+  fs.writeFileSync(jsonPath, JSON.stringify(json, null, '\t'));
 }
 
 /**
@@ -221,9 +225,8 @@ class Zipper {
 
 export {
   ls,
-  copy,
-  del,
   fileIterator,
   filesTransfer,
   Zipper,
+  updateJson,
 };
