@@ -8,7 +8,15 @@ export type DevServe = {
     port: 3000;
     host: string;
     open: string;
+    /**
+     * 配置那些路径走代理服务
+     */
     proxyPath?: string | RegExp | (string | RegExp)[];
+    /**
+     * 代理配置
+     * 
+     * https://github.com/chimurai/http-proxy-middleware#options
+     */
     proxy?: ProxyOptions;
 }
 

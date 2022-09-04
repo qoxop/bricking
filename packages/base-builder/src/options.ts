@@ -53,7 +53,11 @@ const defaultOption = () => ({
     proxy: {} as Configuration['proxy'],
   },
   bundle: {
-    /** 自定义的 webpack 配置路径 */
+    /**
+     * 自定义的 webpack 配置路径，导出内容可以是
+     * - Function -> 通过 `(oldConfig) => newConfig` 方式修改 webpack 配置
+     * - Object -> 使用 webpackMerge 合并配置
+     */
     webpack: '',
     /** 是否打包构建产物 */
     pack: false,

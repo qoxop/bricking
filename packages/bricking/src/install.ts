@@ -87,7 +87,7 @@ export type BaseLibInfo = {
 }
 
 /**
- * 获取基建包信息，并下载相关依赖
+ * 获取基座包信息，并下载相关依赖
  */
 export async function getBaseLibInfo(): Promise<BaseLibInfo> {
   let baseLibInfo:BaseLibInfo = null as any;

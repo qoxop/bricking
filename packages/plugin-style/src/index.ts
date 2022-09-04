@@ -51,11 +51,14 @@ export type Options =  {
     sourceMap?: boolean;
     /**
      * less 配置 
+     * 
      * https://lesscss.org/usage/#less-options
      */
     less?: LessOption | boolean,
     /**
      * sass 配置 
+     * 
+     * https://sass-lang.com/documentation/js-api/interfaces/Options
      */
     sass?: Partial<SassOptions> | boolean,
     /**
