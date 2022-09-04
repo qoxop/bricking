@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { btkType, btkFile } from '@bricking/toolkit/dist';
+import { btkType, fsExtra } from '@bricking/toolkit';
 import { getUserOptions } from '../options';
 import { getPackageJson, paths } from '../paths';
 
@@ -33,7 +33,7 @@ export default (remoteEntry: string) => {
   if (!path.isAbsolute(typeOutput)) {
     typeOutput = path.resolve(paths.workspace, typeOutput);
   }
-  btkFile.del.sync(typeOutput);
+  fsExtra.emptyDirSync(typeOutput);
 
   Object.entries(defines).forEach(([key, value]) => {
     hasIndex = key === 'index';

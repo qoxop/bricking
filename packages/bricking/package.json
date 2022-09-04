@@ -62,6 +62,7 @@
     }
   },
   "devDependencies": {
+    "@types/inquirer": "^9.0.1",
     "@types/node": "^17.0.21"
   }
 }

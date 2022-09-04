@@ -6,6 +6,7 @@ import * as btkHash from './src/hashs';
 import * as btkNetwork from './src/networks';
 import * as btkPath from './src/paths';
 import * as btkType from './src/type';
+import fsExtra from 'fs-extra';
 import { colors } from './src/colors'
 
 export {
@@ -18,4 +19,5 @@ export {
   btkPath,
   btkType,
   colors,
+  fsExtra,
 };

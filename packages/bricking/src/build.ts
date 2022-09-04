@@ -7,7 +7,7 @@ import bundleStyle from '@bricking/plugin-style';
 import livereload from 'rollup-plugin-livereload';
 import builtins from 'rollup-plugin-node-builtins';
 import esbuild from 'rollup-plugin-esbuild';
-import { btkDom, btkFile, btkType } from '@bricking/toolkit';
+import { btkDom, btkFile, btkType, fsExtra } from '@bricking/toolkit';
 import config, { packageJson, tsConfig, tsConfigPath, workspace } from './config';
 import { relativeUrl } from './plugins/postcss-relative-url';
 import { openBrowser, startServe } from './server';
@@ -28,7 +28,7 @@ config.style.postcss.plugins.push(relativeUrl({
 }));
 
 const cleanPath = async (output: string) => {
-  await btkFile.del(output);
+  await fsExtra.emptyDir(output);
   mkdirSync(output, { recursive: true });
 };
 
@@ -256,9 +256,9 @@ async function setBrickingJson(
     updateTime: Date.now(),
     publicPath,
   };
-  const documentPath = path.resolve(workspace, './README.md');
+  const documentPath = path.join(workspace, './README.md');
   if (existsSync(documentPath)) {
-    await btkFile.copy(documentPath, output);
+    await fsExtra.copy(documentPath, path.join(output, './README.md'));
     const documentUrl = publicPath ? new URL('./README.md', publicPath).href : './README.md';
     json.document = documentUrl as any;
   }
