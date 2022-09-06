@@ -1,5 +1,11 @@
 # bricking
 
+## 0.4.4
+
+### Patch Changes
+
+- fde9291a: 更新模版地址
+
 ## 0.4.3
 
 ### Patch Changes
