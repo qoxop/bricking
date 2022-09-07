@@ -18,12 +18,10 @@ if (!/working tree clean/.test(stdout)) {
   // reinstall
   spawnSync('pnpm', ['install'], options);
   // publish
-  const { stdout, stderr } = spawnSync('pnpm', ['publish', '-r', '--access', 'public'], { encoding: 'utf-8' });
-  if (/npm ERR\!/.test(stdout) || stderr) {
-    console.log('发布报错～')
+  const { stdout } = spawnSync('pnpm', ['publish', '-r', '--access', 'public'], { encoding: 'utf-8' });
+  if (/npm ERR/.test(stdout)) {
     console.log(stdout);
-    console.log(stderr);
-    process.exit(1);
+    throw new Error('发布报错～');
   } else {
     console.log(stdout);
   }
