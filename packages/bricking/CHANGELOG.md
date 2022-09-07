@@ -1,5 +1,11 @@
 # bricking
 
+## 0.4.6
+
+### Patch Changes
+
+- b58d5fe2: 修复依赖 workspace 版本协议
+
 ## 0.4.5
 
 ### Patch Changes

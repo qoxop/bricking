@@ -1,5 +1,11 @@
 # @bricking/base-builder
 
+## 2.0.5
+
+### Patch Changes
+
+- b58d5fe2: 修复依赖 workspace 版本协议
+
 ## 2.0.4
 
 ### Patch Changes

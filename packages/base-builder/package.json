@@ -1,6 +1,6 @@
 {
   "name": "@bricking/base-builder",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Sytemjs 模块基座打包器",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
