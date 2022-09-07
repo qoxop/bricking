@@ -18,6 +18,9 @@ if (!/working tree clean/.test(stdout)) {
   // publish
   const { stdout, stderr } = spawnSync('pnpm', ['publish', '-r', '--access', 'public'], { encoding: 'utf-8' });
   if (/npm ERR\!/.test(stdout) || stderr) {
+    console.log('发布报错～')
+    console.log(stdout);
+    console.log(stderr);
     process.exit(1);
   } else {
     console.log(stdout);
