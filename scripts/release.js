@@ -15,6 +15,8 @@ if (!/working tree clean/.test(stdout)) {
   spawnSync('git', ['commit', '-m="update version [skip actions]"', '--no-verify'], options);
   // rebuild
   spawnSync('node', ['./scripts/build.js'], options);
+  // reinstall
+  spawnSync('pnpm', ['install'], options);
   // publish
   const { stdout, stderr } = spawnSync('pnpm', ['publish', '-r', '--access', 'public'], { encoding: 'utf-8' });
   if (/npm ERR\!/.test(stdout) || stderr) {
