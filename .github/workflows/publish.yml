@@ -38,7 +38,7 @@ jobs:
       run: pnpm install
     # 设置 git 配置信息
     - name: set git config
-      run: git config --global user.email "qoxop@bricking.dev" && && git config --global user.name "CI"
+      run: git config --global user.email "qoxop@bricking.dev" && git config --global user.name "CI"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     # 检查版本是否更新，更新则发包
