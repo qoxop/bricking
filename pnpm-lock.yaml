@@ -65,7 +65,7 @@ importers:
       '@babel/preset-env': ^7.16.11
       '@babel/preset-react': ^7.16.7
       '@babel/preset-typescript': ^7.16.7
-      '@bricking/toolkit': workspace:*
+      '@bricking/toolkit': workspace:^*
       '@pmmmwh/react-refresh-webpack-plugin': ^0.5.4
       '@svgr/webpack': ^6.2.1
       '@types/node': ^17.0.21
@@ -138,7 +138,7 @@ importers:
   packages/bricking:
     specifiers:
       '@bricking/plugin-style': workspace:^*
-      '@bricking/toolkit': workspace:*
+      '@bricking/toolkit': workspace:^*
       '@rollup/plugin-alias': ^3.1.9
       '@rollup/plugin-commonjs': ^22.0.0
       '@rollup/plugin-json': ^4.1.0
