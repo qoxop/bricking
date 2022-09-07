@@ -1,5 +1,14 @@
 # bricking
 
+## 0.4.5
+
+### Patch Changes
+
+- 3cdd8751: update version
+- Updated dependencies [3cdd8751]
+  - @bricking/plugin-style@0.4.4
+  - @bricking/toolkit@0.4.3
+
 ## 0.4.4
 
 ### Patch Changes

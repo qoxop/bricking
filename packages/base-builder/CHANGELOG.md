@@ -1,5 +1,14 @@
 # @bricking/base-builder
 
+## 2.0.4
+
+### Patch Changes
+
+- 3cdd8751: update version
+- Updated dependencies [3cdd8751]
+  - @bricking/runtime@0.4.4
+  - @bricking/toolkit@0.4.3
+
 ## 2.0.3
 
 ### Patch Changes
