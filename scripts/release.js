@@ -13,12 +13,15 @@ if (!/working tree clean/.test(stdout)) {
   // commit
   spawnSync('git', ['add', '.'], options);
   spawnSync('git', ['commit', '-m="update version [skip actions]"', '--no-verify'], options);
-  // install 
-  spawnSync('pnpm', ['install'], options);
   // rebuild
   spawnSync('node', ['./scripts/build.js'], options);
   // publish
-  spawnSync('pnpm', ['publish', '-r'], options);
+  const { stdout, stderr } = spawnSync('pnpm', ['publish', '-r', '--access', 'public'], { encoding: 'utf-8' });
+  if (/npm ERR\!/.test(stdout) || stderr) {
+    process.exit(1);
+  } else {
+    console.log(stdout);
+  }
   // tag
   spawnSync('npx', ['changeset', 'tag'], options);
   // push

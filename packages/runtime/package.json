@@ -18,7 +18,7 @@
   "repository": {
     "url": "git@github.com:qoxop/bricking.git",
     "type": "git",
-    "directory": "packages/runtime/"
+    "directory": "packages/runtime"
   },
   "dependencies": {
     "@types/systemjs": "^6.1.1",

@@ -20,7 +20,7 @@
   "repository": {
     "url": "git@github.com:qoxop/bricking.git",
     "type": "git",
-    "directory": "packages/bricking/"
+    "directory": "packages/bricking"
   },
   "dependencies": {
     "@bricking/plugin-style": "workspace:^*",

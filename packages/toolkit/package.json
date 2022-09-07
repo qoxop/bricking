@@ -15,7 +15,7 @@
   "repository": {
     "url": "git@github.com:qoxop/bricking.git",
     "type": "git",
-    "directory": "packages/tookit/"
+    "directory": "packages/tookit"
   },
   "publishConfig": {
     "access": "public"
