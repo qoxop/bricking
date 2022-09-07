@@ -9,6 +9,7 @@ on:
 env:
   CI: true
   PNPM_CACHE_FOLDER: .pnpm-store
+  NPM_TOKEN: ${{ NPM_TOKEN }}
 jobs:
   version:
     runs-on: ubuntu-latest
