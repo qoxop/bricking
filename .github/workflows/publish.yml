@@ -24,6 +24,9 @@ jobs:
         node-version: 16.x
         registry-url: https://registry.npmjs.org/
         cache: "pnpm"
+    # 设置 npm token
+    -name: set npm token
+      run: npm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
     # 安装依赖
     - name: install dependencies
       run: pnpm install
