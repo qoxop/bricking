@@ -410,6 +410,14 @@
     {
       "packageName": "@bricking/plugin-style",
       "projectFolder": "packages/plugin-style"
+    },
+    {
+      "packageName": "bricking",
+      "projectFolder": "packages/bricking"
+    },
+    {
+      "packageName": "@bricking/base-builder",
+      "projectFolder": "packages/base-builder"
     }
     // {
     //   /**
