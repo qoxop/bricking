@@ -1,9 +1,9 @@
 const path = require("path");
 const { Extractor, ExtractorConfig } = require("@microsoft/api-extractor");
 const ts = require('typescript');
-const del = require('del');
+const fs = require('fs-extra');
 
-del.sync(path.resolve(__dirname, '../dist'));
+fs.removeSync(path.resolve(__dirname, '../dist'));
 
 // bundle
 require("esbuild").build({
@@ -41,5 +41,4 @@ Extractor.invoke(
         showVerboseMessages: true
     }
 );
-
-del.sync(tempDir);
+fs.removeSync(tempDir);

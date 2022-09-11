@@ -17,7 +17,7 @@
 		"cpy-cli": "^4.0.0",
 		"del": "^6.0.0",
 		"del-cli": "^4.0.1",
-		"esbuild": "^0.14.21",
+		"esbuild": "0.15.7",
 		"eslint": "^8.10.0",
 		"eslint-config-airbnb": "^19.0.4",
 		"eslint-plugin-import": ">=2.25.3 <3.0.0",

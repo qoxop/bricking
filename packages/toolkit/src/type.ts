@@ -1,6 +1,5 @@
-import fs from 'fs';
+import fs from 'fs-extra';
 import path from 'path';
-import del from 'del';
 import ts from 'typescript';
 import { Extractor, ExtractorConfig } from '@microsoft/api-extractor';
 import { ls } from './files';
@@ -88,5 +87,5 @@ export const createTypeDefine = (props: {
     input: OutputName,
   });
   // 删除临时目录
-  del(TempDir);
+  fs.removeSync(TempDir);
 };
