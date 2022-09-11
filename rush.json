@@ -406,6 +406,10 @@
     {
       "packageName": "@bricking/runtime",
       "projectFolder": "packages/runtime"
+    },
+    {
+      "packageName": "@bricking/plugin-style",
+      "projectFolder": "packages/plugin-style"
     }
     // {
     //   /**
