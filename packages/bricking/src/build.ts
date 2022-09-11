@@ -342,7 +342,7 @@ export async function runStart() {
   // 兼容 entry 不存在的情况
   if (config.entry) {
     await watch(config.entry, config.output);
-    importMaps = Object.keys(config.entry).reduce((prev, cur) => ({ ...prev, [`${cur}`]: `./${cur}.js` }), {})
+    importMaps = Object.keys(config.entry).reduce((prev, cur) => ({ ...prev, [`${cur}`]: `./${cur}.js` }), {});
   }
   await watch({ 'browse-entry': config.browseEntry }, config.output, importMaps);
   await setHtml(importMaps, './browse-entry.js');

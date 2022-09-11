@@ -21,7 +21,7 @@ const $bricking = Object.defineProperties({}, {
   },
 });
 
-Object.defineProperty(window, '$bricking', {
+Object.defineProperty(self, '$bricking', {
   get() {
     return $bricking;
   },

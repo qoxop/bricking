@@ -2,7 +2,7 @@
 /* eslint-disable no-undef */
 import 'systemjs/dist/system.min.js';
 
-const isAsyncFlag = 'Symbol' in window ? Symbol('is_async_flag') : '$__is_async_flag__';
+const isAsyncFlag = 'Symbol' in self ? Symbol('is_async_flag') : '$__is_async_flag__';
 
 /** 拓展 systemjs 的 import-maps */
 const IMPORT_MAPS:TImportMaps = {};

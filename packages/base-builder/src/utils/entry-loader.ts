@@ -29,14 +29,14 @@ module.exports = (source) => {
   if (bundle.entry) {
     if (bundle.entry === defines.index) { // TODO 处理后缀
       source += `import * as baseEntry from "${bundle.entry}";\n`;
-      source += `\nwindow.$bricking.mm.set({ "${pkgName}": baseEntry })\n`;
+      source += `\nself.$bricking.mm.set({ "${pkgName}": baseEntry })\n`;
       indexInjected = true;
     } else {
       source += `import "${bundle.entry}";\n`;
     }
   }
   if (defines.index && !indexInjected) {
-    source += `\nwindow.$bricking.mm.set({ "${pkgName}": require("${defines.index}") })\n`;
+    source += `\nself.$bricking.mm.set({ "${pkgName}": require("${defines.index}") })\n`;
   }
 
   if (autoInjectDefines) {
@@ -44,14 +44,14 @@ module.exports = (source) => {
       .filter(([key]) => key !== 'index')
       .map(([key, value]) => (`\t"${pkgName}/${key}": () => import("${value}"),`))
       .join('\n');
-    source += `\nwindow.$bricking.mm.setDynamic({\n${definesImports}\n});`;
+    source += `\nself.$bricking.mm.setDynamic({\n${definesImports}\n});`;
   }
   if (autoInjectDependencies) {
     const depsImports = Object.keys(peerDependencies)
       .filter((key) => (!/^@types\//.test(key) && !depsExclude.includes(key)))
       .map((key) => `\t"${key}": () => import("${key}"),`)
       .join('\n');
-    source += `\nwindow.$bricking.mm.setDynamic({\n${depsImports}\n});`;
+    source += `\nself.$bricking.mm.setDynamic({\n${depsImports}\n});`;
   }
   return source;
 };
