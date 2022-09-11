@@ -1,12 +1,10 @@
 const path = require("path");
-const fs = require("fs");
-const del = require("del");
+const fs = require("fs-extra");
 const ts = require('typescript');
 
 const DistDir = path.resolve(__dirname, '../dist/');
 
-// clear
-del.sync(DistDir);
+fs.removeSync(DistDir)
 if (!fs.existsSync(DistDir)) fs.mkdirSync(DistDir);
 
 // bundle
