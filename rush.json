@@ -275,7 +275,7 @@
   },
 
   "repository": {
-    "url": "https://github.com/qoxop/bricking",
+    "url": "https://github.com/qoxop/bricking.git",
     "defaultBranch": "main",
     "defaultRemote": "origin"
   },
