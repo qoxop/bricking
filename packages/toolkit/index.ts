@@ -1,3 +1,4 @@
+import fsExtra from 'fs-extra';
 import * as btkCompile from './src/compiles';
 import * as btkDom from './src/doms';
 import * as btkFile from './src/files';
@@ -6,8 +7,7 @@ import * as btkHash from './src/hashs';
 import * as btkNetwork from './src/networks';
 import * as btkPath from './src/paths';
 import * as btkType from './src/type';
-import fsExtra from 'fs-extra';
-import { colors } from './src/colors'
+import { colors } from './src/colors';
 
 export {
   btkCompile,

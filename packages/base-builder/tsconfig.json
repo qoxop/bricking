@@ -1,22 +1,7 @@
 {
     "included": ["src/**/*"],
+    "extends": "@bricking/common-config/tsconfig/node.json",
     "compilerOptions": {
-        "baseUrl": ".",
-        "outDir": "dist",
-        "target": "ES2018",
-        "module": "CommonJS",
-        "moduleResolution": "Node",
-        "strict": true,
-        "declaration": true,
-        "sourceMap": false,
-        "noUnusedLocals": true,
-        "esModuleInterop": true,
-        "skipLibCheck": true,
-        "noImplicitAny": false,
-        "typeRoots": ["node_module/@types"]
-    },
-    "exclude": [
-        "node_modules",
-        "dist"
-    ]
+        "outDir": "dist"
+    }
 }

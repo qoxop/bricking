@@ -418,6 +418,10 @@
     {
       "packageName": "@bricking/base-builder",
       "projectFolder": "packages/base-builder"
+    },
+    {
+      "packageName": "@bricking/common-config",
+      "projectFolder": "packages/_common"
     }
     // {
     //   /**

@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "del dist && tsc"
+    "build": "del dist && tsc",
+    "lint": "eslint ."
   },
   "bin": {
     "base-builder": "bin/index.js"
@@ -44,7 +45,7 @@
     "less-loader": "^10.2.0",
     "less-plugin-npm-import": "^2.1.0",
     "loader-utils": "^3.2.0",
-    "postcss": "^8.4.6",
+    "postcss": "^8.4.8",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-loader": "^6.2.1",
     "postcss-preset-env": "^7.4.0",
@@ -79,6 +80,8 @@
   },
   "devDependencies": {
     "@types/node": "^17.0.21",
-    "del-cli": "^4.0.1"
+    "@bricking/common-config": "workspace:*",
+    "del-cli": "^4.0.1",
+    "eslint": "~8.23.1"
   }
 }

@@ -5,11 +5,14 @@ module.exports = {
         "node": true
     },
     "extends": [
+        "airbnb",
+        "plugin:react/recommended",
         "plugin:react/recommended",
         "plugin:vue/vue3-recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended",
-        "airbnb"
     ],
+    "ignorePatterns": ["**/dist/*", "**/scripts/*", "**/node_modules/**/*", "**/bin/**/*"],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaFeatures": {

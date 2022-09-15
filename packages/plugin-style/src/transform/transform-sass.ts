@@ -4,18 +4,17 @@ import { CssLoaderProps } from './types';
 /**
  * 渲染 sass 文件
  * @param options
- * @returns 
+ * @returns
  */
 export const SassRender = (options: Options) => (
-    new Promise<{error?: SassError, result?: Result}>((resolve) => {
-        const sass = require('node-sass');
-        const callback: SassRenderCallback = (error, result) => {
-            if (error)  return resolve({ error });
-            resolve({ result });
-        };
-        sass.render(options, callback);
-    }
-));
+  new Promise<{error?: SassError, result?: Result}>((resolve) => {
+    const sass = require('node-sass');
+    const callback: SassRenderCallback = (error, result) => {
+      if (error) return resolve({ error });
+      resolve({ result });
+    };
+    sass.render(options, callback);
+  }));
 
 export type SassOptions = Partial<Pick<Options,
 'importer'

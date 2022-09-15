@@ -15,9 +15,9 @@ import { CssLoaderProps } from './transform/types';
 
 /**
  * 对模块ID按引用顺序进行排序
- * @param id 
- * @param getModuleInfo 
- * @param seen 
+ * @param id
+ * @param getModuleInfo
+ * @param seen
  * @returns
  */
 function getRecursiveImportOrder(id: string, getModuleInfo: GetModuleInfo, seen = new Set()): string[] {
@@ -35,8 +35,8 @@ function getRecursiveImportOrder(id: string, getModuleInfo: GetModuleInfo, seen 
 
 const LessRegExp = /\.less$/;
 const SassRegExp = /\.s(a|c)ss$/;
- 
-export type Options =  {
+
+export type Options = {
     /**
      * 文件命名规则，eg: `'base-dir/[name]-[hash][extname]'`
      * - `[hash]` - 文件 hash
@@ -50,14 +50,14 @@ export type Options =  {
      */
     sourceMap?: boolean;
     /**
-     * less 配置 
-     * 
+     * less 配置
+     *
      * https://lesscss.org/usage/#less-options
      */
     less?: LessOption | boolean,
     /**
-     * sass 配置 
-     * 
+     * sass 配置
+     *
      * https://sass-lang.com/documentation/js-api/interfaces/Options
      */
     sass?: Partial<SassOptions> | boolean,
@@ -85,36 +85,36 @@ export default (options: Options): Plugin => {
       if (/^https?:\/\/.*\.css(\?.*)?$/.test(source)) {
         return `${REMOTE_CSS_PREFIX}${source}`;
       }
-      if(/^https?:\/\/.*\|css$/.test(source)) {
+      if (/^https?:\/\/.*\|css$/.test(source)) {
         return `${REMOTE_CSS_PREFIX}${source.replace(/\|css$/, '')}`;
       }
       if (source === INJECT_REMOTE_CSS_ID) {
-        return INJECT_REMOTE_CSS_ID
+        return INJECT_REMOTE_CSS_ID;
       }
-      return null
+      return null;
     },
     load(id) {
       // 处理远程样式文件
       if (id === INJECT_REMOTE_CSS_ID) {
-          return INJECT_REMOTE_CSS_CODE;
+        return INJECT_REMOTE_CSS_CODE;
       }
       if (id.indexOf(REMOTE_CSS_PREFIX) === 0) {
-          return `import inject from "${INJECT_REMOTE_CSS_ID}";\ninject("${id.replace(REMOTE_CSS_PREFIX, '')}");`;
+        return `import inject from "${INJECT_REMOTE_CSS_ID}";\ninject("${id.replace(REMOTE_CSS_PREFIX, '')}");`;
       }
       return null;
-  },
+    },
     async transform(code: string, id: string) {
       const moduleInfo = this.getModuleInfo(id);
       // 给入口文件添加导入样式的代码
       if (moduleInfo && moduleInfo.isEntry) {
         // @ts-ignore
         const concat = new Concat(true, id, '\n');
-        concat.add(null,  `import "${STYLE_EXTERNALS_MODULE}";`)
+        concat.add(null, `import "${STYLE_EXTERNALS_MODULE}";`);
         concat.add(id, code, this.getCombinedSourcemap().toString());
         return {
           code: concat.content.toString(),
           map: concat.sourceMap,
-        }
+        };
       }
       if (id.indexOf(REMOTE_CSS_PREFIX) === 0) return null;
       // 过滤掉不处理的类型
@@ -128,9 +128,9 @@ export default (options: Options): Plugin => {
           /** 依赖文件 */
           dependencies: new Set<string>(),
           /** Css 模块对象 */
-          modules: {}
+          modules: {},
         },
-        options: {}
+        options: {},
       };
       let preSourceMap = null;
       if (LessRegExp.test(id) && less) {
@@ -143,24 +143,23 @@ export default (options: Options): Plugin => {
         loaderProps.content = data.css;
         preSourceMap = data.map;
       }
-      const { css, map } = await transformCss({ ...loaderProps, options: postcss || {}, preSourceMap: preSourceMap });
+      const { css, map } = await transformCss({ ...loaderProps, options: postcss || {}, preSourceMap });
       allCssFiles.set(id, { id, css, map });
       if (process.env.NODE_ENV === 'development') {
-        loaderProps.context.dependencies.forEach(item => {
+        loaderProps.context.dependencies.forEach((item) => {
           this.addWatchFile(item);
         });
       }
       if (postcss?.module) {
-        
         return {
           code: `export default ${JSON.stringify(loaderProps.context.modules || {})}`,
-          map: null
-        }
+          map: null,
+        };
       }
       return {
         code: '',
-        map: null
-      }
+        map: null,
+      };
     },
 
     augmentChunkHash(chunkInfo) {
@@ -177,7 +176,7 @@ export default (options: Options): Plugin => {
       // 输出目录
       const dir = outputOptions.dir || path.dirname(outputOptions.file as string);
       // 入口 chunk
-      const [entryChunkId, entryChunk] = Object.entries(bundle).find(([_, chunk]) => chunk.type === 'chunk' && chunk.isEntry) as [string, OutputChunk];
+      const [entryChunkId, entryChunk] = Object.entries(bundle).find(([, chunk]) => chunk.type === 'chunk' && chunk.isEntry) as [string, OutputChunk];
       // 入口chunk文件(输出位置)
       const entryFile = outputOptions.file || path.join(outputOptions.dir as string, entryChunkId);
       const entries = [...allCssFiles.values()];
@@ -199,11 +198,11 @@ export default (options: Options): Plugin => {
         const map = result.map || null;
         concat.add(relative, result.css, map);
       }
-      const cssCode =  sourceMap ? concat.content.toString() + `\n/*# sourceMappingURL=./${path.basename(mapFileName)} */` :  concat.content.toString();
+      const cssCode = sourceMap ? `${concat.content.toString()}\n/*# sourceMappingURL=./${path.basename(mapFileName)} */` : concat.content.toString();
       // 替换
       entryChunk.code = entryChunk.code.replace(STYLE_EXTERNALS_MODULE, `${STYLE_EXTERNALS_MODULE}?link=./${fileName}`);
       // 输出
-      this.emitFile({ fileName: fileName, type: 'asset', source: cssCode });
+      this.emitFile({ fileName, type: 'asset', source: cssCode });
       if (sourceMap && concat.sourceMap) {
         this.emitFile({ fileName: mapFileName, type: 'asset', source: concat.sourceMap });
       }
