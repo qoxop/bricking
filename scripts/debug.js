@@ -1,8 +1,7 @@
-const { spawnSync } = require('child_process');
 const fs = require('fs');
-const got = require('got');
 const path = require("path");
-const { getPkgGraph } = require('./utils');
+const { spawnSync } = require('child_process');
+const { getPkgGraph, getJson } = require('./utils');
 
 const LocalNpmRegistry = 'https://npm.qoxop.run/'
 const PKG_DEBUG_PATH = path.resolve(__dirname, '../_bricking');
@@ -15,20 +14,26 @@ git-checks=false
 registry=${LocalNpmRegistry}
 `
 
+fs.cpSync(
+  path.resolve(process.cwd(), 'packages/'),
+  path.resolve(process.cwd(),  '_bricking/'),
+  {
+    recursive: true,
+    filter: (source) => !(/_/.test(source) || /node_modules/.test(source))
+  }
+);
+
 // 写入 npmrc
 fs.writeFileSync(path.resolve(PKG_DEBUG_PATH, './.npmrc'), npmrc);
 
-
-const graph = getPkgGraph(['_bricking/packages'], []);
-
-
 (async () => {
-  const { latest } = await got(`${LocalNpmRegistry}-/verdaccio/data/sidebar/bricking`).json();
+  const graph = getPkgGraph(['_bricking'], []);
+  const { latest } = await getJson(`${LocalNpmRegistry}-/verdaccio/data/sidebar/bricking`)
   const newVersion = latest.version
     .split('.')
     .map((v, index) => (index === 2 ? +v+1 : v))
     .join('.');
-  // 更新依赖 verion 
+  // 更新依赖 version 
   Object.entries(graph).forEach(([_, { deps, path: p_path }]) => {
     const jsonPath = path.resolve(p_path, 'package.json');
     const json = require(jsonPath);
@@ -55,4 +60,3 @@ const graph = getPkgGraph(['_bricking/packages'], []);
     spawnSync('npm', ['publish', `--registry=${LocalNpmRegistry}`], { stdio: 'inherit', cwd: p_path });
   })
 })();
-

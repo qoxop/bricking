@@ -313,13 +313,15 @@ export async function runBuild() {
       filter: (abs) => [/\.zip$/, /\.md$/].every((item) => !item.test(abs)),
     });
   }
-  Object.entries(config.entry).forEach(([name, _path]) => {
-    btkType.createTypeDefine({
-      input: path.resolve(workspace, _path),
-      output: path.resolve(config.output, `./${name}.d.ts`),
-      cwd: workspace,
+  if (config.entry) {
+    Object.entries(config.entry).forEach(([name, _path]) => {
+      btkType.createTypeDefine({
+        input: path.resolve(workspace, _path),
+        output: path.resolve(config.output, `./${name}.d.ts`),
+        cwd: workspace,
+      });
     });
-  });
+  }
   const now = Date.now();
   logs.keepLog(`[⌛️speed]: ${((now - start) / 1000).toFixed(2)}s`);
 }
