@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@bricking/toolkit",
+      "comment": "引入 rush.js",
+      "type": "none"
+    }
+  ],
+  "packageName": "@bricking/toolkit"
+}

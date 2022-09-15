@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "bricking",
+      "comment": "引入 rush.js",
+      "type": "none"
+    }
+  ],
+  "packageName": "bricking"
+}
