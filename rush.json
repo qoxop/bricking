@@ -354,23 +354,28 @@
   "projects": [
     {
       "packageName": "@bricking/toolkit",
-      "projectFolder": "packages/toolkit"
+      "projectFolder": "packages/toolkit",
+      "shouldPublish": true
     },
     {
       "packageName": "@bricking/runtime",
-      "projectFolder": "packages/runtime"
+      "projectFolder": "packages/runtime",
+      "shouldPublish": true
     },
     {
       "packageName": "@bricking/plugin-style",
-      "projectFolder": "packages/plugin-style"
+      "projectFolder": "packages/plugin-style",
+      "shouldPublish": true
     },
     {
       "packageName": "bricking",
-      "projectFolder": "packages/bricking"
+      "projectFolder": "packages/bricking",
+      "shouldPublish": true
     },
     {
       "packageName": "@bricking/base-builder",
-      "projectFolder": "packages/base-builder"
+      "projectFolder": "packages/base-builder",
+      "shouldPublish": true
     },
     {
       "packageName": "@bricking/common-config",
