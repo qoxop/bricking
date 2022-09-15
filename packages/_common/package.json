@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "bricking 通用项目配置",
   "main": "index.js",
+  "scripts": {
+    "build": ""
+  },
   "files": [
     "src",
     "tsconfig",

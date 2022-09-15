@@ -1,6 +1,7 @@
 {
-  "include": ["src", "index.ts"],
   "extends": "@bricking/common-config/tsconfig/node.json",
+  "include": ["src", "index.ts"],
+  "exclude": ["dist"],
   "compilerOptions": {
     "outDir": "dist"
   }
