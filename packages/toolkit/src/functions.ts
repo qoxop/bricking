@@ -14,3 +14,32 @@ export function once<Args extends unknown[] = unknown[], Rt = any>(func: (...arg
     return returned;
   };
 }
+
+// https://github.com/filamentgroup/directory-encoder/blob/master/lib/svg-uri-encoder.js
+export function encodeSVG(buffer:Buffer) {
+  return (
+    encodeURIComponent(
+      buffer
+        .toString('utf-8')
+        // strip newlines and tabs
+        .replace(/[\n\r]/gim, '')
+        .replace(/\t/gim, ' ')
+        // strip comments
+        .replace(/<!--(.*(?=-->))-->/gim, '')
+        // replace
+        .replace(/'/gim, '\\i'),
+    )
+      // encode brackets
+      .replace(/\(/g, '%28')
+      .replace(/\)/g, '%29')
+  );
+}
+
+export const getDataUrl = (id: string, buffer: Buffer) => {
+  // @ts-ignore
+  const mimetype = mime.getType(id);
+  const isSVG = mimetype === 'image/svg+xml';
+  const data = isSVG ? encodeSVG(buffer) : buffer.toString('base64');
+  const encoding = isSVG ? '' : ';base64';
+  return `data:${mimetype}${encoding},${data}`;
+};
