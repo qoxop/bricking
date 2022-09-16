@@ -6,7 +6,6 @@ import * as Url from 'url';
 import * as path from 'path';
 import { btkHash } from '@bricking/toolkit';
 import { Declaration, Result } from 'postcss';
-import { AssetsMap, getDataUrl } from './rollup-url';
 
 /**
  * 将资源文件全部转为相对路径引用的方式
@@ -26,13 +25,15 @@ type RelativeUrlOptions = {
     limit?: number;
     /**
      * 文件名称模块字符串
-     * @default `[hash].[ext]`
+     * @default `[hash][extname]`
      */
     filename?: string;
     /**
      * 查找文件的特定目录
      */
     loadPaths?: string[];
+    AssetsMap: Map<string, string>;
+    getDataUrl: (id: string, buffer: Buffer) => string;
 }
 
 const WITH_QUOTES = /^['"]/;
@@ -85,6 +86,8 @@ const handleFile = async ({
   loadPaths,
   cssOutput,
   baseOutput,
+  AssetsMap,
+  getDataUrl
 }) => {
   // 获取资源信息，绝对路径、search 、hash
   const { absolutePath, search, hash } = getAssetInfo(url, loadPaths);

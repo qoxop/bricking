@@ -26,7 +26,6 @@
     "cssnano": "^5.1.12",
     "postcss": "^8.4.8",
     "postcss-modules": "^4.0.0",
-    "rollup": "^2.58.0",
     "rollup-pluginutils": "^2.8.2"
   },
   "peerDependencies": {
@@ -47,6 +46,7 @@
     "@bricking/common-config": "workspace:*",
     "del-cli": "^4.0.1",
     "eslint": "~8.23.1",
+    "rollup": "^2.58.0",
     "typescript": "^4.8.2"
   }
 }

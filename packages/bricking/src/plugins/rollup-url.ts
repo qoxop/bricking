@@ -5,8 +5,7 @@
 import fs from 'fs';
 import path from 'path';
 import util from 'util';
-import mime from 'mime';
-import { btkHash } from '@bricking/toolkit';
+import { btkFunc, btkHash } from '@bricking/toolkit';
 import { createFilter, FilterPattern } from '@rollup/pluginutils';
 
 const mkdir = util.promisify(fs.mkdir);
@@ -21,26 +20,6 @@ type UrlOptions = {
   limit?: number,
   fileName?: string,
   publicPath?: string,
-}
-
-// https://github.com/filamentgroup/directory-encoder/blob/master/lib/svg-uri-encoder.js
-function encodeSVG(buffer) {
-  return (
-    encodeURIComponent(
-      buffer
-        .toString('utf-8')
-        // strip newlines and tabs
-        .replace(/[\n\r]/gim, '')
-        .replace(/\t/gim, ' ')
-        // strip comments
-        .replace(/<!--(.*(?=-->))-->/gim, '')
-        // replace
-        .replace(/'/gim, '\\i'),
-    )
-      // encode brackets
-      .replace(/\(/g, '%28')
-      .replace(/\)/g, '%29')
-  );
 }
 
 function copy(src: string, dest: string) {
@@ -77,14 +56,6 @@ function getCode(relativePath: string, publicPath = '') {
  * 共享资源映射表，保证同一份资源只被处理一次
  */
 export const AssetsMap = new Map<string, string>();
-export const getDataUrl = (id: string, buffer: Buffer) => {
-  // @ts-ignore
-  const mimetype = mime.getType(id);
-  const isSVG = mimetype === 'image/svg+xml';
-  const data = isSVG ? encodeSVG(buffer) : buffer.toString('base64');
-  const encoding = isSVG ? '' : ';base64';
-  return `data:${mimetype}${encoding},${data}`;
-};
 
 export default function url(options:UrlOptions = {}) {
   const {
@@ -119,7 +90,7 @@ export default function url(options:UrlOptions = {}) {
           AssetsMap.set(id, outputFileName);
           return getCode(outputFileName, publicPath);
         }
-        return `export default "${getDataUrl(id, buffer)}"`;
+        return `export default "${btkFunc.getDataUrl(id, buffer)}"`;
       });
     },
     generateBundle: async function write(outputOptions) {

@@ -9,23 +9,12 @@ import builtins from 'rollup-plugin-node-builtins';
 import esbuild from 'rollup-plugin-esbuild';
 import { btkDom, btkFile, btkType, fsExtra } from '@bricking/toolkit';
 import config, { packageJson, tsConfig, tsConfigPath, workspace } from './config';
-import { relativeUrl } from './plugins/postcss-relative-url';
 import { openBrowser, startServe } from './server';
 import rollupUrl from './plugins/rollup-url';
 import rollupLog from './plugins/rollup-log';
 import * as logs from './utils/log';
 import { getBaseLibInfo } from './install';
 import { BrickingJson } from './typing';
-
-// 添加 postcss-relative-url 插件
-// @ts-ignore
-config.style.postcss.plugins.push(relativeUrl({
-  cssOutput: path.dirname(path.resolve(config.output, config.style.filename as string)),
-  baseOutput: config.output,
-  limit: config.assets.limit,
-  filename: config.assets.filename,
-  loadPaths: config.assets.loadPaths,
-}));
 
 const cleanPath = async (output: string) => {
   await fsExtra.emptyDir(output);

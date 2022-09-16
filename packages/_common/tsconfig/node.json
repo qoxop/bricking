@@ -7,7 +7,7 @@
     "moduleResolution": "Node",
     "strict": true,
     "declaration": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "noUnusedLocals": true,
     "esModuleInterop": true,
     "skipLibCheck": true,

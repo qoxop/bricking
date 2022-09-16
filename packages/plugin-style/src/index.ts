@@ -51,14 +51,12 @@ export type Options = {
     sourceMap?: boolean;
     /**
      * less 配置
-     *
-     * https://lesscss.org/usage/#less-options
+     * - https://lesscss.org/usage/#less-options
      */
     less?: LessOption | boolean,
     /**
      * sass 配置
-     *
-     * https://sass-lang.com/documentation/js-api/interfaces/Options
+     * - https://sass-lang.com/documentation/js-api/interfaces/Options
      */
     sass?: Partial<SassOptions> | boolean,
     /**
@@ -187,8 +185,12 @@ export default (options: Options): Plugin => {
         entries.sort((a, b) => moduleIds.indexOf(a.id) - moduleIds.indexOf(b.id));
       }
       // 计算 hash 值
-      const filehash = btkHash.getSafeId(entries.map((entry) => entry.css).join('-'), path.parse(entryFile).name);
-      const fileName = filename.replace('[hash]', filehash);
+      const filehash = btkHash.getHash(entries.map((entry) => entry.css).join('-'), path.parse(entryFile).name);
+      // 计算文件名称
+      const fileName = filename
+        .replace('[name]', path.parse(entryFile).name)
+        .replace('[hash]', filehash)
+        .replace('[extname]', '.css');
       const mapFileName = `${fileName}.map`;
       // 拼接代码
       // @ts-ignore
