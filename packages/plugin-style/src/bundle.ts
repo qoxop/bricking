@@ -13,7 +13,7 @@ type AssetsOptions = {
    */
   limit?: number;
   /**
-   * 文件名格式，默认 "assets/[hash].[extname]"
+   * 文件名格式，默认 "assets/[hash][extname]"
    */
   filename?: string;
   /**
@@ -84,7 +84,7 @@ async function batchCopy(map: Map<string, string>, outputDir: string) {
   await Promise.all(
     Array.from(map.entries()).map(async ([id, filename]) => {
       // 拷贝文件
-      await fsExtra.copyFile(id, path.join(outputDir, filename))
+      await fsExtra.copy(id, path.join(outputDir, filename), { recursive: true })
     }),
   );
 }
@@ -122,7 +122,7 @@ async function generate({
           baseOutput: output,
           ...Object.assign({
             limit: 1024 * 4,
-            filename: 'assets/[hash].[extname]',
+            filename: 'assets/[hash][extname]',
             loadPaths: [],
           }, assetsOptions),
         })
@@ -135,9 +135,13 @@ async function generate({
   const localFilename = filename.replace('[hash]', hash);
   // 输出路径
   const filepath = path.resolve(output, localFilename);
+  const dirPath = path.dirname(filepath);
+  if (!fsExtra.existsSync(dirPath)) {
+    fsExtra.mkdirSync(dirPath, { recursive: true })
+  }
   await fsExtra.writeFile(filepath, cssResult.css);
   if (sourceMap) {
-    await fsExtra.writeFile(`${filepath}.map`, cssResult.map);
+    await fsExtra.writeFile(`${filepath}.map`, JSON.stringify(cssResult.map));
   }
   await batchCopy(AssetsMap, output);
   return {

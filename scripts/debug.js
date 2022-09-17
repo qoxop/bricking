@@ -3,7 +3,7 @@ const path = require("path");
 const { spawnSync } = require('child_process');
 const { getPkgGraph, getJson } = require('./utils');
 
-const LocalNpmRegistry = 'https://npm.qoxop.run/'
+const LocalNpmRegistry = 'http://my-npm.com/'
 const PKG_DEBUG_PATH = path.resolve(__dirname, '../_bricking');
 
 const npmrc = `

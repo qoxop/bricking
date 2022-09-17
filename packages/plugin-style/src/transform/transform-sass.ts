@@ -41,7 +41,7 @@ export default async (props: CssLoaderProps<SassOptions>) => {
 
   if (result) {
     result.stats.includedFiles.forEach((dep) => context.dependencies.add(dep));
-    return { css: result.css.toString(), map: JSON.parse(result.map.toString()) };
+    return { css: result.css.toString(), map: sourceMap ? JSON.parse(result.map.toString()) : null };
   }
   throw error;
 };
