@@ -4,7 +4,7 @@
 
 # 构建任务
 build:
-	node common/scripts/install-run-rush.js build
+	node common/scripts/install-run-rush.js rebuild
 
 # 清空调试目录
 clean:
