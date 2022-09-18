@@ -29,11 +29,11 @@ jobs:
     # 设置 npm token
     - name: set npm token
       run: npm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
-    # # 设置 git 配置信息
-    # - name: set git config
-    #   run: git config --global user.email "qoxop@bricking.dev" && git config --global user.name "CI"
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # 设置 git 配置信息
+    - name: set git config
+      run: git config --global user.email "qoxop@bricking.dev" && git config --global user.name "CI"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     # 执行发布命令
     - name: publish packages
       run: make publish
