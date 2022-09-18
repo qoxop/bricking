@@ -3,7 +3,7 @@ import { fsExtra, btkHash, btkFunc } from "@bricking/toolkit";
 import transformLess, { LessOption } from "./transform/transform-less";
 import transformSass, { SassOptions } from "./transform/transform-sass";
 import transformCss, { PostCSSOptions } from "./transform/transform-css";
-import { relativeUrl } from './plugins/postcss-relative-url'
+import { postcssRelativeUrl } from './plugins/postcss-relative-url'
 
 
 
@@ -115,7 +115,7 @@ async function generate({
       ...postCssOptions,
       plugins: [
         ...(postCssOptions?.plugins || []),
-        relativeUrl({
+        postcssRelativeUrl({
           AssetsMap,
           getDataUrl: btkFunc.getDataUrl,
           cssOutput: output,

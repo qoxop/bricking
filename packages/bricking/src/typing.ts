@@ -1,5 +1,5 @@
 import { Plugin } from 'rollup';
-import { Options as StyleOptions } from '@bricking/plugin-style';
+import { RollupStylePluginOptions as StyleOptions } from '@bricking/plugin-style';
 import { DevServe } from './server';
 
 export type BrickingAsset = {

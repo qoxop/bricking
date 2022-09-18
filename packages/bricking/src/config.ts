@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { btkCompile, btkFunc } from '@bricking/toolkit';
-import { relativeUrl } from '@bricking/plugin-style/dist/plugins/postcss-relative-url'
+import { postcssRelativeUrl } from '@bricking/plugin-style'
 import { BrickingOptions } from './typing';
 import { AssetsMap } from './plugins/rollup-url';
 
@@ -17,7 +17,7 @@ const tsConfig = require(tsConfigPath);
 const packageJson = require(packageJsonPath);
 
 // 需要额外添加 URL 处理插件
-(config as any).style.postcss.plugins.push(relativeUrl({
+(config as any).style.postcss.plugins.push(postcssRelativeUrl({
   cssOutput: path.dirname(path.resolve(config.output, config.style.filename as string)),
   baseOutput: config.output,
   limit: config.assets.limit,

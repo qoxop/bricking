@@ -10,7 +10,7 @@ import { Declaration, Result } from 'postcss';
 /**
  * 将资源文件全部转为相对路径引用的方式
  */
-type RelativeUrlOptions = {
+type PostcssRelativeUrlOptions = {
     /**
      * Css 文件输出目录(绝对路径)
      */
@@ -124,7 +124,7 @@ const handleFile = async ({
   return `${/\.+\//.test(rUrl) ? '' : './'}${rUrl}${search || ''}${hash || ''}`;
 };
 
-const urlDeclProcessor = (options: Required<RelativeUrlOptions>, result: Result, decl: Declaration) => {
+const urlDeclProcessor = (options: Required<PostcssRelativeUrlOptions>, result: Result, decl: Declaration) => {
   const promises: Promise<any>[] = [];
   // 源文件地址和目录
   const sourceFilename = decl.source && decl.source.input && decl.source.input.file;
@@ -151,7 +151,7 @@ const urlDeclProcessor = (options: Required<RelativeUrlOptions>, result: Result,
   return Promise.all(promises);
 };
 
-const relativeUrl = (options: RelativeUrlOptions) => {
+const postcssRelativeUrl = (options: PostcssRelativeUrlOptions) => {
   // init options
   options.limit = options.limit ? options.limit : (options.limit === 0 ? Infinity : 1024 * 2);
   options.filename = options.filename || '[hash].[ext]';
@@ -177,9 +177,9 @@ const relativeUrl = (options: RelativeUrlOptions) => {
     },
   };
 };
-relativeUrl.postcss = true;
+postcssRelativeUrl.postcss = true;
 
 export {
-  relativeUrl,
-  RelativeUrlOptions as RelativeUrlOption,
+  postcssRelativeUrl,
+  PostcssRelativeUrlOptions,
 };

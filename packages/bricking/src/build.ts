@@ -3,7 +3,7 @@ import { mkdirSync, existsSync, writeFileSync } from 'fs';
 import * as rollup from 'rollup';
 import alias from '@rollup/plugin-alias';
 import jsonPlugin from '@rollup/plugin-json';
-import bundleStyle from '@bricking/plugin-style';
+import { rollupStylePlugin } from '@bricking/plugin-style';
 import livereload from 'rollup-plugin-livereload';
 import builtins from 'rollup-plugin-node-builtins';
 import esbuild from 'rollup-plugin-esbuild';
@@ -67,7 +67,7 @@ const commonPlugin = (useEsbuild?: boolean, target?: string) => ([
   alias({ entries: getAliasEntries() }),
   jsonPlugin(),
   // 打包样式文件
-  bundleStyle(config.style),
+  rollupStylePlugin(config.style),
   // 处理文件
   rollupUrl({
     limit: config.assets.limit,
