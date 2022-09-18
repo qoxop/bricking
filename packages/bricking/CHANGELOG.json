@@ -1,0 +1,30 @@
+{
+  "name": "bricking",
+  "entries": [
+    {
+      "version": "0.5.0",
+      "tag": "bricking_v0.5.0",
+      "date": "Sun, 18 Sep 2022 14:02:44 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "引入 rush.js"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "修改内部插件API名称"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@bricking/plugin-style\" from `^*` to `^0.5.0`"
+          },
+          {
+            "comment": "Updating dependency \"@bricking/toolkit\" from `^*` to `^0.5.0`"
+          }
+        ]
+      }
+    }
+  ]
+}

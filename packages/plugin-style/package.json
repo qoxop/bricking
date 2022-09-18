@@ -1,6 +1,6 @@
 {
   "name": "@bricking/plugin-style",
-  "version": "0.4.4",
+  "version": "0.5.0",
   "description": "rollup style plugin",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -20,7 +20,7 @@
   },
   "license": "ISC",
   "dependencies": {
-    "@bricking/toolkit": "workspace:^*",
+    "@bricking/toolkit": "workspace:^0.5.0",
     "concat-with-sourcemaps": "^1.1.0",
     "cssnano": "^5.1.12",
     "postcss": "^8.4.8",
