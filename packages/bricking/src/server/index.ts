@@ -14,7 +14,7 @@ export type DevServe = {
     proxyPath?: string | RegExp | (string | RegExp)[];
     /**
      * 代理配置
-     * 
+     *
      * https://github.com/chimurai/http-proxy-middleware#options
      */
     proxy?: ProxyOptions;

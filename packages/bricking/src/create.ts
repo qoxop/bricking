@@ -2,15 +2,13 @@ import * as os from 'os';
 import * as path from 'path';
 import inquirer from 'inquirer';
 import { spawnSync } from 'child_process';
-import { colors, fsExtra, btkFile } from '@bricking/toolkit';
+import { colors, fsExtra, btkFile, btkNetwork } from '@bricking/toolkit';
 
 type Template = {
   name: string;
   git: string;
   source: string;
   branch: string;
-  // eslint-disable-next-line no-unused-vars
-  tips?: (props: { projectPath: string }) => string;
 }
 type Options = {
   type?: string;
@@ -19,7 +17,7 @@ type Options = {
   cwd?: string
 }
 
-const templates: Record<string, Template[]> = {
+const _templates: Record<string, Template[]> = {
   base: [
     {
       name: 'react-base',
@@ -34,7 +32,6 @@ const templates: Record<string, Template[]> = {
       git: 'git@github.com:qoxop/bricking-templates.git',
       source: 'bricking-templates/packages/module/react-micro',
       branch: 'release',
-      tips: ({ projectPath }) => `如需替换默认基座 \n请到 ${path.join(projectPath, './bricking.ts')} 中自行修改～`,
     },
   ],
 };
@@ -42,6 +39,12 @@ const templates: Record<string, Template[]> = {
 const randomStr = () => Math.ceil(Math.random() * 10000).toString(32);
 
 export async function create({ type, name, template, cwd = './' }: Options) {
+  let templates: Record<string, Template[]> = _templates;
+  try {
+    templates = await btkNetwork.getJson(process.env.BRICKING_TPL || 'https://vercel.bricking.dev/templates.json');
+  } catch (error) {
+    console.error(error);
+  }
   const answers = await inquirer.prompt([
     {
       name: 'type',
@@ -131,8 +134,5 @@ export async function create({ type, name, template, cwd = './' }: Options) {
   );
   console.log(colors.green('同步完成 ✅ \n'));
   console.log(colors.grey(`> cd ${path.join(cwd, projectName)}`));
-  console.log(colors.grey('> yarn && yarn dev'));
-  if (tpl.tips) {
-    console.log(colors.grey(tpl.tips({ projectPath })));
-  }
+  console.log(colors.grey('> yarn && yarn dev\n'));
 }

@@ -12,16 +12,15 @@ export const updatePkgJson = (json: any) => {
   const { peerDependencies, ...other } = json;
   const newPeerDependencies = {};
   Object.keys(peerDependencies)
-    .filter(key => !peerDependencies[`@types/${key}`])
-    .forEach(key => {
-      newPeerDependencies[key] = peerDependencies[key]
-    })
+    .filter((key) => !peerDependencies[`@types/${key}`])
+    .forEach((key) => {
+      newPeerDependencies[key] = peerDependencies[key];
+    });
   return {
     ...other,
     peerDependencies: newPeerDependencies,
-  }
-  
-}
+  };
+};
 
 export default (remoteEntry: string) => {
   let hasIndex = false;

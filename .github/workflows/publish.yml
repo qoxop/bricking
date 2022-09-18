@@ -10,14 +10,17 @@ jobs:
   version:
     runs-on: ubuntu-latest
     steps:
+    # 仓库准备
     - name: checkout
       uses: actions/checkout@v3
       with:
           fetch-depth: 0
+    # 安装 pnpm
     - name: Install pnpm
       uses: pnpm/action-setup@v2.2.2
       with:
         version: 7.9.3
+    # 安装 node
     - name: Use Node.js 16.x
       uses: actions/setup-node@v3
       with:
@@ -27,17 +30,14 @@ jobs:
     # 设置 npm token
     - name: set npm token
       run: npm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
-    # 安装依赖
-    - name: install dependencies
-      run: pnpm install
-    # 设置 git 配置信息
-    - name: set git config
-      run: git config --global user.email "qoxop@bricking.dev" && git config --global user.name "CI"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    # 检查版本是否更新，更新则发包
-    - name: Check and release packages
-      run: pnpm run ci:publish
+    # # 设置 git 配置信息
+    # - name: set git config
+    #   run: git config --global user.email "qoxop@bricking.dev" && git config --global user.name "CI"
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # 执行发布命令
+    - name: publish packages
+      run: make publish
       env:
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

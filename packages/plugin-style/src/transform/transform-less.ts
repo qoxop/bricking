@@ -28,5 +28,5 @@ export default async (props: CssLoaderProps<LessOption>) => {
     sourceMap: sourceMap ? { outputSourceFiles: true } : false,
   });
   imports.map((file: string) => context.dependencies.add(file));
-  return { css, map: JSON.parse(map) };
+  return { css, map: sourceMap ? JSON.parse(map) : null };
 };

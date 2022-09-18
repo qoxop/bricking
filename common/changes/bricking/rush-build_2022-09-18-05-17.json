@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "bricking",
+      "comment": "修改内部插件API名称",
+      "type": "minor"
+    }
+  ],
+  "packageName": "bricking"
+}

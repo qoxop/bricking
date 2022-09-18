@@ -13,11 +13,11 @@ export default function(href) {
   link.setAttribute('rel','stylesheet');
   document.head.appendChild(link);
 }
-`
+`;
 /**
  * 插入远程样式文件的模块 ID
  */
- const INJECT_REMOTE_CSS_ID = '$__INJECT_REMOTE_CSS__'
+const INJECT_REMOTE_CSS_ID = '$__INJECT_REMOTE_CSS__';
 
 /**
  * 远程样式文件 ID 前缀

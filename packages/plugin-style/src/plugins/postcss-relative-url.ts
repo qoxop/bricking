@@ -6,12 +6,11 @@ import * as Url from 'url';
 import * as path from 'path';
 import { btkHash } from '@bricking/toolkit';
 import { Declaration, Result } from 'postcss';
-import { AssetsMap, getDataUrl } from './rollup-url';
 
 /**
  * 将资源文件全部转为相对路径引用的方式
  */
-type RelativeUrlOptions = {
+type PostcssRelativeUrlOptions = {
     /**
      * Css 文件输出目录(绝对路径)
      */
@@ -26,13 +25,15 @@ type RelativeUrlOptions = {
     limit?: number;
     /**
      * 文件名称模块字符串
-     * @default `[hash].[ext]`
+     * @default `[hash][extname]`
      */
     filename?: string;
     /**
      * 查找文件的特定目录
      */
     loadPaths?: string[];
+    AssetsMap: Map<string, string>;
+    getDataUrl: (id: string, buffer: Buffer) => string;
 }
 
 const WITH_QUOTES = /^['"]/;
@@ -85,6 +86,8 @@ const handleFile = async ({
   loadPaths,
   cssOutput,
   baseOutput,
+  AssetsMap,
+  getDataUrl
 }) => {
   // 获取资源信息，绝对路径、search 、hash
   const { absolutePath, search, hash } = getAssetInfo(url, loadPaths);
@@ -121,7 +124,7 @@ const handleFile = async ({
   return `${/\.+\//.test(rUrl) ? '' : './'}${rUrl}${search || ''}${hash || ''}`;
 };
 
-const urlDeclProcessor = (options: Required<RelativeUrlOptions>, result: Result, decl: Declaration) => {
+const urlDeclProcessor = (options: Required<PostcssRelativeUrlOptions>, result: Result, decl: Declaration) => {
   const promises: Promise<any>[] = [];
   // 源文件地址和目录
   const sourceFilename = decl.source && decl.source.input && decl.source.input.file;
@@ -148,7 +151,7 @@ const urlDeclProcessor = (options: Required<RelativeUrlOptions>, result: Result,
   return Promise.all(promises);
 };
 
-const relativeUrl = (options: RelativeUrlOptions) => {
+const postcssRelativeUrl = (options: PostcssRelativeUrlOptions) => {
   // init options
   options.limit = options.limit ? options.limit : (options.limit === 0 ? Infinity : 1024 * 2);
   options.filename = options.filename || '[hash].[ext]';
@@ -174,9 +177,9 @@ const relativeUrl = (options: RelativeUrlOptions) => {
     },
   };
 };
-relativeUrl.postcss = true;
+postcssRelativeUrl.postcss = true;
 
 export {
-  relativeUrl,
-  RelativeUrlOptions as RelativeUrlOption,
+  postcssRelativeUrl,
+  PostcssRelativeUrlOptions,
 };

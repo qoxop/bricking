@@ -3,29 +3,18 @@ import { mkdirSync, existsSync, writeFileSync } from 'fs';
 import * as rollup from 'rollup';
 import alias from '@rollup/plugin-alias';
 import jsonPlugin from '@rollup/plugin-json';
-import bundleStyle from '@bricking/plugin-style';
+import { rollupStylePlugin } from '@bricking/plugin-style';
 import livereload from 'rollup-plugin-livereload';
 import builtins from 'rollup-plugin-node-builtins';
 import esbuild from 'rollup-plugin-esbuild';
 import { btkDom, btkFile, btkType, fsExtra } from '@bricking/toolkit';
 import config, { packageJson, tsConfig, tsConfigPath, workspace } from './config';
-import { relativeUrl } from './plugins/postcss-relative-url';
 import { openBrowser, startServe } from './server';
 import rollupUrl from './plugins/rollup-url';
 import rollupLog from './plugins/rollup-log';
 import * as logs from './utils/log';
 import { getBaseLibInfo } from './install';
 import { BrickingJson } from './typing';
-
-// 添加 postcss-relative-url 插件
-// @ts-ignore
-config.style.postcss.plugins.push(relativeUrl({
-  cssOutput: path.dirname(path.resolve(config.output, config.style.filename as string)),
-  baseOutput: config.output,
-  limit: config.assets.limit,
-  filename: config.assets.filename,
-  loadPaths: config.assets.loadPaths,
-}));
 
 const cleanPath = async (output: string) => {
   await fsExtra.emptyDir(output);
@@ -78,7 +67,7 @@ const commonPlugin = (useEsbuild?: boolean, target?: string) => ([
   alias({ entries: getAliasEntries() }),
   jsonPlugin(),
   // 打包样式文件
-  bundleStyle(config.style),
+  rollupStylePlugin(config.style),
   // 处理文件
   rollupUrl({
     limit: config.assets.limit,
@@ -313,13 +302,15 @@ export async function runBuild() {
       filter: (abs) => [/\.zip$/, /\.md$/].every((item) => !item.test(abs)),
     });
   }
-  Object.entries(config.entry).forEach(([name, _path]) => {
-    btkType.createTypeDefine({
-      input: path.resolve(workspace, _path),
-      output: path.resolve(config.output, `./${name}.d.ts`),
-      cwd: workspace,
+  if (config.entry) {
+    Object.entries(config.entry).forEach(([name, _path]) => {
+      btkType.createTypeDefine({
+        input: path.resolve(workspace, _path),
+        output: path.resolve(config.output, `./${name}.d.ts`),
+        cwd: workspace,
+      });
     });
-  });
+  }
   const now = Date.now();
   logs.keepLog(`[⌛️speed]: ${((now - start) / 1000).toFixed(2)}s`);
 }
@@ -342,7 +333,7 @@ export async function runStart() {
   // 兼容 entry 不存在的情况
   if (config.entry) {
     await watch(config.entry, config.output);
-    importMaps = Object.keys(config.entry).reduce((prev, cur) => ({ ...prev, [`${cur}`]: `./${cur}.js` }), {})
+    importMaps = Object.keys(config.entry).reduce((prev, cur) => ({ ...prev, [`${cur}`]: `./${cur}.js` }), {});
   }
   await watch({ 'browse-entry': config.browseEntry }, config.output, importMaps);
   await setHtml(importMaps, './browse-entry.js');
