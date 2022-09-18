@@ -14,7 +14,7 @@ debug: build clean
 
 # 发布包
 publish: build
-	node common/scripts/install-run-rush.js publish
+	node common/scripts/install-run-rush.js publish --apply --target-branch main --publish
 
 # 安装依赖
 install:
