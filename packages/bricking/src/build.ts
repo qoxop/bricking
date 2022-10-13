@@ -81,6 +81,7 @@ const commonPlugin = (useEsbuild?: boolean, target?: string) => ([
   require('@rollup/plugin-replace')({
     values: {
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+      ...config.replacement,
     },
     preventAssignment: true,
   }),
@@ -223,7 +224,7 @@ async function setHtml(importMaps: Record<string, string>, browseEntry: string) 
       url: browseEntry,
       type: 'systemjs-module',
     },
-  ], config.output);
+  ], config.replacement || {}, config.output);
 }
 
 async function setBrickingJson(

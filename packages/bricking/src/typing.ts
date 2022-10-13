@@ -73,6 +73,7 @@ export type BrickingOptions = {
   },
   devServe?: Partial<DevServe> ;
   publicPath?: string;
+  replacement?: Record<string, string>;
   plugins?: (false | Plugin)[];
 }
 

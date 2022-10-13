@@ -22,10 +22,11 @@ type Script = {
  * 在文档对象上插入脚本标签
  * @param dom - jsdom 对象
  * @param scripts - 脚本信息
+ * @param replacement 替换对象
  * @param output - 输出路径
  * @returns
  */
-function injectScripts(dom: any, scripts: Script[], output?: string) {
+function injectScripts(dom: any, scripts: Script[], replacement:Record<string, string>, output?: string) {
   const { window: { document } } = dom;
   scripts.forEach((item) => {
     const script = document.createElement('script');
@@ -43,7 +44,11 @@ function injectScripts(dom: any, scripts: Script[], output?: string) {
     document.body.append(script);
   });
   if (output) {
-    fs.writeFileSync(path.join(output, './index.html'), dom.serialize(), { encoding: 'utf-8' });
+    let htmlString = dom.serialize() as string;
+    for (const [key, value] of Object.entries(replacement)) {
+      htmlString = htmlString.split(key).join(value);
+    }
+    fs.writeFileSync(path.join(output, './index.html'), htmlString, { encoding: 'utf-8' });
   }
   return dom;
 }
