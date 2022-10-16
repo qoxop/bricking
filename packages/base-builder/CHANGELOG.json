@@ -2,6 +2,18 @@
   "name": "@bricking/base-builder",
   "entries": [
     {
+      "version": "2.1.1",
+      "tag": "@bricking/base-builder_v2.1.1",
+      "date": "Sun, 16 Oct 2022 17:09:16 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "修复 publicPath 问题"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.1.0",
       "tag": "@bricking/base-builder_v2.1.0",
       "date": "Sun, 16 Oct 2022 16:18:59 GMT",
