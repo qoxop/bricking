@@ -212,7 +212,7 @@ const watch = async (entry: string | Record<string, string>, output: string, imp
  */
 async function setHtml(importMaps: Record<string, string>, browseEntry: string) {
   const { remoteEntry } = await getBaseLibInfo();
-  btkDom.injectScripts(btkDom.getIndexDom(), [
+  btkDom.injectScripts(btkDom.getHtmlDom(config.html.path), [
     {
       url: remoteEntry,
     },
@@ -224,7 +224,7 @@ async function setHtml(importMaps: Record<string, string>, browseEntry: string) 
       url: browseEntry,
       type: 'systemjs-module',
     },
-  ], config.replacement || {}, config.output);
+  ], config.html.replacement || {}, config.output);
 }
 
 async function setBrickingJson(

@@ -26,6 +26,10 @@ export type BrickingOptions = {
    * 浏览器入口
    */
   browseEntry: string;
+  html?: {
+    path: string;
+    replacement?: Record<string, string>,
+  },
   /**
    * 公共基座包
    */
