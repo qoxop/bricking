@@ -28,7 +28,8 @@ export type BrickingOptions = {
   browseEntry: string;
   html?: {
     path: string;
-    replacement?: Record<string, string>,
+    importMaps?: Record<string, string>;
+    replacement?: Record<string, string>;
   },
   /**
    * 公共基座包

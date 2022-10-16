@@ -217,7 +217,10 @@ async function setHtml(importMaps: Record<string, string>, browseEntry: string) 
       url: remoteEntry,
     },
     {
-      content: JSON.stringify({ imports: importMaps }),
+      content: JSON.stringify({ imports: {
+        ...(importMaps || ''),
+        ...(config.html.importMaps || {}),
+      } }),
       type: 'systemjs-importmap',
     },
     {
