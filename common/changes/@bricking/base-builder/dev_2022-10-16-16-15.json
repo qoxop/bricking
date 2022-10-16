@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@bricking/base-builder",
+      "comment": "配置项优化",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@bricking/base-builder"
+}
