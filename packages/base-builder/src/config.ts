@@ -30,6 +30,7 @@ const RS = require.resolve;
 const {
   react = {} as any,
   compile: compileOptions,
+  publicPath,
   devServer: { hostname, ...devServerOptions },
 } = getUserOptions();
 
@@ -140,7 +141,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
     },
     output: {
       clean: true,
-      publicPath: isEnvDevelopment ? '/' : 'auto',
+      publicPath: publicPath || 'auto',
       path: path.join(paths.outputPath, 'packages'),
       pathinfo: isEnvDevelopment,
       filename: isEnvProduction
