@@ -1,6 +1,6 @@
 {
   "name": "@bricking/base-builder",
-  "version": "2.0.5",
+  "version": "2.1.0",
   "description": "Sytemjs 模块基座打包器",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -34,7 +34,7 @@
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
-    "@bricking/toolkit": "workspace:^0.5.0",
+    "@bricking/toolkit": "workspace:^0.6.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.4",
     "@svgr/webpack": "^6.2.1",
     "babel-loader": "^8.2.3",
