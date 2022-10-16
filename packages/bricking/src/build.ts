@@ -48,12 +48,15 @@ const getAliasEntries = () => {
  * @returns
  */
 const getExternals = async () => {
-  let { peerDependencies } = await getBaseLibInfo();
+  let { peerDependencies, name } = await getBaseLibInfo();
   peerDependencies = Object.keys(peerDependencies).reduce((prev, cur) => {
     prev[cur.replace(/^@types\//, '')] = true;
     return prev;
   }, {});
-  return Object.keys(peerDependencies).concat(['___INJECT_STYLE_LINK___']);
+  return (Object.keys(peerDependencies) as (string|RegExp)[]).concat([
+    '___INJECT_STYLE_LINK___',
+    new RegExp(`^${name}`),
+  ]);
 };
 
 /**
@@ -340,7 +343,7 @@ export async function runStart() {
     importMaps = Object.keys(config.entry).reduce((prev, cur) => ({ ...prev, [`${cur}`]: `./${cur}.js` }), {});
   }
   await watch({ 'browse-entry': config.browseEntry }, config.output, importMaps);
-  await setHtml(importMaps, './browse-entry.js');
+  await setHtml(importMaps, '/browse-entry.js');
   const now = Date.now();
   logs.keepLog(`[⌛️speed]: ${((now - start) / 1000).toFixed(2)}s`);
   await runServe();
