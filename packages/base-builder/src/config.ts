@@ -30,7 +30,7 @@ const RS = require.resolve;
 const {
   react = {} as any,
   compile: compileOptions,
-  devServer: devServerOptions,
+  devServer: { hostname, ...devServerOptions },
 } = getUserOptions();
 
 const cssRegex = /\.css$/;
@@ -140,7 +140,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
     },
     output: {
       clean: true,
-      publicPath: 'auto',
+      publicPath: isEnvDevelopment ? '/' : 'auto',
       path: path.join(paths.outputPath, 'packages'),
       pathinfo: isEnvDevelopment,
       filename: isEnvProduction
@@ -407,17 +407,17 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
 };
 
 export const devServerConfig: Configuration['devServer'] = {
-  port: devServerOptions.port,
   host: '0.0.0.0',
   hot: false,
   compress: true,
   liveReload: true,
   historyApiFallback: true,
-  https: devServerOptions.protocol === 'https',
+  https: false,
   headers: {
     'Access-Control-Allow-Origin': '*',
   },
   devMiddleware: {
     writeToDisk: true,
   },
+  ...devServerOptions,
 };

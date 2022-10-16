@@ -26,6 +26,11 @@ export type BrickingOptions = {
    * 浏览器入口
    */
   browseEntry: string;
+  html?: {
+    path: string;
+    importMaps?: Record<string, string>;
+    replacement?: Record<string, string>;
+  },
   /**
    * 公共基座包
    */
@@ -73,6 +78,7 @@ export type BrickingOptions = {
   },
   devServe?: Partial<DevServe> ;
   publicPath?: string;
+  replacement?: Record<string, string>;
   plugins?: (false | Plugin)[];
 }
 

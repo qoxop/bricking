@@ -89,3 +89,47 @@ export const createTypeDefine = (props: {
   // 删除临时目录
   fs.removeSync(TempDir);
 };
+
+export const createTypeDefines = (props: {
+  /** 基础目录 */
+  base: string;
+  /** 映射关系 */
+  record: Record<string, string>;
+  /** 输出目录 */
+  output: string;
+  /** 项目目录 */
+  cwd?: string;
+}) => {
+  let {
+    base,
+    record,
+    output,
+    cwd = process.cwd(),
+  } = props;
+  const TempDir = path.resolve(cwd, './__temp');
+  try {
+    // 生成类型定义文件
+    generateDTS({
+      rootNames: [...ls(base)],
+      outDir: TempDir,
+    });
+    for (const key in record) {
+      if (Object.prototype.hasOwnProperty.call(record, key)) {
+        const value = path.isAbsolute(record[key]) ? record[key] : path.resolve(cwd, record[key]);
+        const rPath = path.relative(base, value);
+        // 对类型定义文件进行捆绑
+        rollupDTS({
+          cwd,
+          input: path.resolve(TempDir, rPath.replace(/\.tsx?$/, '.d.ts')),
+          output: path.resolve(output, `./${key}.d.ts`),
+        });
+      }
+    }
+    // 删除临时目录
+    fs.removeSync(TempDir);
+  } catch (error) {
+    console.trace(error);
+    // 删除临时目录
+    fs.removeSync(TempDir);
+  }
+};

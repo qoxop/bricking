@@ -3,11 +3,11 @@ import path from 'path';
 import { JSDOM } from 'jsdom';
 
 /**
- * 获取工作目录下的 index.html 文档对象
- * @param workspace - 工作空间
+ * 获取 html 文档对象
+ * @param htmlPath - html 文档路径
  * @returns
  */
-const getIndexDom = (workspace?: string) => new JSDOM(fs.readFileSync(path.join(workspace || process.cwd(), 'index.html'), 'utf8'));
+const getHtmlDom = (htmlPath: string) => new JSDOM(fs.readFileSync(htmlPath, 'utf8'));
 
 type Script = {
     url: string,
@@ -22,10 +22,11 @@ type Script = {
  * 在文档对象上插入脚本标签
  * @param dom - jsdom 对象
  * @param scripts - 脚本信息
+ * @param replacement 替换对象
  * @param output - 输出路径
  * @returns
  */
-function injectScripts(dom: any, scripts: Script[], output?: string) {
+function injectScripts(dom: any, scripts: Script[], replacement:Record<string, string>, output?: string) {
   const { window: { document } } = dom;
   scripts.forEach((item) => {
     const script = document.createElement('script');
@@ -43,12 +44,16 @@ function injectScripts(dom: any, scripts: Script[], output?: string) {
     document.body.append(script);
   });
   if (output) {
-    fs.writeFileSync(path.join(output, './index.html'), dom.serialize(), { encoding: 'utf-8' });
+    let htmlString = dom.serialize() as string;
+    for (const [key, value] of Object.entries(replacement)) {
+      htmlString = htmlString.split(key).join(value);
+    }
+    fs.writeFileSync(path.join(output, './index.html'), htmlString, { encoding: 'utf-8' });
   }
   return dom;
 }
 export {
-  getIndexDom,
+  getHtmlDom,
   injectScripts,
 };
 

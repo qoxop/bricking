@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { packageJsonPath } from './config';
+import { packageJsonPath, workspace } from './config';
 import { BrickingOptions } from './typing';
 
 const absolutely = (p: string|undefined, def: string) => {
@@ -30,6 +30,11 @@ export function defineBricking(options: BrickingOptions): Required<BrickingOptio
       ],
     },
   };
+  if (!options.html) {
+    options.html = {
+      path: path.resolve(workspace, './index.html'),
+    };
+  }
   if (options.doPack === true) {
     try {
       const { name } = require(packageJsonPath);

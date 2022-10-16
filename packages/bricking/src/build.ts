@@ -48,12 +48,15 @@ const getAliasEntries = () => {
  * @returns
  */
 const getExternals = async () => {
-  let { peerDependencies } = await getBaseLibInfo();
+  let { peerDependencies, name } = await getBaseLibInfo();
   peerDependencies = Object.keys(peerDependencies).reduce((prev, cur) => {
     prev[cur.replace(/^@types\//, '')] = true;
     return prev;
   }, {});
-  return Object.keys(peerDependencies).concat(['___INJECT_STYLE_LINK___']);
+  return (Object.keys(peerDependencies) as (string|RegExp)[]).concat([
+    '___INJECT_STYLE_LINK___',
+    new RegExp(`^${name}`),
+  ]);
 };
 
 /**
@@ -81,6 +84,7 @@ const commonPlugin = (useEsbuild?: boolean, target?: string) => ([
   require('@rollup/plugin-replace')({
     values: {
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+      ...config.replacement,
     },
     preventAssignment: true,
   }),
@@ -211,19 +215,22 @@ const watch = async (entry: string | Record<string, string>, output: string, imp
  */
 async function setHtml(importMaps: Record<string, string>, browseEntry: string) {
   const { remoteEntry } = await getBaseLibInfo();
-  btkDom.injectScripts(btkDom.getIndexDom(), [
+  btkDom.injectScripts(btkDom.getHtmlDom(config.html.path), [
     {
       url: remoteEntry,
     },
     {
-      content: JSON.stringify({ imports: importMaps }),
+      content: JSON.stringify({ imports: {
+        ...(importMaps || ''),
+        ...(config.html.importMaps || {}),
+      } }),
       type: 'systemjs-importmap',
     },
     {
       url: browseEntry,
       type: 'systemjs-module',
     },
-  ], config.output);
+  ], config.html.replacement || {}, config.output);
 }
 
 async function setBrickingJson(
@@ -336,7 +343,7 @@ export async function runStart() {
     importMaps = Object.keys(config.entry).reduce((prev, cur) => ({ ...prev, [`${cur}`]: `./${cur}.js` }), {});
   }
   await watch({ 'browse-entry': config.browseEntry }, config.output, importMaps);
-  await setHtml(importMaps, './browse-entry.js');
+  await setHtml(importMaps, '/browse-entry.js');
   const now = Date.now();
   logs.keepLog(`[⌛️speed]: ${((now - start) / 1000).toFixed(2)}s`);
   await runServe();

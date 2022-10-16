@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@bricking/toolkit",
+      "comment": "优化类型打包函数和html生成函数",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@bricking/toolkit"
+}

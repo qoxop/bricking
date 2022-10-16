@@ -5,7 +5,7 @@ import { createProxyMiddleware, Options as ProxyOptions } from 'http-proxy-middl
 import * as logs from '../utils/log';
 
 export type DevServe = {
-    port: 3000;
+    port: number;
     host: string;
     open: string;
     /**

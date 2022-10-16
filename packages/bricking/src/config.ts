@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { btkCompile, btkFunc } from '@bricking/toolkit';
-import { postcssRelativeUrl } from '@bricking/plugin-style'
+import { postcssRelativeUrl } from '@bricking/plugin-style';
 import { BrickingOptions } from './typing';
 import { AssetsMap } from './plugins/rollup-url';
 
