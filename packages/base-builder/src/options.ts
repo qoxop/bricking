@@ -49,9 +49,7 @@ const defaultOption = () => ({
   devServer: {
     port: '8080',
     hostname: 'localhost',
-    protocol: 'http' as ('http'|'https'),
-    proxy: {} as Configuration['proxy'],
-  },
+  } as Configuration & { hostname: string },
   bundle: {
     /**
      * 自定义的 webpack 配置路径，导出内容可以是
@@ -79,8 +77,10 @@ const defaultOption = () => ({
     moduleDefines: {
       /** 是否自动注入自定义的模块，否则需要自行在入口文件处进行导入 */
       autoInject: true,
+      /** 类型文件的基础路径, 默认 './src' */
+      baseDir: './src',
       /** 自定义模块的模块名与路径映射 */
-      defines: {} as Record<string, string>,
+      defines: {} as { index: string, [key: string]: string },
     },
   },
 });

@@ -23,24 +23,33 @@ export const updatePkgJson = (json: any) => {
 };
 
 export default (remoteEntry: string) => {
-  let hasIndex = false;
-
   const { bundle, output } = getUserOptions();
   let typeOutput = path.join(output, './types');
-  let { defines = {} } = bundle.moduleDefines;
+  let { defines = {} as any, baseDir } = bundle.moduleDefines;
+
+  const hasIndex = !!defines.index || !!bundle.entry;
+
+  if (!path.isAbsolute(baseDir)) {
+    baseDir = path.resolve(paths.workspace, baseDir);
+  }
+
+  if (hasIndex && !defines.index) {
+    const indexPath = path.isAbsolute(bundle.entry as string)
+      ? bundle.entry as string
+      : path.resolve(paths.workspace, bundle.entry as string);
+    defines.index = path.relative(baseDir, indexPath);
+  }
 
   if (!path.isAbsolute(typeOutput)) {
     typeOutput = path.resolve(paths.workspace, typeOutput);
   }
   fsExtra.emptyDirSync(typeOutput);
 
-  Object.entries(defines).forEach(([key, value]) => {
-    hasIndex = key === 'index';
-    btkType.createTypeDefine({
-      input: path.isAbsolute(value) ? value : path.resolve(paths.workspace, value),
-      output: path.resolve(typeOutput, `${key}.d.ts`),
-      cwd: paths.workspace,
-    });
+  btkType.createTypeDefines({
+    base: baseDir,
+    record: defines,
+    output: typeOutput,
+    cwd: paths.workspace,
   });
 
   const packageObj = getPackageJson() as any;
