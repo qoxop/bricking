@@ -255,7 +255,7 @@ async function setBrickingJson(
   const documentPath = path.join(workspace, './README.md');
   if (existsSync(documentPath)) {
     await fsExtra.copy(documentPath, path.join(output, './README.md'));
-    const documentUrl = publicPath ? new URL('./README.md', publicPath).href : './README.md';
+    const documentUrl = publicPath ? `${publicPath}README.md` : './README.md';
     json.document = documentUrl as any;
   }
   const { document } = await getBaseLibInfo();
@@ -287,7 +287,7 @@ export async function runBuild() {
     const entryChunks = rollupOutput.output.filter((chunk) => chunk.type === 'chunk' && chunk.isEntry);
     importMaps = entryChunks.reduce((prev, cur) => {
       if (publicPath) {
-        prev[`${cur.name}`] = new URL(`./${cur.fileName}`, publicPath).href;
+        prev[`${cur.name}`] = `${publicPath}${cur.fileName}`;
       } else {
         prev[`${cur.name}`] = `./${cur.fileName}`;
       }
@@ -299,7 +299,7 @@ export async function runBuild() {
   await setBrickingJson(importMaps, Array.from(imports));
   await setHtml(
     importMaps,
-    publicPath ? new URL(browseEntryChunk.fileName, publicPath).href : `./${browseEntryChunk.fileName}`,
+    publicPath ? `${publicPath}${browseEntryChunk.fileName}` : `./${browseEntryChunk.fileName}`,
   );
   if (config.doPack) {
     await btkFile.Zipper.doZip({

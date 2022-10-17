@@ -26,23 +26,6 @@ const humanlizePath = (filepath: string) => normalizePath(path.relative(process.
  */
 const replaceExt = (p: string, ext: string) => p.replace(/.\w+?$/, ext);
 
-/**
- * urlResolve Url 合并
- * @param source 源路径
- * @param subPath 子路径
- * @returns
- */
-const urlResolve = (source:string, subPath: string): string => {
-  if (!/^http/.test(source)) {
-    return path.join(source, subPath);
-  }
-  // http://www.a.com/path -> http://www.a.com/path/
-  if (/\/\w+$/.test(source)) {
-    source += '/';
-  }
-  return new URL(subPath, source).href;
-};
-
 const extensions = ['.js', '.jsx', '.ts', '.tsx'];
 const modulePathResolve = (filepath: string, relative: string, extraExtensions: string[] = []) => {
   const curDirPath = path.dirname(filepath);
@@ -92,7 +75,6 @@ const findModulePath = (moduleName: string) => {
 
 export {
   replaceExt,
-  urlResolve,
   normalizePath,
   humanlizePath,
   findModulePath,
