@@ -2,6 +2,18 @@
   "name": "bricking",
   "entries": [
     {
+      "version": "0.6.3",
+      "tag": "bricking_v0.6.3",
+      "date": "Mon, 17 Oct 2022 14:47:18 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "修复相对路径问题"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.6.2",
       "tag": "bricking_v0.6.2",
       "date": "Mon, 17 Oct 2022 13:41:30 GMT",
