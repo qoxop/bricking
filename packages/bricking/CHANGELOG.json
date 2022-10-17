@@ -2,6 +2,18 @@
   "name": "bricking",
   "entries": [
     {
+      "version": "0.6.1",
+      "tag": "bricking_v0.6.1",
+      "date": "Mon, 17 Oct 2022 08:51:34 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "使publicPath支持非正式URL"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.6.0",
       "tag": "bricking_v0.6.0",
       "date": "Sun, 16 Oct 2022 16:18:59 GMT",

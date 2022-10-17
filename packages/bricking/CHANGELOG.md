@@ -1,6 +1,13 @@
 # Change Log - bricking
 
-This log was last generated on Sun, 16 Oct 2022 16:18:59 GMT and should not be manually modified.
+This log was last generated on Mon, 17 Oct 2022 08:51:34 GMT and should not be manually modified.
+
+## 0.6.1
+Mon, 17 Oct 2022 08:51:34 GMT
+
+### Patches
+
+- 使publicPath支持非正式URL
 
 ## 0.6.0
 Sun, 16 Oct 2022 16:18:59 GMT
