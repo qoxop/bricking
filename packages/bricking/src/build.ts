@@ -53,10 +53,12 @@ const getExternals = async () => {
     prev[cur.replace(/^@types\//, '')] = true;
     return prev;
   }, {});
-  return (Object.keys(peerDependencies) as (string|RegExp)[]).concat([
+  return [
+    ...Object.keys(peerDependencies),
+    ...Object.keys(config.html.importMaps || {}),
     '___INJECT_STYLE_LINK___',
     new RegExp(`^${name}`),
-  ]);
+  ];
 };
 
 /**
