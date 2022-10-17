@@ -291,7 +291,7 @@ export async function runBuild() {
       if (publicPath) {
         prev[`${cur.name}`] = `${publicPath}${cur.fileName}`;
       } else {
-        prev[`${cur.name}`] = `./${cur.fileName}`;
+        prev[`${cur.name}`] = `/${cur.fileName}`;
       }
       return prev;
     }, {});
@@ -301,7 +301,7 @@ export async function runBuild() {
   await setBrickingJson(importMaps, Array.from(imports));
   await setHtml(
     importMaps,
-    publicPath ? `${publicPath}${browseEntryChunk.fileName}` : `./${browseEntryChunk.fileName}`,
+    publicPath ? `${publicPath}${browseEntryChunk.fileName}` : `/${browseEntryChunk.fileName}`,
   );
   if (config.doPack) {
     await btkFile.Zipper.doZip({
@@ -342,7 +342,7 @@ export async function runStart() {
   // 兼容 entry 不存在的情况
   if (config.entry) {
     await watch(config.entry, config.output);
-    importMaps = Object.keys(config.entry).reduce((prev, cur) => ({ ...prev, [`${cur}`]: `./${cur}.js` }), {});
+    importMaps = Object.keys(config.entry).reduce((prev, cur) => ({ ...prev, [`${cur}`]: `/${cur}.js` }), {});
   }
   await watch({ 'browse-entry': config.browseEntry }, config.output, importMaps);
   await setHtml(importMaps, '/browse-entry.js');
