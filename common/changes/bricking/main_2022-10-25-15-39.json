@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "bricking",
+      "comment": "修复 monorepo 项目的生产模式下子项目安装依赖失败的问题 ",
+      "type": "patch"
+    }
+  ],
+  "packageName": "bricking"
+}
