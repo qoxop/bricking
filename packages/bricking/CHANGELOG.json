@@ -2,6 +2,18 @@
   "name": "bricking",
   "entries": [
     {
+      "version": "0.6.5",
+      "tag": "bricking_v0.6.5",
+      "date": "Tue, 25 Oct 2022 15:40:47 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "修复 monorepo 项目的生产模式下子项目安装依赖失败的问题 "
+          }
+        ]
+      }
+    },
+    {
       "version": "0.6.4",
       "tag": "bricking_v0.6.4",
       "date": "Tue, 25 Oct 2022 12:21:10 GMT",

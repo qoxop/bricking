@@ -1,6 +1,13 @@
 # Change Log - bricking
 
-This log was last generated on Tue, 25 Oct 2022 12:21:10 GMT and should not be manually modified.
+This log was last generated on Tue, 25 Oct 2022 15:40:47 GMT and should not be manually modified.
+
+## 0.6.5
+Tue, 25 Oct 2022 15:40:47 GMT
+
+### Patches
+
+- 修复 monorepo 项目的生产模式下子项目安装依赖失败的问题 
 
 ## 0.6.4
 Tue, 25 Oct 2022 12:21:10 GMT
