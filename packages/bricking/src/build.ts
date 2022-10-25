@@ -4,6 +4,7 @@ import * as rollup from 'rollup';
 import alias from '@rollup/plugin-alias';
 import jsonPlugin from '@rollup/plugin-json';
 import { rollupStylePlugin } from '@bricking/plugin-style';
+import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
 import builtins from 'rollup-plugin-node-builtins';
 import esbuild from 'rollup-plugin-esbuild';
@@ -43,6 +44,10 @@ const getAliasEntries = () => {
   return entries;
 };
 
+const customResolver = resolve({
+  extensions: ['.mjs', '.js', '.jsx', '.ts', '.tsx', '.json', '.sass', '.scss', '.less'],
+}) as any;
+
 /**
  * 获取外部依赖列表
  * @returns
@@ -66,10 +71,10 @@ const getExternals = async () => {
  * @returns
  */
 const commonPlugin = (useEsbuild?: boolean, target?: string) => ([
-  require('@rollup/plugin-node-resolve').default({ browser: true }),
+  resolve({ browser: true, extensions: ['.mjs', '.js', '.jsx', '.tsx', '.ts'] }),
   require('@rollup/plugin-commonjs')(),
   builtins({ crypto: true }),
-  alias({ entries: getAliasEntries() }),
+  alias({ entries: getAliasEntries(), customResolver }),
   jsonPlugin(),
   // 打包样式文件
   rollupStylePlugin(config.style),

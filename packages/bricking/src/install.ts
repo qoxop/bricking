@@ -100,7 +100,7 @@ export async function getBaseLibInfo(): Promise<BaseLibInfo> {
       name,
       version: `${publicPath}${typesPack}`,
     };
-    if (!packageJson.dependencies[name]) {
+    if (!packageJson.dependencies[name] || packageJson.dependencies[name] !== baseLibInfo.version) {
       await installDeps({ [name]: baseLibInfo.version });
     }
   } else {
