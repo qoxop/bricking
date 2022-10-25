@@ -2,6 +2,18 @@
   "name": "bricking",
   "entries": [
     {
+      "version": "0.6.4",
+      "tag": "bricking_v0.6.4",
+      "date": "Tue, 25 Oct 2022 12:21:10 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "自动安装版本变更&优化别名配置"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.6.3",
       "tag": "bricking_v0.6.3",
       "date": "Mon, 17 Oct 2022 14:47:18 GMT",
