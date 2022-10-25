@@ -87,21 +87,26 @@ export type BaseLibInfo = {
   document?: string;
 }
 
+let baseLibInfo: BaseLibInfo;
+export function getBaseLibInfo() {
+  return baseLibInfo;
+}
+
 /**
  * 获取基座包信息，并下载相关依赖
  */
-export async function getBaseLibInfo(): Promise<BaseLibInfo> {
-  let baseLibInfo:BaseLibInfo = null as any;
+export async function initBaseLibInfo() {
+  let _baseLibInfo:BaseLibInfo = null as any;
   // 以 json 链接方式配置
   if (typeof config.basePackage === 'string') {
     const { name, publicPath, typesPack, ...other } = await btkNetwork.getJson<any>(config.basePackage);
-    baseLibInfo = {
+    _baseLibInfo = {
       ...other,
       name,
       version: `${publicPath}${typesPack}`,
     };
-    if (!packageJson.dependencies[name] || packageJson.dependencies[name] !== baseLibInfo.version) {
-      await installDeps({ [name]: baseLibInfo.version });
+    if (!packageJson.dependencies[name] || packageJson.dependencies[name] !== _baseLibInfo.version) {
+      await installDeps({ [name]: _baseLibInfo.version });
     }
   } else {
     // 指定名称和版本号的方式配置
@@ -124,17 +129,17 @@ export async function getBaseLibInfo(): Promise<BaseLibInfo> {
       modulePath = btkPath.findModulePath(name);
       pkgInfo = require(`${modulePath}${path.sep}package.json`);
     }
-    baseLibInfo = {
+    _baseLibInfo = {
       name,
       version,
       ...pkgInfo,
     };
   }
-  return baseLibInfo;
+  baseLibInfo = _baseLibInfo;
 }
 
 export async function install(deps: string[] = []) {
-  const { peerDependencies } = await getBaseLibInfo();
+  const { peerDependencies } = baseLibInfo;
   if (deps.length === 0) {
     const choices = Object.entries(peerDependencies).map(([name, version]) => ({
       name,

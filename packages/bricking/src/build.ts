@@ -4,7 +4,7 @@ import * as rollup from 'rollup';
 import alias from '@rollup/plugin-alias';
 import jsonPlugin from '@rollup/plugin-json';
 import { rollupStylePlugin } from '@bricking/plugin-style';
-import resolve from '@rollup/plugin-node-resolve';
+import rollupResolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
 import builtins from 'rollup-plugin-node-builtins';
 import esbuild from 'rollup-plugin-esbuild';
@@ -44,7 +44,7 @@ const getAliasEntries = () => {
   return entries;
 };
 
-const customResolver = resolve({
+const customResolver = rollupResolve({
   extensions: ['.mjs', '.js', '.jsx', '.ts', '.tsx', '.json', '.sass', '.scss', '.less'],
 }) as any;
 
@@ -53,7 +53,7 @@ const customResolver = resolve({
  * @returns
  */
 const getExternals = async () => {
-  let { peerDependencies, name } = await getBaseLibInfo();
+  let { peerDependencies, name } = getBaseLibInfo();
   peerDependencies = Object.keys(peerDependencies).reduce((prev, cur) => {
     prev[cur.replace(/^@types\//, '')] = true;
     return prev;
@@ -71,7 +71,7 @@ const getExternals = async () => {
  * @returns
  */
 const commonPlugin = (useEsbuild?: boolean, target?: string) => ([
-  resolve({ browser: true, extensions: ['.mjs', '.js', '.jsx', '.tsx', '.ts'] }),
+  rollupResolve({ browser: true, extensions: ['.mjs', '.js', '.jsx', '.tsx', '.ts'] }),
   require('@rollup/plugin-commonjs')(),
   builtins({ crypto: true }),
   alias({ entries: getAliasEntries(), customResolver }),
@@ -221,7 +221,7 @@ const watch = async (entry: string | Record<string, string>, output: string, imp
  * @param browseEntry
  */
 async function setHtml(importMaps: Record<string, string>, browseEntry: string) {
-  const { remoteEntry } = await getBaseLibInfo();
+  const { remoteEntry } = getBaseLibInfo();
   btkDom.injectScripts(btkDom.getHtmlDom(config.html.path), [
     {
       url: remoteEntry,
@@ -265,7 +265,7 @@ async function setBrickingJson(
     const documentUrl = publicPath ? `${publicPath}README.md` : './README.md';
     json.document = documentUrl as any;
   }
-  const { document } = await getBaseLibInfo();
+  const { document } = getBaseLibInfo();
   if (document) {
     json.dependence.document = document as any;
   }

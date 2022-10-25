@@ -8,15 +8,21 @@ require('yargs')
     () => void 0,
     () => {
       process.env.NODE_ENV = 'development';
-      require('../dist/build').runStart();
+      const { initBaseLibInfo } = require('../dist/install');
+      const { runStart } = require('../dist/build');
+      initBaseLibInfo().then(runStart);
     },
   ).command(
     'build',
     '构建项目',
     () => void 0,
     () => {
-      process.env.NODE_ENV = 'production';
-      require('../dist/build').runBuild();
+      // pnpm 的一个 bug, monorepo项目结构中 production 模式下子项目安装依赖会失败
+      const { initBaseLibInfo } = require('../dist/install');
+      initBaseLibInfo().then(() => {
+        process.env.NODE_ENV = 'production';
+        require('../dist/build').runBuild();
+      });
     },
   )
   .command(

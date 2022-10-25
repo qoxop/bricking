@@ -12,11 +12,9 @@ const absolutely = (p: string|undefined, def: string) => {
   return path.resolve(process.cwd(), p);
 };
 
-const isDev = process.env.NODE_ENV === 'DEV';
-
 export function defineBricking(options: BrickingOptions): Required<BrickingOptions> {
   options.output = absolutely(options.output, 'dist');
-  options.minimize = options.minimize ?? !isDev;
+  options.minimize = options.minimize ?? (process.env.NODE_ENV !== 'development');
   options.style = {
     filename: 'bundle-[hash].css',
     sourceMap: true,
@@ -59,7 +57,7 @@ export function defineBricking(options: BrickingOptions): Required<BrickingOptio
   // if (!options.entry || !Object.keys(options.entry).length) {
   //   throw new Error('options.entry is require~');
   // }
-  if (!options.browseEntry && isDev) {
+  if (!options.browseEntry && (process.env.NODE_ENV === 'development')) {
     throw new Error('options.browseEntry is require~');
   }
   if (!(
