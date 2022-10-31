@@ -2,6 +2,18 @@
   "name": "bricking",
   "entries": [
     {
+      "version": "0.6.6",
+      "tag": "bricking_v0.6.6",
+      "date": "Mon, 31 Oct 2022 09:31:55 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "避免更改workspace协议的版本号"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.6.5",
       "tag": "bricking_v0.6.5",
       "date": "Tue, 25 Oct 2022 15:40:47 GMT",
