@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "bricking",
+      "comment": "避免更改workspace协议的版本号",
+      "type": "patch"
+    }
+  ],
+  "packageName": "bricking"
+}
