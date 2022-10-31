@@ -105,7 +105,7 @@ export async function initBaseLibInfo() {
       name,
       version: `${publicPath}${typesPack}`,
     };
-    if (!packageJson.dependencies[name] || packageJson.dependencies[name] !== _baseLibInfo.version) {
+    if (!packageJson.dependencies[name] || (packageJson.dependencies[name] !== _baseLibInfo.version && !/workspace/.test(packageJson.dependencies[name]))) {
       await installDeps({ [name]: _baseLibInfo.version });
     }
   } else {
