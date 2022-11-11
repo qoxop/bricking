@@ -1,6 +1,13 @@
 # Change Log - @bricking/base-builder
 
-This log was last generated on Sun, 16 Oct 2022 17:09:16 GMT and should not be manually modified.
+This log was last generated on Fri, 11 Nov 2022 02:50:15 GMT and should not be manually modified.
+
+## 2.1.2
+Fri, 11 Nov 2022 02:50:15 GMT
+
+### Patches
+
+- 添加loader修改器
 
 ## 2.1.1
 Sun, 16 Oct 2022 17:09:16 GMT
