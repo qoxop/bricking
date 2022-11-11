@@ -278,7 +278,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
             },
           },
           // app script
-          {
+          compileOptions.loaderModify.appScript({
             test: /\.(js|mjs|jsx|ts|tsx)$/,
             exclude: /(node_modules|bower_components)/,
             loader: RS('babel-loader'),
@@ -288,7 +288,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
               cacheCompression: false,
               compact: isEnvProduction,
             },
-          },
+          }),
           // lib script
           {
             test: /\.(js|mjs)$/,

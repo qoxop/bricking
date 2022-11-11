@@ -33,6 +33,9 @@ const defaultOption = () => ({
     definitions: {} as Record<string, string | string[]>,
     defineMapping: {} as Record<string, string>,
     htmlOptions: {} as HtmlWebpackPlugin.Options | undefined,
+    loaderModify: {
+      appScript: (loader: any) => (loader),
+    },
     /**
      * 参考 webpack 插件钩子文档
      * https://webpack.js.org/api/compiler-hooks/#hooks
