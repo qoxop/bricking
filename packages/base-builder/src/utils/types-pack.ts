@@ -43,7 +43,10 @@ export default (remoteEntry: string) => {
   if (!path.isAbsolute(typeOutput)) {
     typeOutput = path.resolve(paths.workspace, typeOutput);
   }
-  fsExtra.emptyDirSync(typeOutput);
+  // 开发时避免重复清空类型文件, 影响开发体验
+  if (process.env.NODE_ENV === 'production') {
+    fsExtra.emptyDirSync(typeOutput);
+  }
 
   btkType.createTypeDefines({
     base: baseDir,
