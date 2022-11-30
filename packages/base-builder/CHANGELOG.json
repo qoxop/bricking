@@ -2,6 +2,18 @@
   "name": "@bricking/base-builder",
   "entries": [
     {
+      "version": "2.1.3",
+      "tag": "@bricking/base-builder_v2.1.3",
+      "date": "Wed, 30 Nov 2022 04:30:56 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "开发时避免重复清空类型文件, 影响开发体验"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.1.2",
       "tag": "@bricking/base-builder_v2.1.2",
       "date": "Fri, 11 Nov 2022 02:50:15 GMT",
