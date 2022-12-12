@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@bricking/base-builder",
+      "comment": "增加独立的类型编译命令",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@bricking/base-builder"
+}
