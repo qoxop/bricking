@@ -1,6 +1,13 @@
 # Change Log - @bricking/base-builder
 
-This log was last generated on Wed, 30 Nov 2022 04:30:56 GMT and should not be manually modified.
+This log was last generated on Mon, 12 Dec 2022 03:28:53 GMT and should not be manually modified.
+
+## 2.2.0
+Mon, 12 Dec 2022 03:28:53 GMT
+
+### Minor changes
+
+- 增加独立的类型编译命令
 
 ## 2.1.3
 Wed, 30 Nov 2022 04:30:56 GMT

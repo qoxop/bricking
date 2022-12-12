@@ -2,6 +2,18 @@
   "name": "@bricking/base-builder",
   "entries": [
     {
+      "version": "2.2.0",
+      "tag": "@bricking/base-builder_v2.2.0",
+      "date": "Mon, 12 Dec 2022 03:28:53 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "增加独立的类型编译命令"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.1.3",
       "tag": "@bricking/base-builder_v2.1.3",
       "date": "Wed, 30 Nov 2022 04:30:56 GMT",
