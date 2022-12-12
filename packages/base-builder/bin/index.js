@@ -63,6 +63,30 @@ require('yargs')
                 }
             });
         }
+    ).command(
+        'test [dir]',
+        '仅编译类型文件',
+        function (yargs) {
+            yargs.positional('dir', {
+                alias: 'd',
+                default: process.cwd(),
+                describe: '指定项目根目录'
+            });
+        },
+        function (argv) {
+            const cwd = path.isAbsolute(argv.dir) ? argv.dir :  path.resolve(process.cwd(), argv.dir);
+            spawn('node', [
+                path.resolve(__dirname, './task.test.js'),
+                ...process.argv.slice(3),
+            ],{
+                cwd,
+                stdio: 'inherit',
+                env: {
+                    ...process.env,
+                    NODE_ENV: 'production',
+                }
+            });
+        }
     )
     .help()
     .argv;

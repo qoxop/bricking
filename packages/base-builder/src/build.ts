@@ -4,6 +4,7 @@ import WebpackDevServer from 'webpack-dev-server';
 
 import { getWebpackConfig, devServerConfig } from './config';
 import { getUserOptions } from './options';
+import typesPack from './utils/types-pack';
 
 /**
  * 构建任务默认回调方法
@@ -64,7 +65,14 @@ const runServer = async (port?: string) => {
   server.start();
 };
 
+const runTest = async () => {
+  const { publicPath = 'http://localhost:8080' } = getUserOptions();
+  const remoteEntry = `${publicPath}${/\/$/.test(publicPath) ? '' : '/'}base-js-bricking.js;`;
+  typesPack(remoteEntry);
+};
+
 export {
   runBuild,
   runServer,
+  runTest,
 };
