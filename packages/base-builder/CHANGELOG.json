@@ -2,6 +2,18 @@
   "name": "@bricking/base-builder",
   "entries": [
     {
+      "version": "2.3.0",
+      "tag": "@bricking/base-builder_v2.3.0",
+      "date": "Tue, 13 Dec 2022 09:37:52 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "支持导入源码"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.2.0",
       "tag": "@bricking/base-builder_v2.2.0",
       "date": "Mon, 12 Dec 2022 03:28:53 GMT",
