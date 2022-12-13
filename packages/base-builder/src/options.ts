@@ -82,6 +82,10 @@ const defaultOption = () => ({
       autoInject: true,
       /** 类型文件的基础路径, 默认 './src' */
       baseDir: './src',
+      /**
+       * 是否添加源码
+       */
+      addSource: false as Boolean,
       /** 自定义模块的模块名与路径映射 */
       defines: {} as { index: string, [key: string]: string },
     },

@@ -25,7 +25,7 @@ export const updatePkgJson = (json: any) => {
 export default (remoteEntry: string) => {
   const { bundle, output } = getUserOptions();
   let typeOutput = path.join(output, './types');
-  let { defines = {} as any, baseDir } = bundle.moduleDefines;
+  let { defines = {} as any, baseDir, addSource } = bundle.moduleDefines;
 
   const hasIndex = !!defines.index || !!bundle.entry;
 
@@ -54,7 +54,18 @@ export default (remoteEntry: string) => {
     output: typeOutput,
     cwd: paths.workspace,
   });
-
+  if (addSource && process.env.NODE_ENV === 'production') {
+    fsExtra.copySync(
+      baseDir,
+      path.join(typeOutput, path.relative(paths.workspace, baseDir)),
+    );
+    Object.keys(defines).forEach((key) => {
+      fsExtra.writeFileSync(
+        path.join(typeOutput, `./${key}.ts`),
+        `export * from "${defines[key].replace(/\/index\.tsx?$/, '').replace(/\.tsx?$/, '')}"`,
+      );
+    });
+  }
   const packageObj = getPackageJson() as any;
   packageObj.remoteEntry = remoteEntry;
   if (hasIndex) packageObj.types = 'index.d.ts';
