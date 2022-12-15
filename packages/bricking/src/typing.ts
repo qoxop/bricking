@@ -19,6 +19,14 @@ export type BrickingOptions = {
     [name: string]: string;
   };
   /**
+   * 源码基础路径, 默认'./src'
+   */
+  sourceBase?: string;
+  /**
+   * 打包模式
+   */
+  mode?: 'app'|'lib'|'app|lib';
+  /**
    * 输出目录
    */
   output?: string;
@@ -89,6 +97,7 @@ export type BrickingJson = {
     document?: `${'http'|'https'}://${string}.md`;
     requires: string[];
   };
+  peerDependencies?: Record<string, string>,
   name: string;
   version: `${number}.${number}.${number}`;
   updateTime: number;

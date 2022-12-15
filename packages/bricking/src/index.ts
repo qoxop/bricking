@@ -33,6 +33,12 @@ export function defineBricking(options: BrickingOptions): Required<BrickingOptio
       path: path.resolve(workspace, './index.html'),
     };
   }
+  if (!options.sourceBase) {
+    options.sourceBase = './src';
+  }
+  if (!options.mode) {
+    options.mode = 'app';
+  }
   if (options.doPack === true) {
     try {
       const { name } = require(packageJsonPath);

@@ -63,6 +63,7 @@ type RollupStylePluginOptions = {
      * postcss 配置
      */
     postcss?: PostCSSOptions;
+    useCssLinkPlugin?: boolean;
 }
 
 /**
@@ -71,7 +72,7 @@ type RollupStylePluginOptions = {
  */
 const rollupStylePlugin = (options: RollupStylePluginOptions): Plugin => {
   // 设置默认选项值
-  const { filename = '[hash].css', sourceMap = true, postcss, less, sass } = options;
+  const { filename = '[hash].css', sourceMap = true, postcss, less, sass, useCssLinkPlugin = true } = options;
   // 过滤器
   const filter = createFilter([/\.css$/, LessRegExp, SassRegExp]);
   // css 文件集合
@@ -201,8 +202,13 @@ const rollupStylePlugin = (options: RollupStylePluginOptions): Plugin => {
         concat.add(relative, result.css, map);
       }
       const cssCode = sourceMap ? `${concat.content.toString()}\n/*# sourceMappingURL=./${path.basename(mapFileName)} */` : concat.content.toString();
-      // 替换
-      entryChunk.code = entryChunk.code.replace(STYLE_EXTERNALS_MODULE, `${STYLE_EXTERNALS_MODULE}?link=./${fileName}`);
+      if (useCssLinkPlugin) {
+        // 替换
+        entryChunk.code = entryChunk.code.replace(STYLE_EXTERNALS_MODULE, `${STYLE_EXTERNALS_MODULE}?link=./${fileName}`);
+      } else {
+        // 替换
+        entryChunk.code = entryChunk.code.replace(STYLE_EXTERNALS_MODULE, `./${fileName}`);
+      }
       // 输出
       this.emitFile({ fileName, type: 'asset', source: cssCode });
       if (sourceMap && concat.sourceMap) {
