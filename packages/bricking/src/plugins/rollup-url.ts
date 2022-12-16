@@ -130,14 +130,10 @@ const url = (options:UrlOptions = {}):Plugin => {
         return `export default "${btkFunc.getDataUrl(id, buffer)}"`;
       });
     },
-    async renderChunk(code, chunk, outputOptions) {
+    async renderChunk(code) {
       if (!bundle) {
-        const base = outputOptions.dir || path.dirname(outputOptions.file as string);
-        const sourceFileName = path.resolve(base, chunk.fileName);
         // TODO SourceMap 规则
         const ast = parse(code, {
-          sourceFileName,
-          sourceMapName: `${sourceFileName}.map`,
           parser: {
             parse: (source: string) => this.parse(source, { ecmaVersion: 'latest', locations: true }),
           },
@@ -154,7 +150,7 @@ const url = (options:UrlOptions = {}):Plugin => {
         const result = print(ast);
         return {
           code: result.code,
-          map: result.map,
+          map: null,
         };
       }
       return null;
