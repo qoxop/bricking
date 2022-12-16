@@ -2,6 +2,18 @@
   "name": "@bricking/plugin-style",
   "entries": [
     {
+      "version": "0.6.1",
+      "tag": "@bricking/plugin-style_v0.6.1",
+      "date": "Fri, 16 Dec 2022 08:25:57 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "多入口样式导入"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.6.0",
       "tag": "@bricking/plugin-style_v0.6.0",
       "date": "Thu, 15 Dec 2022 09:11:11 GMT",
