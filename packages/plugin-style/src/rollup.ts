@@ -175,7 +175,10 @@ const rollupStylePlugin = (options: RollupStylePluginOptions): Plugin => {
       // 输出目录
       const dir = outputOptions.dir || path.dirname(outputOptions.file as string);
       // 入口 chunk
-      const [entryChunkId, entryChunk] = Object.entries(bundle).find(([, chunk]) => chunk.type === 'chunk' && chunk.isEntry) as [string, OutputChunk];
+      const entryChunks = Object.entries(bundle).filter(([, chunk]) => chunk.type === 'chunk' && chunk.isEntry) as [string, OutputChunk][];
+      if (!entryChunks.length) return;
+
+      const [[entryChunkId, entryChunk], ...restChunks] = entryChunks;
       // 入口chunk文件(输出位置)
       const entryFile = outputOptions.file || path.join(outputOptions.dir as string, entryChunkId);
       const entries = [...allCssFiles.values()];
@@ -213,6 +216,18 @@ const rollupStylePlugin = (options: RollupStylePluginOptions): Plugin => {
       this.emitFile({ fileName, type: 'asset', source: cssCode });
       if (sourceMap && concat.sourceMap) {
         this.emitFile({ fileName: mapFileName, type: 'asset', source: concat.sourceMap });
+      }
+      // 替换剩余的入口文件
+      if (restChunks.length) {
+        restChunks.forEach(chunk => {
+          if (useCssLinkPlugin) {
+            // 替换
+            chunk[1].code = entryChunk.code.replace(STYLE_EXTERNALS_MODULE, `${STYLE_EXTERNALS_MODULE}?link=./${fileName}`);
+          } else {
+            // 替换
+            chunk[1].code = entryChunk.code.replace(STYLE_EXTERNALS_MODULE, `./${fileName}`);
+          }
+        })
       }
     },
   };

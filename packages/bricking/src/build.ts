@@ -88,6 +88,7 @@ const commonPlugin = ({
     include: config.assets.include,
     exclude: config.assets.exclude || [],
     fileName: config.assets.filename,
+    bundle: mode === 'app',
   }),
   // 日志插件
   rollupLog({ workspace }),
