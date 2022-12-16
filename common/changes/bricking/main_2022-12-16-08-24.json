@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "bricking",
+      "comment": "优化库打包模式",
+      "type": "patch"
+    }
+  ],
+  "packageName": "bricking"
+}
