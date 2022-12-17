@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@bricking/plugin-style",
+      "comment": "修复问题",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@bricking/plugin-style"
+}
