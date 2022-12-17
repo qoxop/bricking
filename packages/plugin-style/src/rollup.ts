@@ -103,6 +103,18 @@ const rollupStylePlugin = (options: RollupStylePluginOptions): Plugin => {
       return null;
     },
     async transform(code: string, id: string) {
+      const moduleInfo = this.getModuleInfo(id);
+      // 给入口文件添加导入样式的代码
+      if (useCssLinkPlugin && moduleInfo && moduleInfo.isEntry) {
+        // @ts-ignore
+        const concat = new Concat(true, id, '\n');
+        concat.add(null, `import "${STYLE_EXTERNALS_MODULE}";`);
+        concat.add(id, code, this.getCombinedSourcemap().toString());
+        return {
+          code: concat.content.toString(),
+          map: concat.sourceMap,
+        };
+      }
       if (id.indexOf(REMOTE_CSS_PREFIX) === 0) return null;
       if (!filter(id)) return null;
 
@@ -222,10 +234,10 @@ const rollupStylePlugin = (options: RollupStylePluginOptions): Plugin => {
         restChunks.forEach(chunk => {
           if (useCssLinkPlugin) {
             // 替换
-            chunk[1].code = entryChunk.code.replace(STYLE_EXTERNALS_MODULE, `${STYLE_EXTERNALS_MODULE}?link=./${fileName}`);
+            chunk[1].code = chunk[1].code.replace(STYLE_EXTERNALS_MODULE, `${STYLE_EXTERNALS_MODULE}?link=./${fileName}`);
           } else {
             // 替换
-            chunk[1].code = entryChunk.code.replace(STYLE_EXTERNALS_MODULE, `./${fileName}`);
+            chunk[1].code = chunk[1].code.replace(STYLE_EXTERNALS_MODULE, `./${fileName}`);
           }
         })
       }

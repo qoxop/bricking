@@ -76,7 +76,8 @@ const commonPlugin = ({
   useEsbuild = false,
   target = 'es2017',
   mode = 'app',
-}: { useEsbuild?: boolean; target?: string; mode?: 'app'|'lib'}) => ([
+  output,
+}: { useEsbuild?: boolean; target?: string; mode?: 'app'|'lib', output?: string}) => ([
   rollupResolve({ browser: true, extensions: ['.mjs', '.js', '.jsx', '.tsx', '.ts'] }),
   require('@rollup/plugin-commonjs')(),
   builtins({ crypto: true }),
@@ -120,6 +121,9 @@ const commonPlugin = ({
       tsconfig: tsConfigPath,
       sourceMap: true,
       inlineSources: true,
+      compilerOptions: {
+        ...(output ? { outDir: output } : {}),
+      },
     }),
 ]);
 
@@ -172,7 +176,7 @@ const build = async (
         // 自定义插件
         ...(config.plugins || []),
         // 压缩
-        terser({ format: { comments: false } }),
+        terser({ format: { comments: false }, sourceMap: true }),
       ],
     });
     const rollupOutput = await bundle.write({
@@ -196,18 +200,18 @@ const build = async (
       ],
       plugins: [
         // 通用插件
-        ...commonPlugin({ useEsbuild, target, mode: 'lib' }),
+        ...commonPlugin({ useEsbuild: false, target, mode: 'lib', output: outputPackPath }),
         // 自定义插件
         ...(config.plugins || []),
         // 压缩
-        terser({ format: { comments: false } }),
+        // terser({ format: { comments: false }, sourceMap: true }),
       ],
     });
     const rollupOutput = await bundle.write({
       dir: outputPackPath,
       format: 'esm',
       entryFileNames: '[name].js',
-      sourcemap: true,
+      // sourcemap: true,
     });
     if (!ret.bundle) ret.bundle = bundle;
     if (!ret.rollupOutput) ret.rollupOutput = rollupOutput;
@@ -232,7 +236,7 @@ const build = async (
         // 自定义插件
         ...(config.plugins || []),
         // 压缩
-        terser({ format: { comments: false } }),
+        terser({ format: { comments: false }, sourceMap: true }),
       ],
     });
     const bundleOutput = await bundle.write({
@@ -387,6 +391,7 @@ async function setBrickingJson(
     path.resolve(output, 'package.json'),
     JSON.stringify(json, null, '\t'),
   );
+  if (!existsSync(outputPackPath)) mkdirSync(outputPackPath, { recursive: true });
   writeFileSync(
     path.resolve(outputPackPath, 'package.json'),
     JSON.stringify(json, null, '\t'),

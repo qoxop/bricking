@@ -142,7 +142,7 @@ const url = (options:UrlOptions = {}):Plugin => {
           visitLiteral(nodePath) {
             const { value } = nodePath.node;
             if (typeof value !== 'string' || !value.startsWith(PREFIX)) return this.traverse(nodePath);
-            const replacementNode = types.builders.literal(value.replace(PREFIX, ''));
+            const replacementNode = types.builders.literal(value.replace(PREFIX, (/^\.\//.test(value) ? '' : './')));
             nodePath.replace(replacementNode);
             this.traverse(nodePath);
           },
