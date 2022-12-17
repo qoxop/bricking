@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@bricking/plugin-style",
+      "comment": "优化样式导入逻辑",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@bricking/plugin-style"
+}

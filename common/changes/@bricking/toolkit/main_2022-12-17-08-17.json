@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@bricking/toolkit",
+      "comment": "升级基础库",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@bricking/toolkit"
+}
