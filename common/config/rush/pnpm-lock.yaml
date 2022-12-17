@@ -45,7 +45,7 @@ importers:
       '@babel/preset-react': ^7.16.7
       '@babel/preset-typescript': ^7.16.7
       '@bricking/common-config': workspace:*
-      '@bricking/toolkit': workspace:^0.6.0
+      '@bricking/toolkit': workspace:^0.6.1
       '@pmmmwh/react-refresh-webpack-plugin': ^0.5.4
       '@svgr/webpack': ^6.2.1
       '@types/node': ^17.0.21
@@ -123,8 +123,8 @@ importers:
   ../../packages/bricking:
     specifiers:
       '@bricking/common-config': workspace:*
-      '@bricking/plugin-style': workspace:^0.6.1
-      '@bricking/toolkit': workspace:^0.6.0
+      '@bricking/plugin-style': workspace:^0.6.2
+      '@bricking/toolkit': workspace:^0.6.1
       '@rollup/plugin-alias': ^4.0.2
       '@rollup/plugin-commonjs': ^23.0.5
       '@rollup/plugin-json': ^5.0.2
@@ -188,7 +188,7 @@ importers:
   ../../packages/plugin-style:
     specifiers:
       '@bricking/common-config': workspace:*
-      '@bricking/toolkit': workspace:^0.6.0
+      '@bricking/toolkit': workspace:^0.6.1
       '@types/less': ~3.0.3
       '@types/node-sass': ~4.11.3
       concat-with-sourcemaps: ^1.1.0

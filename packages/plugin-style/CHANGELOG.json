@@ -2,6 +2,18 @@
   "name": "@bricking/plugin-style",
   "entries": [
     {
+      "version": "0.6.3",
+      "tag": "@bricking/plugin-style_v0.6.3",
+      "date": "Sat, 17 Dec 2022 09:14:36 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "修复问题"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.6.2",
       "tag": "@bricking/plugin-style_v0.6.2",
       "date": "Sat, 17 Dec 2022 08:18:25 GMT",

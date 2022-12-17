@@ -1,6 +1,6 @@
 {
   "name": "bricking",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "一个基于 rollup 的 Systemjs 模块打包器",
   "main": "dist/index.js",
   "scripts": {
@@ -24,7 +24,7 @@
     "directory": "packages/bricking"
   },
   "dependencies": {
-    "@bricking/plugin-style": "workspace:^0.6.2",
+    "@bricking/plugin-style": "workspace:^0.6.3",
     "@bricking/toolkit": "workspace:^0.6.1",
     "@rollup/plugin-alias": "^4.0.2",
     "@rollup/plugin-commonjs": "^23.0.5",
