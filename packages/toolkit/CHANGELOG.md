@@ -1,6 +1,13 @@
 # Change Log - @bricking/toolkit
 
-This log was last generated on Sun, 16 Oct 2022 16:18:59 GMT and should not be manually modified.
+This log was last generated on Sat, 17 Dec 2022 08:18:25 GMT and should not be manually modified.
+
+## 0.6.1
+Sat, 17 Dec 2022 08:18:25 GMT
+
+### Patches
+
+- 升级基础库
 
 ## 0.6.0
 Sun, 16 Oct 2022 16:18:59 GMT
