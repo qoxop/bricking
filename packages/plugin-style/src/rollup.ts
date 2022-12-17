@@ -103,21 +103,9 @@ const rollupStylePlugin = (options: RollupStylePluginOptions): Plugin => {
       return null;
     },
     async transform(code: string, id: string) {
-      const moduleInfo = this.getModuleInfo(id);
-      // 给入口文件添加导入样式的代码
-      if (moduleInfo && moduleInfo.isEntry) {
-        // @ts-ignore
-        const concat = new Concat(true, id, '\n');
-        concat.add(null, `import "${STYLE_EXTERNALS_MODULE}";`);
-        concat.add(id, code, this.getCombinedSourcemap().toString());
-        return {
-          code: concat.content.toString(),
-          map: concat.sourceMap,
-        };
-      }
       if (id.indexOf(REMOTE_CSS_PREFIX) === 0) return null;
-      // 过滤掉不处理的类型
       if (!filter(id)) return null;
+
       // 配置 loader 上下文
       const loaderProps: CssLoaderProps<any> = {
         content: code,
@@ -169,7 +157,19 @@ const rollupStylePlugin = (options: RollupStylePluginOptions): Plugin => {
       }), {});
       return JSON.stringify(extractedValue);
     },
-
+    renderChunk(code, chunk, outputOptions) {
+      // 如果存在样式
+      if (allCssFiles.size && chunk.isEntry && (outputOptions.dir || outputOptions.file)) {
+        const concat = new Concat(true, chunk.fileName, '\n');
+        concat.add(null, `import "${STYLE_EXTERNALS_MODULE}";`)
+        concat.add(chunk.fileName, code);
+        return {
+          code: concat.content.toString(),
+          map: concat.sourceMap,
+        }
+      }
+      return null;
+    },
     async generateBundle(outputOptions, bundle) {
       if (allCssFiles.size === 0 || !(outputOptions.dir || outputOptions.file)) return;
       // 输出目录

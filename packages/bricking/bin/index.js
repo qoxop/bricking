@@ -16,14 +16,14 @@ require('yargs')
     'build',
     '构建项目',
     () => void 0,
-    () => {
+    (argv) => {
       // pnpm 的一个 bug, monorepo项目结构中 production 模式下子项目安装依赖会失败
       const { initBaseLibInfo } = require('../dist/install');
       try {
         initBaseLibInfo().then(async () => {
           process.env.NODE_ENV = 'production';
           try {
-            await require('../dist/build').runBuild();
+            await require('../dist/build').runBuild(!!argv.dev);
           } catch (err) {
             console.error(err)
             process.exit(-1);

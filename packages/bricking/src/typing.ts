@@ -92,6 +92,7 @@ export type BrickingOptions = {
 
 export type BrickingJson = {
   entry: Record<string, `${'http'|'https'}://${string}.js`>;
+  bundle?: string;
   document?: `${'http'|'https'}://${string}.md`;
   dependence: {
     document?: `${'http'|'https'}://${string}.md`;
