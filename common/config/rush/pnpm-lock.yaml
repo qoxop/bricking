@@ -123,7 +123,7 @@ importers:
   ../../packages/bricking:
     specifiers:
       '@bricking/common-config': workspace:*
-      '@bricking/plugin-style': workspace:^0.6.2
+      '@bricking/plugin-style': workspace:^0.6.3
       '@bricking/toolkit': workspace:^0.6.1
       '@rollup/plugin-alias': ^4.0.2
       '@rollup/plugin-commonjs': ^23.0.5
