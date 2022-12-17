@@ -36,6 +36,11 @@ export type BrickingOptions = {
   browseEntry: string;
   html?: {
     path: string;
+    scripts?: {
+      url: string;
+      type?: string;
+      props?: Record<string, string>;
+    }[];
     importMaps?: Record<string, string>;
     replacement?: Record<string, string>;
   },

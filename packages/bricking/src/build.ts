@@ -335,6 +335,7 @@ async function setHtml(importMaps: Record<string, string>, browseEntry: string) 
     {
       url: remoteEntry,
     },
+    ...(config.html.scripts || []),
     {
       content: JSON.stringify({ imports: {
         ...(importMaps || ''),
