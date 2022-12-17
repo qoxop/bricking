@@ -171,7 +171,7 @@ const rollupStylePlugin = (options: RollupStylePluginOptions): Plugin => {
     },
     renderChunk(code, chunk, outputOptions) {
       // 如果存在样式
-      if (allCssFiles.size && chunk.isEntry && (outputOptions.dir || outputOptions.file)) {
+      if (!useCssLinkPlugin && allCssFiles.size && chunk.isEntry && (outputOptions.dir || outputOptions.file)) {
         const concat = new Concat(true, chunk.fileName, '\n');
         concat.add(null, `import "${STYLE_EXTERNALS_MODULE}";`)
         concat.add(chunk.fileName, code);
