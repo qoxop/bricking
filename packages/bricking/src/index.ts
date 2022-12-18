@@ -39,6 +39,9 @@ export function defineBricking(options: BrickingOptions): Required<BrickingOptio
   if (!options.mode) {
     options.mode = 'app';
   }
+  if (!options.externals) {
+    options.externals = [];
+  }
   if (options.doPack === true) {
     try {
       const { name } = require(packageJsonPath);

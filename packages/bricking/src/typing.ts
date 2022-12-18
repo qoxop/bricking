@@ -30,6 +30,7 @@ export type BrickingOptions = {
    * 输出目录
    */
   output?: string;
+  externals?: string[];
   /**
    * 浏览器入口
    */
@@ -103,6 +104,7 @@ export type BrickingJson = {
     document?: `${'http'|'https'}://${string}.md`;
     requires: string[];
   };
+  externals?: string[];
   peerDependencies?: Record<string, string>,
   name: string;
   version: `${number}.${number}.${number}`;

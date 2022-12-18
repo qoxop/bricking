@@ -167,6 +167,7 @@ const build = async (
       context: 'window',
       input: entry,
       external: [
+        ...config.externals,
         ...Object.keys(importMaps || {}),
         ...(await getExternals()),
       ],
@@ -360,7 +361,7 @@ async function setBrickingJson(
   imports: string[],
   bundle?: string,
 ) {
-  const { publicPath, output } = config;
+  const { publicPath, output, entry } = config;
   const { version, name } = packageJson;
   const requires = imports.filter(
     (item) => !/^___INJECT_STYLE_LINK___/.test(item),
@@ -374,6 +375,7 @@ async function setBrickingJson(
     dependence: {
       requires,
     },
+    externals: Object.keys(entry).map((k) => (`${name}/${k}`)),
     peerDependencies,
     updateTime: Date.now(),
     publicPath,
