@@ -35,7 +35,7 @@ export const startServe = (config: DevServe, dist: string) => {
       // 1. 跨域设置
       devServe.use((req, res, next) => {
         res.setHeader('Access-Control-Allow-Credentials', 'true');
-        res.setHeader('Access-Control-Allow-Origin', req.originalUrl);
+        res.setHeader('Access-Control-Allow-Origin', '*');
         next();
       });
       // 2. 静态资源服务

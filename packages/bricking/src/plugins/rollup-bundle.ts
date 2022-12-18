@@ -14,13 +14,13 @@ const bundleEntry = ({ configPath, realEntry, pkgName }):Plugin => {
     },
     load(id: string) {
       if (id === configPath) {
-        let code = 'import $bricking from "@bricking/runtime";\n';
+        let code = '';
         const keys = Object.keys(realEntry);
         // import module
         code += keys.map((k, i) => (`import * as m${i} from "${realEntry[k]}";`)).join('\n');
         // inject module
         const codePairs = keys.map((k, i) => (`\t"${mk(k)}": m${i},\n`)).join('');
-        code += `\n$bricking.mm.set({\n${codePairs}})\n`;
+        code += `\nself.$bricking.mm.set({\n${codePairs}})\n`;
         return { code, map: null };
       }
       return null;

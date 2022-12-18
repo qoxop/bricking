@@ -309,8 +309,8 @@ const watch = async (
     },
   });
   // 如果是纯粹的 lib 模式，需要时时生成类型，以便于调试
+  let time: NodeJS.Timeout;
   if (mode === 'lib') {
-    let time: NodeJS.Timeout;
     watcher.on('change', () => {
       clearTimeout(time);
       time = setTimeout(() => generateTypes(), 2000);
@@ -322,6 +322,7 @@ const watch = async (
         event.result.close();
       }
       if (event.code === 'END') {
+        time = setTimeout(() => generateTypes(), 10);
         resolve(libBundleName);
       }
     });
@@ -339,7 +340,6 @@ async function setHtml(importMaps: Record<string, string>, browseEntry: string) 
     {
       url: remoteEntry,
     },
-    ...(config.html.scripts || []),
     {
       content: JSON.stringify({ imports: {
         ...(importMaps || ''),
@@ -347,6 +347,7 @@ async function setHtml(importMaps: Record<string, string>, browseEntry: string) 
       } }),
       type: 'systemjs-importmap',
     },
+    ...(config.html.scripts || []),
     {
       url: browseEntry,
       type: 'systemjs-module',

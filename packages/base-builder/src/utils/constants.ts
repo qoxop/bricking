@@ -1,1 +1,1 @@
-export const excludePackages = ['@babel/runtime', 'core-js', '@bricking/runtime'];
+export const excludePackages = ['@babel/runtime', 'core-js'];

@@ -107,7 +107,7 @@ const register = {
       if (force || !CUSTOM_MODULE_MAPS[name]) {
         const module = maps[name];
         if (module) {
-          if (typeof module === 'object' && !('default' in module)) {
+          if (typeof module === 'object' && !('default' in module) && !Object.isFrozen(module)) {
             module.default = { ...module };
           }
           CUSTOM_MODULE_MAPS[name] = module;

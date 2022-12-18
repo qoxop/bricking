@@ -33,8 +33,18 @@ const compileToEs3 = async (code: string) => {
   const { code: miniCode } = await minify(Es3Code, { sourceMap: false });
   return miniCode;
 };
-
+const compileToEs5 = async (code: string) => {
+  const Es5Code = ts.transpileModule(code, {
+    compilerOptions: {
+      module: ts.ModuleKind.None,
+      target: ts.ScriptTarget.ES5,
+    },
+  }).outputText;
+  const { code: miniCode } = await minify(Es5Code, { sourceMap: false });
+  return miniCode;
+};
 export {
   registerTsHooks,
   compileToEs3,
+  compileToEs5,
 };
