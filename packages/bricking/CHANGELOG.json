@@ -2,6 +2,18 @@
   "name": "bricking",
   "entries": [
     {
+      "version": "0.7.6",
+      "tag": "bricking_v0.7.6",
+      "date": "Sun, 18 Dec 2022 03:07:26 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "输出和消费externals"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.7.5",
       "tag": "bricking_v0.7.5",
       "date": "Sun, 18 Dec 2022 02:58:35 GMT",
