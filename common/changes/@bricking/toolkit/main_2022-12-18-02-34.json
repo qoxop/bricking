@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@bricking/toolkit",
+      "comment": "修改html生成工具(强制systemjs脚本按顺序执行)",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@bricking/toolkit"
+}

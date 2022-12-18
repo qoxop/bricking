@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@bricking/base-builder",
+      "comment": "允许对@bricking/runtime进行导出",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@bricking/base-builder"
+}
