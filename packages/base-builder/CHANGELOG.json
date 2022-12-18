@@ -2,6 +2,26 @@
   "name": "@bricking/base-builder",
   "entries": [
     {
+      "version": "2.3.1",
+      "tag": "@bricking/base-builder_v2.3.1",
+      "date": "Sun, 18 Dec 2022 02:35:36 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "允许对@bricking/runtime进行导出"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@bricking/toolkit\" from `^0.6.1` to `^0.6.2`"
+          },
+          {
+            "comment": "Updating dependency \"@bricking/runtime\" from `^*` to `^0.4.5`"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.3.0",
       "tag": "@bricking/base-builder_v2.3.0",
       "date": "Tue, 13 Dec 2022 09:37:52 GMT",

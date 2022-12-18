@@ -2,6 +2,18 @@
   "name": "@bricking/toolkit",
   "entries": [
     {
+      "version": "0.6.2",
+      "tag": "@bricking/toolkit_v0.6.2",
+      "date": "Sun, 18 Dec 2022 02:35:36 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "修改html生成工具(强制systemjs脚本按顺序执行)"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.6.1",
       "tag": "@bricking/toolkit_v0.6.1",
       "date": "Sat, 17 Dec 2022 08:18:25 GMT",

@@ -2,6 +2,18 @@
   "name": "@bricking/runtime",
   "entries": [
     {
+      "version": "0.4.5",
+      "tag": "@bricking/runtime_v0.4.5",
+      "date": "Sun, 18 Dec 2022 02:35:36 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "修复设置模块时，模块对象被冻结的问题"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.4.4",
       "tag": "@bricking/runtime_v0.4.4",
       "date": "Sun, 18 Sep 2022 14:02:44 GMT",

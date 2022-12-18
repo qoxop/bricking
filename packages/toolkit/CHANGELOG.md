@@ -1,6 +1,13 @@
 # Change Log - @bricking/toolkit
 
-This log was last generated on Sat, 17 Dec 2022 08:18:25 GMT and should not be manually modified.
+This log was last generated on Sun, 18 Dec 2022 02:35:36 GMT and should not be manually modified.
+
+## 0.6.2
+Sun, 18 Dec 2022 02:35:36 GMT
+
+### Patches
+
+- 修改html生成工具(强制systemjs脚本按顺序执行)
 
 ## 0.6.1
 Sat, 17 Dec 2022 08:18:25 GMT
