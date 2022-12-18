@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@bricking/toolkit",
+      "comment": "撤销rollup 更新",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@bricking/toolkit"
+}

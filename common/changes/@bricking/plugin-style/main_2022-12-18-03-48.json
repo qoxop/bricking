@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@bricking/plugin-style",
+      "comment": "撤销rollup更新",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@bricking/plugin-style"
+}

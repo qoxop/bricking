@@ -175,7 +175,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
             },
             compress: {
               ecma: 5,
-              warnings: false,
+              // warnings: false,
               comparisons: false,
               inline: 2,
             },
