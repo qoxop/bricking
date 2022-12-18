@@ -56,7 +56,7 @@ async function injectScripts(dom: any, scripts: Script[], replacement:Record<str
   })()\n;`;
   if (systemScripts.length) {
     const script = document.createElement('script');
-    script.innerHTML = compileToEs5(execCode);
+    script.innerHTML = await compileToEs5(execCode);
     document.body.append(script);
   }
   if (output) {

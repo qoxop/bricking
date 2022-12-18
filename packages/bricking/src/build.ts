@@ -336,7 +336,7 @@ const watch = async (
  */
 async function setHtml(importMaps: Record<string, string>, browseEntry: string) {
   const { remoteEntry } = getBaseLibInfo();
-  btkDom.injectScripts(btkDom.getHtmlDom(config.html.path), [
+  await btkDom.injectScripts(btkDom.getHtmlDom(config.html.path), [
     {
       url: remoteEntry,
     },
