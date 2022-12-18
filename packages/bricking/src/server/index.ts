@@ -34,7 +34,7 @@ export const startServe = (config: DevServe, dist: string) => {
       const devServe = express();
       // 1. 跨域设置
       devServe.use((req, res, next) => {
-        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        // res.setHeader('Access-Control-Allow-Credentials', 'true');
         res.setHeader('Access-Control-Allow-Origin', '*');
         next();
       });

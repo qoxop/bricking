@@ -35,6 +35,7 @@ async function injectScripts(dom: any, scripts: Script[], replacement:Record<str
   const otherScripts = scripts.filter((item) => item.type !== 'systemjs-module');
   otherScripts.forEach((item) => {
     const script = document.createElement('script');
+    script.crossorigin = 'anonymous';
     if (item.type) {
       script.type = item.type;
     }
@@ -56,6 +57,7 @@ async function injectScripts(dom: any, scripts: Script[], replacement:Record<str
   })()\n;`;
   if (systemScripts.length) {
     const script = document.createElement('script');
+    script.crossorigin = 'anonymous';
     script.innerHTML = await compileToEs5(execCode);
     document.body.append(script);
   }

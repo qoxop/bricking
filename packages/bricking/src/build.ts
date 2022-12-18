@@ -5,7 +5,6 @@ import alias from '@rollup/plugin-alias';
 import jsonPlugin from '@rollup/plugin-json';
 import { rollupStylePlugin } from '@bricking/plugin-style';
 import rollupResolve from '@rollup/plugin-node-resolve';
-import terser from '@rollup/plugin-terser';
 import livereload from 'rollup-plugin-livereload';
 import builtins from 'rollup-plugin-node-builtins';
 import esbuild from 'rollup-plugin-esbuild';
@@ -177,7 +176,7 @@ const build = async (
         // 自定义插件
         ...(config.plugins || []),
         // 压缩
-        terser({ format: { comments: false }, sourceMap: true }),
+        require('rollup-plugin-terser').terser({ format: { comments: false } }),
       ],
     });
     const rollupOutput = await bundle.write({
@@ -237,7 +236,7 @@ const build = async (
         // 自定义插件
         ...(config.plugins || []),
         // 压缩
-        terser({ format: { comments: false }, sourceMap: true }),
+        require('rollup-plugin-terser').terser({ format: { comments: false } }),
       ],
     });
     const bundleOutput = await bundle.write({
