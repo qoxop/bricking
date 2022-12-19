@@ -322,7 +322,9 @@ const watch = async (
         event.result.close();
       }
       if (event.code === 'END') {
-        time = setTimeout(() => generateTypes(), 10);
+        if (mode === 'lib') {
+          time = setTimeout(() => generateTypes(), 4000);
+        }
         resolve(libBundleName);
       }
     });
