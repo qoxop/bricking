@@ -2,6 +2,18 @@
   "name": "@bricking/runtime",
   "entries": [
     {
+      "version": "0.4.6",
+      "tag": "@bricking/runtime_v0.4.6",
+      "date": "Mon, 19 Dec 2022 08:05:57 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "update ts"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.4.5",
       "tag": "@bricking/runtime_v0.4.5",
       "date": "Sun, 18 Dec 2022 02:35:36 GMT",

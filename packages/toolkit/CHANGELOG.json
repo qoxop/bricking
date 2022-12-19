@@ -2,6 +2,18 @@
   "name": "@bricking/toolkit",
   "entries": [
     {
+      "version": "0.6.5",
+      "tag": "@bricking/toolkit_v0.6.5",
+      "date": "Mon, 19 Dec 2022 08:05:57 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "update ts"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.6.4",
       "tag": "@bricking/toolkit_v0.6.4",
       "date": "Sun, 18 Dec 2022 04:00:03 GMT",

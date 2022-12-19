@@ -1,6 +1,13 @@
 # Change Log - @bricking/runtime
 
-This log was last generated on Sun, 18 Dec 2022 02:35:36 GMT and should not be manually modified.
+This log was last generated on Mon, 19 Dec 2022 08:05:57 GMT and should not be manually modified.
+
+## 0.4.6
+Mon, 19 Dec 2022 08:05:57 GMT
+
+### Patches
+
+- update ts
 
 ## 0.4.5
 Sun, 18 Dec 2022 02:35:36 GMT

@@ -2,6 +2,26 @@
   "name": "bricking",
   "entries": [
     {
+      "version": "0.7.8",
+      "tag": "bricking_v0.7.8",
+      "date": "Mon, 19 Dec 2022 08:05:57 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "update ts & 优化开发体验"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@bricking/plugin-style\" from `^0.6.5` to `^0.6.6`"
+          },
+          {
+            "comment": "Updating dependency \"@bricking/toolkit\" from `^0.6.4` to `^0.6.5`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.7.7",
       "tag": "bricking_v0.7.7",
       "date": "Sun, 18 Dec 2022 04:00:03 GMT",
