@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@bricking/base-builder",
+      "comment": "update ts",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@bricking/base-builder"
+}

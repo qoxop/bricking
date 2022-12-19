@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "bricking",
+      "comment": "update ts & 优化开发体验",
+      "type": "patch"
+    }
+  ],
+  "packageName": "bricking"
+}

@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@bricking/runtime",
+      "comment": "update ts",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@bricking/runtime"
+}
