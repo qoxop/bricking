@@ -62,6 +62,7 @@ const getExternals = async () => {
   return [
     ...Object.keys(peerDependencies),
     ...Object.keys(config.html.importMaps || {}),
+    ...(config.externals || []),
     '___INJECT_STYLE_LINK___',
     new RegExp(`^${name}`),
   ];
@@ -166,7 +167,6 @@ const build = async (
       context: 'window',
       input: entry,
       external: [
-        ...config.externals,
         ...Object.keys(importMaps || {}),
         ...(await getExternals()),
       ],
