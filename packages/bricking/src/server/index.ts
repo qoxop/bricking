@@ -18,6 +18,11 @@ export type DevServe = {
      * https://github.com/chimurai/http-proxy-middleware#options
      */
     proxy?: ProxyOptions;
+    routes?: Array<{
+      method?: 'get'|'post';
+      path: string;
+      handler: express.Handler
+    }>
 }
 
 let opened = false;
@@ -46,6 +51,13 @@ export const startServe = (config: DevServe, dist: string) => {
           config.proxyPath,
           createProxyMiddleware(config.proxy),
         );
+      }
+      if (config.routes && config.routes.length) {
+        config.routes.forEach(({ method = 'get', path: p, handler }) => {
+          if (['get', 'post'].includes(method) && p && !!handler) {
+            devServe[method](p, handler);
+          }
+        });
       }
       // 4. support browserHistory
       devServe.get('*', (_, response) => {

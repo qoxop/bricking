@@ -510,8 +510,8 @@ export async function runStart() {
   }
   const publicPath = `http://${config.devServe.host}:${config.devServe.port}`;
   await setBrickingJson(importMaps, [], `${publicPath}/${libBundleName}`);
-  // 纯粹的库模式不需要 browse-entry 和 html
-  if (config.mode !== 'lib') {
+
+  if (config.browseEntry && config.html) {
     await watch({ 'browse-entry': config.browseEntry }, config.output, importMaps, 'app');
     await setHtml(importMaps, '/browse-entry.js');
   }
