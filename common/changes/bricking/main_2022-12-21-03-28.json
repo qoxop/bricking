@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "bricking",
+      "comment": "支持多个热重载服务",
+      "type": "patch"
+    }
+  ],
+  "packageName": "bricking"
+}
