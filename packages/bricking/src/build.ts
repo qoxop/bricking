@@ -296,6 +296,7 @@ const watch = async (
         verbose: false,
         delay: 300,
         port: config.devServe?.wsPort,
+        scriptId: config.devServe?.scriptId,
       }),
     ].filter(Boolean),
     output: {
