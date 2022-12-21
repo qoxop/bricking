@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "bricking",
+      "comment": "支持修改热更新端口",
+      "type": "patch"
+    }
+  ],
+  "packageName": "bricking"
+}
