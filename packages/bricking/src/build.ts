@@ -295,6 +295,7 @@ const watch = async (
         watch: config.output,
         verbose: false,
         delay: 300,
+        port: config.devServe?.wsPort || 35729,
       }),
     ].filter(Boolean),
     output: {

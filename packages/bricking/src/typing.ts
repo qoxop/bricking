@@ -90,7 +90,7 @@ export type BrickingOptions = {
     filename?: string;
     loadPaths?: string[];
   },
-  devServe?: Partial<DevServe> ;
+  devServe?: Partial<DevServe & { wsPort: number }> ;
   publicPath?: string;
   replacement?: Record<string, string>;
   plugins?: (false | Plugin)[];
