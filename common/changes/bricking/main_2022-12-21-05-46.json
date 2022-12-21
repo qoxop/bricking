@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "bricking",
+      "comment": "添加 scriptId 参数",
+      "type": "patch"
+    }
+  ],
+  "packageName": "bricking"
+}
