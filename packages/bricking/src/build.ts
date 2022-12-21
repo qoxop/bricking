@@ -5,7 +5,6 @@ import alias from '@rollup/plugin-alias';
 import jsonPlugin from '@rollup/plugin-json';
 import { rollupStylePlugin } from '@bricking/plugin-style';
 import rollupResolve from '@rollup/plugin-node-resolve';
-import livereload from 'rollup-plugin-livereload';
 import builtins from 'rollup-plugin-node-builtins';
 import esbuild from 'rollup-plugin-esbuild';
 import { btkDom, btkFile, btkType, fsExtra } from '@bricking/toolkit';
@@ -17,6 +16,7 @@ import rollupBundle from './plugins/rollup-bundle';
 import * as logs from './utils/log';
 import { getBaseLibInfo } from './install';
 import { BrickingJson } from './typing';
+import myLivereload from './plugins/rollup-reload';
 
 const cleanPath = async (output: string) => {
   await fsExtra.emptyDir(output);
@@ -291,11 +291,11 @@ const watch = async (
       ...commonPlugin({ useEsbuild: true, mode: 'app' }),
       // 自定义插件
       ...(config.plugins || []),
-      livereload({
+      myLivereload({
         watch: config.output,
         verbose: false,
         delay: 300,
-        port: config.devServe?.wsPort || 35729,
+        port: config.devServe?.wsPort,
       }),
     ].filter(Boolean),
     output: {
