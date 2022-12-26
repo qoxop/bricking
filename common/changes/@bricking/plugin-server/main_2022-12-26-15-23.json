@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@bricking/plugin-server",
+      "comment": "修复端口不一致的问题",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@bricking/plugin-server"
+}
