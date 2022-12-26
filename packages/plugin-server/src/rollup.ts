@@ -43,7 +43,7 @@ export function livereloadServer(options: ServeConfig):Plugin {
       this.emitFile({
         fileName: LIVE_RELOAD_SCRIPT,
         type: 'asset',
-        source: getScriptCode(options.host, options.port, '/bricking-ws'),
+        source: getScriptCode(options.host, +(process.env.USE_WS_PROXY_PORT || options.port), '/bricking-ws'),
       });
     },
     writeBundle(outputOptions) {
