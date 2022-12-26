@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "bricking",
+      "comment": "替换热重载功能",
+      "type": "patch"
+    }
+  ],
+  "packageName": "bricking"
+}
