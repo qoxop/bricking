@@ -1,6 +1,13 @@
 # Change Log - bricking
 
-This log was last generated on Wed, 21 Dec 2022 05:47:53 GMT and should not be manually modified.
+This log was last generated on Mon, 26 Dec 2022 14:58:14 GMT and should not be manually modified.
+
+## 0.7.14
+Mon, 26 Dec 2022 14:58:14 GMT
+
+### Patches
+
+- 替换热重载功能
 
 ## 0.7.13
 Wed, 21 Dec 2022 05:47:53 GMT

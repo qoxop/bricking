@@ -1,0 +1,17 @@
+{
+  "name": "@bricking/plugin-server",
+  "entries": [
+    {
+      "version": "1.0.1",
+      "tag": "@bricking/plugin-server_v1.0.1",
+      "date": "Mon, 26 Dec 2022 14:58:14 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "初始化"
+          }
+        ]
+      }
+    }
+  ]
+}
