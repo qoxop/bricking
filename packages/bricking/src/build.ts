@@ -4,19 +4,18 @@ import * as rollup from 'rollup';
 import alias from '@rollup/plugin-alias';
 import jsonPlugin from '@rollup/plugin-json';
 import { rollupStylePlugin } from '@bricking/plugin-style';
+import { livereloadServer } from '@bricking/plugin-server';
 import rollupResolve from '@rollup/plugin-node-resolve';
 import builtins from 'rollup-plugin-node-builtins';
 import esbuild from 'rollup-plugin-esbuild';
 import { btkDom, btkFile, btkType, fsExtra } from '@bricking/toolkit';
 import config, { packageJson, tsConfig, tsConfigPath, workspace, sourceBase, outputPackPath, configPath } from './config';
-import { openBrowser, startServe } from './server';
 import rollupUrl from './plugins/rollup-url';
 import rollupLog from './plugins/rollup-log';
 import rollupBundle from './plugins/rollup-bundle';
 import * as logs from './utils/log';
 import { getBaseLibInfo } from './install';
 import { BrickingJson } from './typing';
-import myLivereload from './plugins/rollup-reload';
 
 const cleanPath = async (output: string) => {
   await fsExtra.emptyDir(output);
@@ -291,13 +290,7 @@ const watch = async (
       ...commonPlugin({ useEsbuild: true, mode: 'app' }),
       // 自定义插件
       ...(config.plugins || []),
-      myLivereload({
-        watch: config.output,
-        verbose: false,
-        delay: 300,
-        port: config.devServe?.wsPort,
-        scriptId: config.devServe?.scriptId,
-      }),
+      livereloadServer(config.devServe as any),
     ].filter(Boolean),
     output: {
       dir: output,
@@ -491,14 +484,6 @@ export async function runBuild(devMode: boolean) {
 }
 
 /**
- * 启动服务器
- */
-export async function runServe() {
-  await startServe(config.devServe as any, config.output);
-  openBrowser(`http://${config.devServe.host}:${config.devServe.port}${config.devServe.open}`);
-}
-
-/**
  * 执行开发任务
  */
 export async function runStart() {
@@ -520,5 +505,4 @@ export async function runStart() {
 
   const now = Date.now();
   logs.keepLog(`[⌛️speed]: ${((now - start) / 1000).toFixed(2)}s`);
-  await runServe();
 }

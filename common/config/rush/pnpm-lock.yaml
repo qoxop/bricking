@@ -123,6 +123,7 @@ importers:
   ../../packages/bricking:
     specifiers:
       '@bricking/common-config': workspace:*
+      '@bricking/plugin-server': workspace:*
       '@bricking/plugin-style': workspace:^0.6.6
       '@bricking/toolkit': workspace:^0.6.5
       '@rollup/plugin-alias': ^3.1.9
@@ -138,15 +139,12 @@ importers:
       del-cli: ^4.0.1
       esbuild: 0.15.7
       eslint: ~8.23.1
-      express: ^4.18.1
-      http-proxy-middleware: ^2.0.6
       inquirer: 8.2.1
       log-update: 4.0.0
       postcss: ^8.4.8
       recast: ~0.22.0
       rollup: ^2.58.0
       rollup-plugin-esbuild: ^4.10.1
-      rollup-plugin-livereload: ^2.0.5
       rollup-plugin-node-builtins: ^2.1.2
       rollup-plugin-node-globals: ^1.4.0
       rollup-plugin-terser: ^7.0.2
@@ -154,6 +152,7 @@ importers:
       typescript: ^4.9.4
       yargs: ^17.3.1
     dependencies:
+      '@bricking/plugin-server': link:../plugin-server
       '@bricking/plugin-style': link:../plugin-style
       '@bricking/toolkit': link:../toolkit
       '@rollup/plugin-alias': 3.1.9_rollup@2.79.1
@@ -165,15 +164,12 @@ importers:
       '@rollup/pluginutils': 4.2.1
       '@types/express': 4.17.15
       esbuild: 0.15.7
-      express: 4.18.2
-      http-proxy-middleware: 2.0.6_@types+express@4.17.15
       inquirer: 8.2.1
       log-update: 4.0.0
       postcss: 8.4.20
       recast: 0.22.0
       rollup: 2.79.1
       rollup-plugin-esbuild: 4.10.3_i453esznhucepjbtqh35z2mwji
-      rollup-plugin-livereload: 2.0.5
       rollup-plugin-node-builtins: 2.1.2
       rollup-plugin-node-globals: 1.4.0
       rollup-plugin-terser: 7.0.2_rollup@2.79.1
@@ -186,6 +182,41 @@ importers:
       '@types/node': 17.0.45
       del-cli: 4.0.1
       eslint: 8.23.1
+
+  ../../packages/plugin-server:
+    specifiers:
+      '@bricking/common-config': workspace:*
+      '@types/express': ~4.17.15
+      '@types/node': ^17.0.21
+      '@types/ws': ~8.5.3
+      chalk: ^4.1.2
+      chokidar: ~3.5.3
+      cross-spawn: ^7.0.3
+      del-cli: ^4.0.1
+      eslint: ~8.23.1
+      express: ^4.18.1
+      http-proxy-middleware: ^2.0.6
+      open: ^8.4.0
+      rollup: ^2.58.0
+      typescript: ^4.9.4
+      ws: ~8.11.0
+    dependencies:
+      chalk: 4.1.2
+      chokidar: 3.5.3
+      cross-spawn: 7.0.3
+      express: 4.18.2
+      http-proxy-middleware: 2.0.6_@types+express@4.17.15
+      open: 8.4.0
+      rollup: 2.79.1
+      ws: 8.11.0
+    devDependencies:
+      '@bricking/common-config': link:../_common
+      '@types/express': 4.17.15
+      '@types/node': 17.0.45
+      '@types/ws': 8.5.3
+      del-cli: 4.0.1
+      eslint: 8.23.1
+      typescript: 4.9.4
 
   ../../packages/plugin-style:
     specifiers:
@@ -2234,7 +2265,6 @@ packages:
     dependencies:
       '@types/connect': 3.4.35
       '@types/node': 17.0.45
-    dev: false
 
   /@types/bonjour/3.5.10:
     resolution: {integrity: sha512-p7ienRMiS41Nu2/igbJxxLDWrSZ0WxM8UQgCeO9KhoVF7cOVFkrKsiDr1EsJIla8vV3oEEjGcz11jc5yimhzZw==}
@@ -2253,7 +2283,6 @@ packages:
     resolution: {integrity: sha512-cdeYyv4KWoEgpBISTxWvqYsVy444DOqehiF3fM3ne10AmJ62RSyNkUnxMJXHQWRQQX2eR94m5y1IZyDwBjV9FQ==}
     dependencies:
       '@types/node': 17.0.45
-    dev: false
 
   /@types/eslint-scope/3.7.4:
     resolution: {integrity: sha512-9K4zoImiZc3HlIp6AVUDE4CWYx22a+lhSZMYNpbjW04+YF0KWj4pJXnEMjdnFTiQibFFmElcsasJXDbdI/EPhA==}
@@ -2287,7 +2316,6 @@ packages:
       '@types/node': 17.0.45
       '@types/qs': 6.9.7
       '@types/range-parser': 1.2.4
-    dev: false
 
   /@types/express/4.17.15:
     resolution: {integrity: sha512-Yv0k4bXGOH+8a+7bELd2PqHQsuiANB+A8a4gnQrkRWzrkKlb6KHaVvyXhqs04sVW/OWlbPyYxRgYlIXLfrufMQ==}
@@ -2296,7 +2324,6 @@ packages:
       '@types/express-serve-static-core': 4.17.31
       '@types/qs': 6.9.7
       '@types/serve-static': 1.15.0
-    dev: false
 
   /@types/fs-extra/9.0.13:
     resolution: {integrity: sha512-nEnwB++1u5lVDM2UI4c1+5R+FYaKfaAzS4OococimjVm3nQw3TuzH5UNsocrcTBbhnerblyHj4A49qXbIiZdpA==}
@@ -2335,7 +2362,6 @@ packages:
 
   /@types/mime/3.0.1:
     resolution: {integrity: sha512-Y4XFY5VJAuw0FgAqPNd6NNoV44jbq9Bz2L7Rh/J6jLTiHBSBJa9fxqQIvkIld4GsoDOcCbvzOUAbLPsSKKg+uA==}
-    dev: false
 
   /@types/minimist/1.2.2:
     resolution: {integrity: sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==}
@@ -2364,11 +2390,9 @@ packages:
 
   /@types/qs/6.9.7:
     resolution: {integrity: sha512-FGa1F62FT09qcrueBA6qYTrJPVDzah9a+493+o2PCXsesWHIn27G98TsSMs3WPNbZIEj4+VJf6saSFpvD+3Zsw==}
-    dev: false
 
   /@types/range-parser/1.2.4:
     resolution: {integrity: sha512-EEhsLsD6UsDM1yFhAvy0Cjr6VwmpMWqFBCb9w07wVugF7w9nfajxLuVmngTIpgS6svCnm6Vaw+MZhoDCKnOfsw==}
-    dev: false
 
   /@types/resolve/1.17.1:
     resolution: {integrity: sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==}
@@ -2395,7 +2419,6 @@ packages:
     dependencies:
       '@types/mime': 3.0.1
       '@types/node': 17.0.45
-    dev: false
 
   /@types/sockjs/0.3.33:
     resolution: {integrity: sha512-f0KEEe05NvUnat+boPTZ0dgaLZ4SfSouXUgv5noUiefG2ajgKjmETo9ZJyuqsl7dfl2aHlLJUiki6B4ZYldiiw==}
@@ -2417,7 +2440,6 @@ packages:
     resolution: {integrity: sha512-6YOoWjruKj1uLf3INHH7D3qTXwFfEsg1kf3c0uDdSBJwfa/llkwIjrAGV7j7mVgGNbzTQ3HiHKKDXl6bJPD97w==}
     dependencies:
       '@types/node': 17.0.45
-    dev: false
 
   /@typescript-eslint/eslint-plugin/5.46.1_agubhgghr7gvtv7pj6gwwpyuxi:
     resolution: {integrity: sha512-YpzNv3aayRBwjs4J3oz65eVLXc9xx0PDbIRisHj+dYhvBn02MjYOD96P8YGiWEIFBrojaUjxvkaUpakD82phsA==}
@@ -5927,24 +5949,6 @@ packages:
   /lines-and-columns/1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
 
-  /livereload-js/3.4.1:
-    resolution: {integrity: sha512-5MP0uUeVCec89ZbNOT/i97Mc+q3SxXmiUGhRFOTmhrGPn//uWVQdCvcLJDy64MSBR5MidFdOR7B9viumoavy6g==}
-    dev: false
-
-  /livereload/0.9.3:
-    resolution: {integrity: sha512-q7Z71n3i4X0R9xthAryBdNGVGAO2R5X+/xXpmKeuPMrteg+W2U8VusTKV3YiJbXZwKsOlFlHe+go6uSNjfxrZw==}
-    engines: {node: '>=8.0.0'}
-    hasBin: true
-    dependencies:
-      chokidar: 3.5.3
-      livereload-js: 3.4.1
-      opts: 2.0.2
-      ws: 7.5.9
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-    dev: false
-
   /loader-runner/4.3.0:
     resolution: {integrity: sha512-3R/1M+yS3j5ou80Me59j7F9IMs4PXs3VqRrm0TU3AbKPxlmpoY1TNscJV/oGJXo8qCatFGTfDbY6W6ipGOYXfg==}
     engines: {node: '>=6.11.5'}
@@ -6493,10 +6497,6 @@ packages:
       prelude-ls: 1.2.1
       type-check: 0.4.0
       word-wrap: 1.2.3
-
-  /opts/2.0.2:
-    resolution: {integrity: sha512-k41FwbcLnlgnFh69f4qdUfvDQ+5vaSDnVPFI/y5XuhKRq97EnVVneO9F1ESVCdiVu4fCS2L8usX3mU331hB7pg==}
-    dev: false
 
   /ora/5.4.1:
     resolution: {integrity: sha512-5b6Y85tPxZZ7QytO+BQzysW31HJku27cRIlkbAXaNx+BdcVi+LlRFmVXzeF6a7JCwJpyw5c4b+YSVImQIrBpuQ==}
@@ -7788,16 +7788,6 @@ packages:
       - supports-color
     dev: false
 
-  /rollup-plugin-livereload/2.0.5:
-    resolution: {integrity: sha512-vqQZ/UQowTW7VoiKEM5ouNW90wE5/GZLfdWuR0ELxyKOJUIaj+uismPZZaICU4DnWPVjnpCDDxEqwU7pcKY/PA==}
-    engines: {node: '>=8.3'}
-    dependencies:
-      livereload: 0.9.3
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-    dev: false
-
   /rollup-plugin-node-builtins/2.1.2:
     resolution: {integrity: sha512-bxdnJw8jIivr2yEyt8IZSGqZkygIJOGAWypXvHXnwKAbUcN4Q/dGTx7K0oAJryC/m6aq6tKutltSeXtuogU6sw==}
     dependencies:
@@ -8967,19 +8957,6 @@ packages:
 
   /wrappy/1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
-
-  /ws/7.5.9:
-    resolution: {integrity: sha512-F+P9Jil7UiSKSkppIiD94dN07AwvFixvLIj1Og1Rl9GGMuNipJnV9JzjD6XuqmAeiswGvUmNLjr5cFuXwNS77Q==}
-    engines: {node: '>=8.3.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: ^5.0.2
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
-    dev: false
 
   /ws/8.11.0:
     resolution: {integrity: sha512-HPG3wQd9sNQoT9xHyNCXoDUa+Xw/VevmY9FoHyQ+g+rrMn4j6FB4np7Z0OhdTgjx6MgQLK7jwSy1YecU1+4Asg==}

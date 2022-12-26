@@ -348,9 +348,6 @@
    */
   // "telemetryEnabled": false,
 
-
-
-
   "projects": [
     {
       "packageName": "@bricking/toolkit",
@@ -375,6 +372,11 @@
     {
       "packageName": "@bricking/base-builder",
       "projectFolder": "packages/base-builder",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@bricking/plugin-server",
+      "projectFolder": "packages/plugin-server",
       "shouldPublish": true
     },
     {

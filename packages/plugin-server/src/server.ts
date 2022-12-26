@@ -1,44 +1,46 @@
 import * as path from 'path';
 import express from 'express';
-import { exec } from 'child_process';
 import { createProxyMiddleware, Options as ProxyOptions } from 'http-proxy-middleware';
-import * as logs from '../utils/log';
+import { createWss, initWatcher } from './livereload';
 
-export type DevServe = {
-    port: number;
-    host: string;
-    open: string;
-    /**
-     * 配置那些路径走代理服务
-     */
-    proxyPath?: string | RegExp | (string | RegExp)[];
-    /**
-     * 代理配置
-     *
-     * https://github.com/chimurai/http-proxy-middleware#options
-     */
-    proxy?: ProxyOptions;
-    routes?: Array<{
-      method?: 'get'|'post';
-      path: string;
-      handler: express.Handler
-    }>
+type ExpressApp = ReturnType<typeof express>;
+export type ServeConfig = {
+  port: number;
+  host: string;
+  open: string;
+  /**
+   * 配置那些路径走代理服务
+   */
+  proxyPath?: string | RegExp | (string | RegExp)[];
+  /**
+   * 代理配置
+   *
+   * https://github.com/chimurai/http-proxy-middleware#options
+   */
+  proxy?: ProxyOptions;
+  routes?: Array<{
+    method?: 'get'|'post';
+    path: string;
+    handler: express.Handler
+  }>
 }
 
 let opened = false;
+
 export const openBrowser = (url: string) => {
   if (opened) return;
-  exec(`${process.platform === 'win32' ? 'start' : 'open'} ${url}`);
+  require('./openBrowser')(url);
   opened = true;
 };
-// @ts-ignore
-let servePromise:Promise<any> = null;
-export const startServe = (config: DevServe, dist: string) => {
+
+let servePromise:Promise<ExpressApp> = null as any;
+
+export const startServe = (config: ServeConfig, dist: string):Promise<ExpressApp> => {
   if (!servePromise) {
     servePromise = new Promise((resolve) => {
       const devServe = express();
       // 1. 跨域设置
-      devServe.use((req, res, next) => {
+      devServe.use((_, res, next) => {
         // res.setHeader('Access-Control-Allow-Credentials', 'true');
         res.setHeader('Access-Control-Allow-Origin', '*');
         next();
@@ -63,9 +65,22 @@ export const startServe = (config: DevServe, dist: string) => {
       devServe.get('*', (_, response) => {
         response.sendFile(path.resolve(dist, 'index.html'));
       });
-      // 5. 启动开发服务器
+      // 5. 监听变化 -> 通知页面刷新
+      if (!process.env.USE_WS_PROXY_PORT) createWss(devServe);
+
+      // 6. 启动开发服务器
       devServe.listen(config.port, () => {
-        logs.keepLog(`[🛰 Serve]: ${config.host}:${config.port}`);
+        console.log(`[🛰 Serve]: ${config.host}:${config.port}`);
+        initWatcher({
+          dir: dist,
+          wsPort: +(process.env.USE_WS_PROXY_PORT || config.port),
+        });
+        if (config.open) {
+          const url = /^http/.test(config.open)
+            ? config.open
+            : `http://${config.host}:${config.port}/${config.open.replace(/^\//, '')}`;
+          openBrowser(url);
+        }
         resolve(devServe);
       });
     });

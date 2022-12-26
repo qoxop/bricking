@@ -1,6 +1,6 @@
 import { Plugin } from 'rollup';
 import { RollupStylePluginOptions as StyleOptions } from '@bricking/plugin-style';
-import { DevServe } from './server';
+import { ServeConfig } from '@bricking/plugin-server';
 
 export type BrickingAsset = {
   modules: {
@@ -90,7 +90,7 @@ export type BrickingOptions = {
     filename?: string;
     loadPaths?: string[];
   },
-  devServe?: Partial<DevServe & { wsPort: number, scriptId: string }> ;
+  devServe?: Partial<ServeConfig>;
   publicPath?: string;
   replacement?: Record<string, string>;
   plugins?: (false | Plugin)[];
