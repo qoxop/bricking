@@ -14,7 +14,7 @@ const getScriptCode = (host: string, port: number, p: string) => `(function() {
   ws.onmessage = (data) => {
     try {
       const msg = JSON.parse(data.data.toString());
-      if (msg.action === 'reload) {
+      if (msg.action === 'reload') {
         window.location.reload();
       }
     } catch (error) {
@@ -37,7 +37,7 @@ export function livereloadServer(options: ServeConfig):Plugin {
         + "var id = 'bricking-livereload-script';"
         + 'var e = d.getElementById(id);'
         + `if (!e) { e = d.createElement('script'); e.id = id; e.src = "/${LIVE_RELOAD_SCRIPT}"; d.body.append(e); }`
-        + '})(document)`';
+        + '})(document);';
     },
     generateBundle() {
       this.emitFile({
@@ -48,7 +48,9 @@ export function livereloadServer(options: ServeConfig):Plugin {
     },
     writeBundle(outputOptions) {
       const dist = outputOptions.dir || dirname(outputOptions.file as string);
-      runServerOnce(dist);
+      setTimeout(() => {
+        runServerOnce(dist);
+      }, 1000);
     },
   };
 }
