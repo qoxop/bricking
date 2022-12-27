@@ -1,6 +1,13 @@
 # Change Log - @bricking/plugin-server
 
-This log was last generated on Mon, 26 Dec 2022 15:24:50 GMT and should not be manually modified.
+This log was last generated on Tue, 27 Dec 2022 01:18:24 GMT and should not be manually modified.
+
+## 1.0.4
+Tue, 27 Dec 2022 01:18:24 GMT
+
+### Patches
+
+- 优化页面启动时机
 
 ## 1.0.3
 Mon, 26 Dec 2022 15:24:50 GMT
