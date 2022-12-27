@@ -75,12 +75,6 @@ export const startServe = (config: ServeConfig, dist: string):Promise<ExpressApp
           dir: dist,
           wsPort: +(process.env.USE_WS_PROXY_PORT || config.port),
         });
-        if (config.open) {
-          const url = /^http/.test(config.open)
-            ? config.open
-            : `http://${config.host}:${config.port}/${config.open.replace(/^\//, '')}`;
-          openBrowser(url);
-        }
         resolve(devServe);
       });
     });

@@ -4,7 +4,7 @@ import * as rollup from 'rollup';
 import alias from '@rollup/plugin-alias';
 import jsonPlugin from '@rollup/plugin-json';
 import { rollupStylePlugin } from '@bricking/plugin-style';
-import { livereloadServer } from '@bricking/plugin-server';
+import { livereloadServer, openBrowser } from '@bricking/plugin-server';
 import rollupResolve from '@rollup/plugin-node-resolve';
 import builtins from 'rollup-plugin-node-builtins';
 import esbuild from 'rollup-plugin-esbuild';
@@ -502,7 +502,12 @@ export async function runStart() {
     await watch({ 'browse-entry': config.browseEntry }, config.output, importMaps, 'app');
     await setHtml(importMaps, '/browse-entry.js');
   }
-
+  if (config.devServe.open) {
+    const url = /^http/.test(config.devServe.open)
+      ? config.devServe.open
+      : `http://${config.devServe.host}:${config.devServe.port}/${config.devServe.open.replace(/^\//, '')}`;
+    openBrowser(url);
+  }
   const now = Date.now();
   logs.keepLog(`[⌛️speed]: ${((now - start) / 1000).toFixed(2)}s`);
 }
