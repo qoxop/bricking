@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "bricking",
+      "comment": "优化页面启动时机",
+      "type": "patch"
+    }
+  ],
+  "packageName": "bricking"
+}
