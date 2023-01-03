@@ -1,6 +1,13 @@
 # Change Log - bricking
 
-This log was last generated on Tue, 27 Dec 2022 01:18:24 GMT and should not be manually modified.
+This log was last generated on Tue, 03 Jan 2023 06:24:26 GMT and should not be manually modified.
+
+## 0.7.18
+Tue, 03 Jan 2023 06:24:26 GMT
+
+### Patches
+
+- 不打包 .map 文件
 
 ## 0.7.17
 Tue, 27 Dec 2022 01:18:24 GMT
