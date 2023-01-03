@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "bricking",
+      "comment": "不打包 .map 文件",
+      "type": "patch"
+    }
+  ],
+  "packageName": "bricking"
+}
