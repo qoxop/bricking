@@ -475,7 +475,7 @@ export async function runBuild(devMode: boolean) {
       dir: config.output,
       output: path.resolve(config.output, `./${config.doPack}.zip`),
       prefix: '',
-      filter: (abs) => [/\.zip$/, /\.md$/, /\.tgz$/, /\.d\.ts$/].every((item) => !item.test(abs)),
+      filter: (abs) => [/\.zip$/, /\.md$/, /\.tgz$/, /\.d\.ts$/, /\.map$/].every((item) => !item.test(abs)),
     });
   }
 
