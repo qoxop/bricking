@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@bricking/plugin-server",
+      "comment": "避免多余的刷新",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@bricking/plugin-server"
+}
