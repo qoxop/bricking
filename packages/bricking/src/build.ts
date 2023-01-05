@@ -1,4 +1,5 @@
 import * as path from 'path';
+import { spawn } from 'child_process';
 import { mkdirSync, existsSync, writeFileSync } from 'fs';
 import * as rollup from 'rollup';
 import alias from '@rollup/plugin-alias';
@@ -126,7 +127,10 @@ const commonPlugin = ({
     }),
 ]);
 
-const generateTypes = () => {
+const generateTypes = (useChildProcess?: boolean) => {
+  if (useChildProcess) {
+    return spawn('node', [path.resolve(__dirname, './generate-type.js')], { stdio: 'inherit' });
+  }
   try {
     btkType.createTypeDefines({
       base: sourceBase,
@@ -305,10 +309,20 @@ const watch = async (
   });
   // 如果是纯粹的 lib 模式，需要时时生成类型，以便于调试
   let time: NodeJS.Timeout;
+  let childProcess: ReturnType<typeof spawn>|undefined;
   if (mode === 'lib') {
     watcher.on('change', () => {
       clearTimeout(time);
-      time = setTimeout(() => generateTypes(), 2000);
+      time = setTimeout(() => {
+        if (childProcess && !childProcess.killed) {
+          try {
+            childProcess.kill();
+          } catch (error) {
+            console.trace(error);
+          }
+        }
+        childProcess = generateTypes(true);
+      }, 1000);
     });
   }
   return new Promise<string>((resolve) => {
@@ -318,7 +332,9 @@ const watch = async (
       }
       if (event.code === 'END') {
         if (mode === 'lib') {
-          time = setTimeout(() => generateTypes(), 4000);
+          time = setTimeout(() => {
+            childProcess = generateTypes(true);
+          }, 500);
         }
         resolve(libBundleName);
       }
