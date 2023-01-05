@@ -1,6 +1,6 @@
 {
   "name": "bricking",
-  "version": "0.7.19",
+  "version": "0.7.20",
   "description": "一个基于 rollup 的 Systemjs 模块打包器",
   "main": "dist/index.js",
   "scripts": {

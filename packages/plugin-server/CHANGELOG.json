@@ -2,6 +2,18 @@
   "name": "@bricking/plugin-server",
   "entries": [
     {
+      "version": "1.0.5",
+      "tag": "@bricking/plugin-server_v1.0.5",
+      "date": "Thu, 05 Jan 2023 13:01:14 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "避免多余的刷新"
+          }
+        ]
+      }
+    },
+    {
       "version": "1.0.4",
       "tag": "@bricking/plugin-server_v1.0.4",
       "date": "Tue, 27 Dec 2022 01:18:24 GMT",
