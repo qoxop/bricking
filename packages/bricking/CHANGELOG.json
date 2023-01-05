@@ -2,6 +2,18 @@
   "name": "bricking",
   "entries": [
     {
+      "version": "0.7.19",
+      "tag": "bricking_v0.7.19",
+      "date": "Thu, 05 Jan 2023 09:25:42 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "优化开发体验"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.7.18",
       "tag": "bricking_v0.7.18",
       "date": "Tue, 03 Jan 2023 06:24:26 GMT",
