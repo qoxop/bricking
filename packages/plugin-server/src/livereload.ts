@@ -69,7 +69,8 @@ function initWatcher(option: {
       /\.git\//,
       /\.svn\//,
       /\.hg\//,
-      /.txt$/,
+      /\.txt$/,
+      /\.d\.ts$/,
     ],
   }).on('add', bc.emitReload)
     .on('change', bc.emitReload)
