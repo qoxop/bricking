@@ -1,11 +1,9 @@
-import path from "path";
-import { fsExtra, btkHash, btkFunc } from "@bricking/toolkit";
-import transformLess, { LessOption } from "./transform/transform-less";
-import transformSass, { SassOptions } from "./transform/transform-sass";
-import transformCss, { PostCSSOptions } from "./transform/transform-css";
-import { postcssRelativeUrl } from './plugins/postcss-relative-url'
-
-
+import path from 'path';
+import { fsExtra, btkHash, btkFunc } from '@bricking/toolkit';
+import transformLess, { LessOption } from './transform/transform-less';
+import transformSass, { SassOptions } from './transform/transform-sass';
+import transformCss, { PostCSSOptions } from './transform/transform-css';
+import { postcssRelativeUrl } from './plugins/postcss-relative-url';
 
 type AssetsOptions = {
   /**
@@ -84,7 +82,7 @@ async function batchCopy(map: Map<string, string>, outputDir: string) {
   await Promise.all(
     Array.from(map.entries()).map(async ([id, filename]) => {
       // 拷贝文件
-      await fsExtra.copy(id, path.join(outputDir, filename), { recursive: true })
+      await fsExtra.copy(id, path.join(outputDir, filename), { recursive: true });
     }),
   );
 }
@@ -100,7 +98,7 @@ async function generate({
   sourceMap,
   postCssOptions,
   assetsOptions,
-  filename
+  filename,
 }) {
   // 文件映射
   const AssetsMap = new Map<string, string>();
@@ -120,13 +118,16 @@ async function generate({
           getDataUrl: btkFunc.getDataUrl,
           cssOutput: output,
           baseOutput: output,
-          ...Object.assign({
-            limit: 1024 * 4,
-            filename: 'assets/[hash][extname]',
-            loadPaths: [],
-          }, assetsOptions),
-        })
-      ]
+          ...(
+            {
+              limit: 1024 * 4,
+              filename: 'assets/[hash][extname]',
+              loadPaths: [],
+              ...assetsOptions,
+            }
+          ),
+        }),
+      ],
     },
   });
   // 计算 hash
@@ -137,7 +138,7 @@ async function generate({
   const filepath = path.resolve(output, localFilename);
   const dirPath = path.dirname(filepath);
   if (!fsExtra.existsSync(dirPath)) {
-    fsExtra.mkdirSync(dirPath, { recursive: true })
+    fsExtra.mkdirSync(dirPath, { recursive: true });
   }
   await fsExtra.writeFile(filepath, cssResult.css);
   if (sourceMap) {
@@ -148,14 +149,14 @@ async function generate({
     hash,
     cssFilepath: filepath,
     mapFilepath: `${filepath}.map`,
-    ...cssResult
-  }
+    ...cssResult,
+  };
 }
 
 /**
  * 打包 less 文件
- * @param props 
- * @returns 
+ * @param props
+ * @returns
  */
 export async function bundleLess(props: BundleLessProps) {
   const {
@@ -165,7 +166,7 @@ export async function bundleLess(props: BundleLessProps) {
     filename = 'style.[hash].css',
     lessOptions = {},
     assetsOptions = {},
-    postCssOptions = {}
+    postCssOptions = {},
   } = props;
   const content = await fsExtra.readFile(input, { encoding: 'utf-8' });
   const context = {
@@ -179,7 +180,7 @@ export async function bundleLess(props: BundleLessProps) {
     sourceMap,
     options: lessOptions,
   });
-  return await generate({
+  return generate({
     result: lessResult,
     input,
     output,
@@ -193,7 +194,6 @@ export async function bundleLess(props: BundleLessProps) {
 
 /**
  * 打包 sass 文件
- * @param params 
  */
 export async function bundleSass(props: BundleSassProps) {
   const {
@@ -203,7 +203,7 @@ export async function bundleSass(props: BundleSassProps) {
     filename = 'style.[hash].css',
     sassOptions = {},
     assetsOptions = {},
-    postCssOptions = {}
+    postCssOptions = {},
   } = props;
   const content = await fsExtra.readFile(input, { encoding: 'utf-8' });
   const context = {
@@ -217,7 +217,7 @@ export async function bundleSass(props: BundleSassProps) {
     sourceMap,
     options: sassOptions,
   });
-  return await generate({
+  return generate({
     result: sassResult,
     input,
     output,

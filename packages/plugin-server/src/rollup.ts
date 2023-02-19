@@ -48,7 +48,7 @@ export function livereloadServer(options: ServeConfig):Plugin {
     },
     writeBundle(outputOptions) {
       const dist = outputOptions.dir || dirname(outputOptions.file as string);
-      runServerOnce(dist);
+      runServerOnce(dist).catch(console.error);
     },
   };
 }

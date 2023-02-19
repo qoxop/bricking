@@ -87,7 +87,7 @@ const handleFile = async ({
   cssOutput,
   baseOutput,
   AssetsMap,
-  getDataUrl
+  getDataUrl,
 }) => {
   // 获取资源信息，绝对路径、search 、hash
   const { absolutePath, search, hash } = getAssetInfo(url, loadPaths);

@@ -141,6 +141,7 @@ importers:
       eslint: ~8.23.1
       inquirer: 8.2.1
       log-update: 4.0.0
+      merge-source-map: ~1.1.0
       postcss: ^8.4.8
       recast: ~0.22.0
       rollup: ^2.58.0
@@ -166,6 +167,7 @@ importers:
       esbuild: 0.15.7
       inquirer: 8.2.1
       log-update: 4.0.0
+      merge-source-map: 1.1.0
       postcss: 8.4.20
       recast: 0.22.0
       rollup: 2.79.1
@@ -6134,6 +6136,12 @@ packages:
 
   /merge-descriptors/1.0.1:
     resolution: {integrity: sha512-cCi6g3/Zr1iqQi6ySbseM1Xvooa98N0w31jzUYrXPX2xqObmFGHJ0tQ5u74H3mVh7wLouTseZyYIq39g8cNp1w==}
+    dev: false
+
+  /merge-source-map/1.1.0:
+    resolution: {integrity: sha512-Qkcp7P2ygktpMPh2mCQZaf3jhN6D3Z/qVZHSdWvQ+2Ef5HgRAPBO57A77+ENm0CPx2+1Ce/MYKi3ymqdfuqibw==}
+    dependencies:
+      source-map: 0.6.1
     dev: false
 
   /merge-stream/2.0.0:

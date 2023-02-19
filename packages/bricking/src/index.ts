@@ -63,8 +63,8 @@ export function defineBricking(options: BrickingOptions): Required<BrickingOptio
     ...options.devServe,
   };
   options.plugins = options.plugins ?? [];
-  if (!options.browseEntry && (process.env.NODE_ENV === 'development')) {
-    throw new Error('options.browseEntry is require~');
+  if (!options.bootstrap && (process.env.NODE_ENV === 'development')) {
+    throw new Error('options.bootstrap is require~');
   }
   if (!(
     (typeof options.basePackage === 'string' && options.basePackage)
