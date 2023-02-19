@@ -18,7 +18,6 @@ import rollupLog from './plugins/rollup-log';
 import { getBaseLibInfo } from './install';
 import { BrickingJson } from './typing';
 import * as logs from './utils/log';
-import {InputOption, RollupOptions} from "rollup";
 
 const cleanPath = async (output: string) => {
   await fsExtra.emptyDir(output);
@@ -47,17 +46,19 @@ const getModuleAliasFromTsConfig = () => {
  * 获取外部依赖列表
  */
 const getExternals = async () => {
-  let { peerDependencies, name } = getBaseLibInfo();
-  peerDependencies = Object.keys(peerDependencies).reduce((prev, cur) => {
-    prev[cur.replace(/^@types\//, '')] = true;
-    return prev;
-  }, {});
+  let { peerDependencies, name } = getBaseLibInfo() || {};
+  if (peerDependencies) {
+    peerDependencies = Object.keys(peerDependencies).reduce((prev, cur) => {
+      prev[cur.replace(/^@types\//, '')] = true;
+      return prev;
+    }, {});
+  }
   return [
-    ...Object.keys(peerDependencies),
+    ...Object.keys(peerDependencies || {}),
     ...Object.keys(config.html.importMaps || {}),
     ...(config.externals || []),
     '___INJECT_STYLE_LINK___',
-    new RegExp(`^${name}`),
+    ...(name ? [new RegExp(`^${name}`)] : []),
   ];
 };
 
@@ -128,17 +129,17 @@ const getCommonPlugin = ({
 const getCommonOptions = async (
   params: {
     mode: string;
-    entry?: InputOption | undefined;
+    entry?: rollup.InputOption | undefined;
     importMaps?: Record<string, string>;
   },
-  callback?: ((opt: RollupOptions) => RollupOptions),
+  callback?: ((opt: rollup.RollupOptions) => rollup.RollupOptions),
 ) => {
   let useEsbuild = false;
   const target = (tsConfig?.compilerOptions?.target || '').toLowerCase();
   if (target && !['es3', 'es5'].includes(target)) {
     useEsbuild = true;
   }
-  const options: RollupOptions = {
+  const options: rollup.RollupOptions = {
     preserveEntrySignatures: 'exports-only',
     context: 'window',
     input: params.entry,
@@ -250,45 +251,29 @@ const watch = async (
 ) => {
   if (!entry) return;
   const libBundleName = `${packageJson.name}.js`;
-  const watcher = rollup.watch({
-    preserveEntrySignatures: 'exports-only',
-    context: 'window',
-    input: entry,
-    onwarn: (warn) => {
+
+  const watcher = rollup.watch(await getCommonOptions({ entry, mode: 'app', importMaps }, (opt) => {
+    opt.onwarn = (warn) => {
       console.error(`💥 Error: ${warn.message}`);
-      if (warn.loc) {
-        const { file, line, column } = warn.loc;
-        console.error(`     └─ position: ${file}:${line}:${column}\n`);
-      }
-    },
-    external: [
-      ...Object.keys(importMaps || {}),
-      ...(await getExternals()),
-    ],
-    plugins: [
-      mode === 'lib' && rollupBundle({
-        configPath,
-        realEntry: entry,
-        pkgName: packageJson.name,
-      }),
-      // 通用插件
-      ...getCommonPlugin({ useEsbuild: true, mode: 'app' }),
-      // 自定义插件
-      ...(config.plugins || []),
-      livereloadServer(config.devServe as any),
-    ].filter(Boolean),
-    output: {
+      warn.loc && console.error(`     └─ position: ${warn.loc.file}:${warn.loc.line}:${warn.loc.column}\n`);
+    };
+    opt.output = {
       dir: output,
       format: 'system',
       entryFileNames: mode === 'lib' ? libBundleName : '[name].js',
       sourcemap: true,
-    },
-    watch: {
-      buildDelay: 300,
-      exclude: ['node_modules/**'],
-    },
-  });
-  // 如果是纯粹的 lib 模式，需要时时生成类型，以便于调试
+    };
+    opt.watch = { buildDelay: 300, exclude: ['node_modules/**'] };
+    opt.plugins?.push(livereloadServer(config.devServe as any)); // 热重载
+    mode === 'lib' && opt.plugins?.unshift(rollupBundle({ // 捆绑插件
+      configPath,
+      realEntry: entry,
+      pkgName: packageJson.name,
+    }));
+    opt.plugins = opt.plugins?.filter((item) => item && item.name !== 'terser'); // 移除 terser 压缩插件
+    return opt;
+  }));
+  // 如果是纯粹的 lib 模式，需要实时生成类型，以便于调试
   let time: NodeJS.Timeout;
   let childProcess: ReturnType<typeof spawn>|undefined;
   if (mode === 'lib') {
@@ -329,10 +314,10 @@ const watch = async (
  * @param browseEntry
  */
 async function setHtml(importMaps: Record<string, string>, browseEntry: string) {
-  const { remoteEntry } = getBaseLibInfo();
+  const baseLibInfo = getBaseLibInfo();
   await btkDom.injectScripts(btkDom.getHtmlDom(config.html.path), [
     {
-      url: remoteEntry,
+      url: baseLibInfo?.remoteEntry,
     },
     {
       content: JSON.stringify({ imports: {
@@ -359,7 +344,7 @@ async function setBrickingJson(
   const requires = imports.filter(
     (item) => !/^___INJECT_STYLE_LINK___/.test(item),
   );
-  const { peerDependencies } = getBaseLibInfo();
+  const baseLibInfo = getBaseLibInfo();
   const json: BrickingJson = {
     name,
     version,
@@ -369,19 +354,20 @@ async function setBrickingJson(
       requires,
     },
     externals: Object.keys(modules).map((k) => (`${name}/${k}`)),
-    peerDependencies,
     updateTime: Date.now(),
     publicPath,
   };
+  if (baseLibInfo && baseLibInfo.peerDependencies) {
+    json.peerDependencies = baseLibInfo.peerDependencies;
+  }
+  if (baseLibInfo && baseLibInfo.document) {
+    json.dependence.document = baseLibInfo.document as any;
+  }
   const documentPath = path.join(workspace, './README.md');
   if (existsSync(documentPath)) {
     await fsExtra.copy(documentPath, path.join(output, './README.md'));
     const documentUrl = publicPath ? `${publicPath}README.md` : './README.md';
     json.document = documentUrl as any;
-  }
-  const { document } = getBaseLibInfo();
-  if (document) {
-    json.dependence.document = document as any;
   }
   writeFileSync(
     path.resolve(output, 'package.json'),
@@ -491,6 +477,7 @@ export async function runStart() {
   const start = Date.now();
 
   let importMaps = {};
+  // 构建模块
   const libBundleName = await watch(config.modules, config.output, {}, config.mode);
   if (config.modules && config.mode !== 'lib') {
     importMaps = Object.keys(config.modules).reduce((prev, cur) => ({ ...prev, [`${cur}`]: `/${cur}.js` }), {});
@@ -498,6 +485,7 @@ export async function runStart() {
   const publicPath = `${'http'}://${config.devServe.host}:${config.devServe.port}`;
   await setBrickingJson(importMaps, [], `${publicPath}/${libBundleName}`);
 
+  // 构建应用
   if (config.bootstrap && config.html) {
     await watch({ 'browse-entry': config.bootstrap }, config.output, importMaps, 'app');
     await setHtml(importMaps, '/browse-entry.js');

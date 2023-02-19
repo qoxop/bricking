@@ -71,7 +71,7 @@ type BaseLibInfo = {
   document?: string;
 }
 
-let baseLibInfo: BaseLibInfo;
+let baseLibInfo: BaseLibInfo|null;
 function getBaseLibInfo() {
   return baseLibInfo;
 }
