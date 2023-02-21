@@ -7,12 +7,12 @@ import { createFilter } from 'rollup-pluginutils';
 import Concat from 'concat-with-sourcemaps';
 import { GetModuleInfo, OutputChunk, Plugin } from 'rollup';
 import { btkHash, btkPath } from '@bricking/toolkit';
-import { INJECT_REMOTE_CSS_CODE, INJECT_REMOTE_CSS_ID, REMOTE_CSS_PREFIX, STYLE_EXTERNALS_MODULE } from './constants';
 import transformCss, { PostCSSOptions } from './transform/transform-css';
 import transformLess, { LessOption } from './transform/transform-less';
 import transformSass, { SassOptions } from './transform/transform-sass';
 import { CssLoaderProps } from './transform/types';
 
+const STYLE_EXTERNALS_MODULE = '___INJECT_STYLE_LINK___';
 const PluginName = 'bricking-runtime-css';
 
 function sortAllModules(entryChunks: [string, OutputChunk][], getModuleInfo: GetModuleInfo) {
@@ -67,7 +67,6 @@ type RollupStylePluginOptions = {
      * postcss 配置
      */
     postcss?: PostCSSOptions;
-    // useCssLinkPlugin?: boolean;
 }
 
 /**
@@ -81,47 +80,22 @@ const rollupStylePlugin = (options: RollupStylePluginOptions): Plugin => {
   const filter = createFilter([/\.css$/, LessRegExp, SassRegExp]);
   // css 文件集合
   const allCssFiles = new Map<string, { id: string; css: string; map: any; }>();
+  const remoteCssUrls = new Set<string>();
   return {
     name: PluginName,
     resolveId(source: string) {
-      // 处理远程样式文件
-      if (/^https?:\/\/.*\.css(\?.*)?$/.test(source)) {
-        return `${REMOTE_CSS_PREFIX}${source}`;
-      }
-      if (/^https?:\/\/.*\|css$/.test(source)) {
-        return `${REMOTE_CSS_PREFIX}${source.replace(/\|css$/, '')}`;
-      }
-      if (source === INJECT_REMOTE_CSS_ID) {
-        return INJECT_REMOTE_CSS_ID;
-      }
-      return null;
-    },
-    load(id) {
-      // 处理远程样式文件
-      if (id === INJECT_REMOTE_CSS_ID) {
-        return INJECT_REMOTE_CSS_CODE;
-      }
-      if (id.indexOf(REMOTE_CSS_PREFIX) === 0) {
-        return `import inject from "${INJECT_REMOTE_CSS_ID}";\ninject("${id.replace(REMOTE_CSS_PREFIX, '')}");`;
+      if (
+        /^https?:\/\/.*\.css(\?.*)?$/.test(source) // 远程 css 文件
+        || /^https?:\/\/.*\|css$/.test(source) // 远程 css 文件(兼容非 .css 后缀)
+      ) {
+        remoteCssUrls.add(source.replace(/\|css$/, ''));
+        // 作为外部模块，不参与编译
+        return { id: source, external: true };
       }
       return null;
     },
     async transform(code: string, id: string) {
-      const moduleInfo = this.getModuleInfo(id);
-      // 给入口文件添加导入样式的代码
-      if (moduleInfo && moduleInfo.isEntry) {
-        // @ts-ignore
-        const concat = new Concat(true, id, '\n');
-        concat.add(null, `import "${STYLE_EXTERNALS_MODULE}";`);
-        concat.add(id, code, this.getCombinedSourcemap().toString());
-        return {
-          code: concat.content.toString(),
-          map: concat.sourceMap,
-        };
-      }
-      if (id.indexOf(REMOTE_CSS_PREFIX) === 0) return null;
       if (!filter(id)) return null;
-
       // 配置 loader 上下文
       const loaderProps: CssLoaderProps<any> = {
         content: code,
@@ -164,7 +138,6 @@ const rollupStylePlugin = (options: RollupStylePluginOptions): Plugin => {
         map: null,
       };
     },
-
     augmentChunkHash(chunkInfo) {
       if (allCssFiles.size === 0 || !chunkInfo.isEntry) return;
       const extractedValue = [...allCssFiles].reduce((object, [key, value]) => ({
@@ -174,11 +147,18 @@ const rollupStylePlugin = (options: RollupStylePluginOptions): Plugin => {
       return JSON.stringify(extractedValue);
     },
     renderChunk(code, chunk, outputOptions) {
-      // 如果存在样式
-      if (allCssFiles.size && chunk.isEntry && (outputOptions.dir || outputOptions.file)) {
+      // 如果存在样式文件
+      if ((allCssFiles.size || remoteCssUrls.size) && chunk.isEntry && (outputOptions.dir || outputOptions.file)) {
         const concat = new Concat(true, chunk.fileName, '\n');
-        concat.add(null, `import "${STYLE_EXTERNALS_MODULE}";`);
-        concat.add(chunk.fileName, code);
+        if (allCssFiles.size) {
+          concat.add(null, `import "${STYLE_EXTERNALS_MODULE}";`);
+        }
+        if (remoteCssUrls.size) {
+          remoteCssUrls.forEach((url) => {
+            concat.add(null, `import "${url}";`);
+          });
+        }
+        concat.add(chunk.fileName, code, chunk.map?.toString());
         return {
           code: concat.content.toString(),
           map: concat.sourceMap,
@@ -225,17 +205,10 @@ const rollupStylePlugin = (options: RollupStylePluginOptions): Plugin => {
       if (sourceMap && concat.sourceMap) {
         this.emitFile({ fileName: mapFileName, type: 'asset', source: concat.sourceMap });
       }
-      if (['systemjs', 'system'].includes(outputOptions.format)) {
-        entryChunks.forEach((chunk) => {
-          // 替换
-          chunk[1].code = chunk[1].code.replace(STYLE_EXTERNALS_MODULE, `${STYLE_EXTERNALS_MODULE}?link=./${fileName}`);
-        });
-      } else if (['commonjs', 'cjs', 'module', 'esm', 'es', 'amd'].includes(outputOptions.format)) {
-        entryChunks.forEach((chunk) => {
-          // 替换
-          chunk[1].code = chunk[1].code.replace(STYLE_EXTERNALS_MODULE, `./${fileName}`);
-        });
-      }
+      entryChunks.forEach((chunk) => {
+        // 替换成相对路径
+        chunk[1].code = chunk[1].code.replace(STYLE_EXTERNALS_MODULE, `./${fileName}`);
+      });
     },
   };
 };
