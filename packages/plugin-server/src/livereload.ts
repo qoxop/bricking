@@ -11,7 +11,7 @@ function createWss(app: ReturnType<typeof express>) {
   const wss = new WebSocketServer({ noServer: true });
   server.on('upgrade', (request, socket, head) => {
     if (request.url) {
-      const { pathname } = new URL(request.url);
+      const pathname = /^http/.test(request.url) ? new URL(request.url).pathname : request.url;
       if (pathname === WS_PATH) {
         wss.handleUpgrade(request, socket, head, (ws) => {
           wss.emit('connection', ws, request);
