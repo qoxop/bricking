@@ -18,6 +18,7 @@ import rollupLog from './plugins/rollup-log';
 import { getBaseLibInfo } from './install';
 import { BrickingJson } from './typing';
 import * as logs from './utils/log';
+import RollupModule from './plugins/rollup-module';
 
 const cleanPath = async (output: string) => {
   await fsExtra.emptyDir(output);
@@ -46,7 +47,7 @@ const getModuleAliasFromTsConfig = () => {
  * 获取外部依赖列表
  */
 const getExternals = async () => {
-  let { peerDependencies, name } = getBaseLibInfo() || {};
+  let { peerDependencies, name } = getBaseLibInfo();
   if (peerDependencies) {
     peerDependencies = Object.keys(peerDependencies).reduce((prev, cur) => {
       prev[cur.replace(/^@types\//, '')] = true;
@@ -57,7 +58,6 @@ const getExternals = async () => {
     ...Object.keys(peerDependencies || {}),
     ...Object.keys(config.html.importMaps || {}),
     ...(config.externals || []),
-    '___INJECT_STYLE_LINK___',
     ...(name ? [new RegExp(`^${name}`)] : []),
   ];
 };
@@ -65,21 +65,23 @@ const getExternals = async () => {
 /**
  * 获取通用插件列表
  */
-const getCommonPlugin = ({
-  output,
-  target = 'es2017',
-  useEsbuild = false,
-}: { useEsbuild?: boolean; target?: string; output?: string}) => ([
-  nodeResolve({ browser: true, extensions: ['.mjs', '.js', '.jsx', '.tsx', '.ts'] }),
+const getCommonPlugin = () => ([
+  nodeResolve({
+    browser: true,
+    exportConditions: ['svelte', 'vue'],
+    extensions: ['.mjs', '.js', '.jsx', '.tsx', '.ts', '.svelte', '.vue'],
+  }),
   commonjs(),
   builtins({ crypto: true }),
   alias({
     entries: getModuleAliasFromTsConfig(),
     customResolver: nodeResolve({
-      extensions: ['.mjs', '.js', '.jsx', '.ts', '.tsx', '.json', '.sass', '.scss', '.less'],
+      extensions: ['.mjs', '.js', '.jsx', '.ts', '.tsx', '.json', '.sass', '.scss', '.less', '.svelte', '.vue'],
     }) as any,
   }),
   jsonPlugin(),
+  // 自定义插件
+  ...(config.plugins || []),
   // 打包样式文件
   rollupStylePlugin({ ...config.style }),
   // 处理文件
@@ -99,28 +101,20 @@ const getCommonPlugin = ({
     },
     preventAssignment: true,
   }),
-  // 编译 ts
-  useEsbuild
-    ? esbuild({
-      include: /\.[jt]sx?$/,
-      minify: process.env.NODE_ENV === 'production',
-      target: process.env.NODE_ENV === 'production' ? (target || 'es2017') : 'esnext',
-      jsx: 'transform',
-      jsxFactory: 'React.createElement',
-      jsxFragment: 'React.Fragment',
-      tsconfig: tsConfigPath,
-      loaders: {
-        '.json': 'json',
-      },
-    })
-    : require('@rollup/plugin-typescript')({
-      tsconfig: tsConfigPath,
-      sourceMap: true,
-      inlineSources: true,
-      compilerOptions: {
-        ...(output ? { outDir: output } : {}),
-      },
-    }),
+  // 编译 tsx? jsx?
+  esbuild({
+    include: /\.[jt]sx?$/,
+    minify: false,
+    target: 'esnext',
+    jsx: 'transform',
+    jsxFactory: 'React.createElement',
+    jsxFragment: 'React.Fragment',
+    tsconfig: tsConfigPath,
+    loaders: {
+      '.json': 'json',
+      '.js': 'jsx',
+    },
+  }),
 ]);
 
 /**
@@ -134,11 +128,6 @@ const getCommonOptions = async (
   },
   callback?: ((opt: rollup.RollupOptions) => rollup.RollupOptions),
 ) => {
-  let useEsbuild = false;
-  const target = (tsConfig?.compilerOptions?.target || '').toLowerCase();
-  if (target && !['es3', 'es5'].includes(target)) {
-    useEsbuild = true;
-  }
   const options: rollup.RollupOptions = {
     preserveEntrySignatures: 'exports-only',
     context: 'window',
@@ -147,14 +136,7 @@ const getCommonOptions = async (
       ...Object.keys(params.importMaps || {}),
       ...(await getExternals()),
     ],
-    plugins: [
-      // 通用插件
-      ...getCommonPlugin({ useEsbuild, target, output: /lib/.test(params.mode) ? outputPackPath : undefined }),
-      // 自定义插件
-      ...(config.plugins || []),
-      // 压缩
-      require('rollup-plugin-terser').terser({ format: { comments: false } }),
-    ],
+    plugins: getCommonPlugin(),
   };
   return callback ? (callback(options) || options) : options;
 };
@@ -199,6 +181,10 @@ const build = async (
     const rollupOutput = await bundle.write({
       dir: output,
       format: 'systemjs',
+      plugins: [
+        RollupModule(true, config.babelOption),
+        require('@rollup/plugin-terser').default({ format: { comments: false } }),
+      ],
       entryFileNames: '[name]-[hash].js',
       sourcemap: true,
     });
@@ -221,7 +207,7 @@ const build = async (
   if (mode === 'lib') {
     const combineBundle = await rollup.rollup(await getCommonOptions({ mode: 'app', importMaps }, (opt) => {
       // 插入捆绑插件
-      opt.plugins?.unshift(rollupBundle({
+      (opt.plugins as any[])?.unshift(rollupBundle({
         configPath,
         realEntry: entry,
         pkgName: packageJson.name,
@@ -231,6 +217,10 @@ const build = async (
     const combineRollupOutput = await combineBundle.write({
       dir: output,
       format: 'systemjs',
+      plugins: [
+        RollupModule(true, config.babelOption),
+        require('@rollup/plugin-terser').default({ format: { comments: false } }),
+      ],
       entryFileNames: `${packageJson.name}-[hash].js`,
       sourcemap: true,
     });
@@ -260,17 +250,18 @@ const watch = async (
     opt.output = {
       dir: output,
       format: 'system',
+      plugins: [RollupModule()],
       entryFileNames: mode === 'lib' ? libBundleName : '[name].js',
       sourcemap: true,
     };
     opt.watch = { buildDelay: 300, exclude: ['node_modules/**'] };
-    opt.plugins?.push(livereloadServer(config.devServe as any)); // 热重载
-    mode === 'lib' && opt.plugins?.unshift(rollupBundle({ // 捆绑插件
+    (opt.plugins as any[])?.push(livereloadServer(config.devServe as any)); // 热重载
+    mode === 'lib' && (opt.plugins as any)?.unshift(rollupBundle({ // 捆绑插件
       configPath,
       realEntry: entry,
       pkgName: packageJson.name,
     }));
-    opt.plugins = opt.plugins?.filter((item) => item && item.name !== 'terser'); // 移除 terser 压缩插件
+    opt.plugins = (opt.plugins as any[])?.filter((item) => item && item.name !== 'terser'); // 移除 terser 压缩插件
     return opt;
   }));
   // 如果是纯粹的 lib 模式，需要实时生成类型，以便于调试
@@ -310,28 +301,29 @@ const watch = async (
 
 /**
  * 设置 html 文件
- * @param importMaps
- * @param browseEntry
  */
-async function setHtml(importMaps: Record<string, string>, browseEntry: string) {
-  const baseLibInfo = getBaseLibInfo();
-  await btkDom.injectScripts(btkDom.getHtmlDom(config.html.path), [
-    {
-      url: baseLibInfo?.remoteEntry,
-    },
-    {
-      content: JSON.stringify({ imports: {
-        ...(importMaps || ''),
-        ...(config.html.importMaps || {}),
-      } }),
-      type: 'systemjs-importmap',
-    },
-    ...(config.html.scripts || []),
-    {
-      url: browseEntry,
-      type: 'systemjs-module',
-    },
-  ], config.html.replacement || {}, config.output);
+async function setHtml(importMaps: Record<string, string>, browseEntry: string, systemBase: string) {
+  const scripts: any[] = [];
+  const imports = { ...(importMaps || {}), ...(config.html?.importMaps || {}) };
+  if (systemBase) {
+    scripts.push({ url: systemBase });
+  }
+  if (Object.keys(imports).length) {
+    scripts.push({ content: JSON.stringify({ imports }), type: 'systemjs-importmap' });
+  }
+  if (config.html?.scripts?.length) {
+    scripts.push(...config.html.scripts);
+  }
+  scripts.push({
+    url: browseEntry,
+    type: 'systemjs-module',
+  });
+  await btkDom.injectScripts(
+    btkDom.getHtmlDom(config.html.path),
+    scripts,
+    config.html.replacement || {},
+    config.output,
+  );
 }
 
 async function setBrickingJson(
@@ -341,9 +333,6 @@ async function setBrickingJson(
 ) {
   const { publicPath, output, modules } = config;
   const { version, name } = packageJson;
-  const requires = imports.filter(
-    (item) => !/^___INJECT_STYLE_LINK___/.test(item),
-  );
   const baseLibInfo = getBaseLibInfo();
   const json: BrickingJson = {
     name,
@@ -351,9 +340,9 @@ async function setBrickingJson(
     bundle,
     entry: importMaps,
     dependence: {
-      requires,
+      requires: imports,
     },
-    externals: Object.keys(modules).map((k) => (`${name}/${k}`)),
+    externals: Object.keys(modules || {}).map((k) => (`${name}/${k}`)),
     updateTime: Date.now(),
     publicPath,
   };
@@ -420,12 +409,20 @@ export async function runBuild(devMode: boolean) {
 
   // 应用构建(编译构建bootstrap)
   if (/app/.test(config.mode)) {
+    const baseLibInfo = getBaseLibInfo();
     const { rollupOutput: debugRollupOut } = await build(config.bootstrap, config.output, importMaps, 'app');
     const browseEntryChunk = (debugRollupOut as rollup.RollupOutput).output.find((chunk) => chunk.type === 'chunk' && chunk.isEntry) as any;
+    if (config.basePackage === 'use-local-runtime') {
+      fsExtra.copySync(
+        path.resolve(__dirname, '../libs/bricking.min.js'),
+        path.resolve(config.output, './bricking.min.js'),
+      );
+    }
     // 输出 html 文件
     await setHtml(
       importMaps,
-      publicPath ? `${publicPath}${browseEntryChunk.fileName}` : `/${browseEntryChunk.fileName}`,
+      publicPath ? `${publicPath}${browseEntryChunk.fileName}` : `./${browseEntryChunk.fileName}`,
+      baseLibInfo?.remoteEntry || (publicPath ? `${publicPath}bricking.min.js` : './bricking.min.js'),
     );
   }
 
@@ -475,20 +472,28 @@ export async function runBuild(devMode: boolean) {
 export async function runStart() {
   await cleanPath(config.output);
   const start = Date.now();
-
   let importMaps = {};
-  // 构建模块
-  const libBundleName = await watch(config.modules, config.output, {}, config.mode);
-  if (config.modules && config.mode !== 'lib') {
-    importMaps = Object.keys(config.modules).reduce((prev, cur) => ({ ...prev, [`${cur}`]: `/${cur}.js` }), {});
+  const baseLibInfo = getBaseLibInfo();
+  const publicPath = `${'http'}://${config.devServe.host}:${config.devServe.port}/`;
+  if (config.modules) {
+    // 构建模块
+    const libBundleName = await watch(config.modules, config.output, {}, config.mode);
+    if (config.modules && config.mode !== 'lib') {
+      importMaps = Object.keys(config.modules).reduce((prev, cur) => ({ ...prev, [`${cur}`]: `/${cur}.js` }), {});
+    }
+    await setBrickingJson(importMaps, [], `${publicPath}${libBundleName}`);
   }
-  const publicPath = `${'http'}://${config.devServe.host}:${config.devServe.port}`;
-  await setBrickingJson(importMaps, [], `${publicPath}/${libBundleName}`);
 
   // 构建应用
   if (config.bootstrap && config.html) {
     await watch({ 'browse-entry': config.bootstrap }, config.output, importMaps, 'app');
-    await setHtml(importMaps, '/browse-entry.js');
+    if (config.basePackage === 'use-local-runtime') {
+      fsExtra.copySync(
+        path.resolve(__dirname, '../libs/bricking.min.js'),
+        path.resolve(config.output, './bricking.min.js'),
+      );
+    }
+    await setHtml(importMaps, '/browse-entry.js', baseLibInfo?.remoteEntry || `${publicPath}bricking.min.js`);
   }
   if (config.devServe.open) {
     const url = /^http/.test(config.devServe.open)

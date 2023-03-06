@@ -3,7 +3,7 @@
  * 将所有的样式文件进行捆绑，统一通过入口 chunk 进行引入(通过 link 方式)
  */
 import path from 'path';
-import { createFilter } from 'rollup-pluginutils';
+import { createFilter } from '@rollup/pluginutils';
 import Concat from 'concat-with-sourcemaps';
 import { GetModuleInfo, OutputChunk, Plugin } from 'rollup';
 import { btkHash, btkPath } from '@bricking/toolkit';
@@ -87,6 +87,7 @@ const rollupStylePlugin = (options: RollupStylePluginOptions): Plugin => {
       if (
         /^https?:\/\/.*\.css(\?.*)?$/.test(source) // 远程 css 文件
         || /^https?:\/\/.*\|css$/.test(source) // 远程 css 文件(兼容非 .css 后缀)
+        || source === STYLE_EXTERNALS_MODULE
       ) {
         remoteCssUrls.add(source.replace(/\|css$/, ''));
         // 作为外部模块，不参与编译
@@ -149,16 +150,20 @@ const rollupStylePlugin = (options: RollupStylePluginOptions): Plugin => {
     renderChunk(code, chunk, outputOptions) {
       // 如果存在样式文件
       if ((allCssFiles.size || remoteCssUrls.size) && chunk.isEntry && (outputOptions.dir || outputOptions.file)) {
+        const newImports:string[] = [];
         const concat = new Concat(true, chunk.fileName, '\n');
         if (allCssFiles.size) {
+          newImports.push(STYLE_EXTERNALS_MODULE);
           concat.add(null, `import "${STYLE_EXTERNALS_MODULE}";`);
         }
         if (remoteCssUrls.size) {
           remoteCssUrls.forEach((url) => {
+            newImports.push(url);
             concat.add(null, `import "${url}";`);
           });
         }
-        concat.add(chunk.fileName, code, chunk.map?.toString());
+        chunk.imports.unshift(...newImports);
+        concat.add(chunk.fileName, code);
         return {
           code: concat.content.toString(),
           map: concat.sourceMap,

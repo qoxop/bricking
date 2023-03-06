@@ -4,7 +4,6 @@
 import MD5 from 'md5';
 import { createHash } from 'crypto';
 import { makeLegalIdentifier } from '@rollup/pluginutils';
-// eslint-disable-next-line import/no-unresolved
 import { fileIterator } from './files';
 
 /**

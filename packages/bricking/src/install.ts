@@ -64,36 +64,47 @@ const installDependencies = async (dependencies: Record<string, string>) => {
 };
 
 type BaseLibInfo = {
-  name: string,
-  version: string,
-  peerDependencies: Record<string, string>;
-  remoteEntry: string;
+  name?: string,
+  version?: string,
+  peerDependencies?: Record<string, string>;
+  remoteEntry?: string;
   document?: string;
 }
 
-let baseLibInfo: BaseLibInfo|null;
+let baseLibInfo: BaseLibInfo = {};
 function getBaseLibInfo() {
   return baseLibInfo;
 }
 
 async function initBaseLibInfo() {
-  let _baseLibInfo:BaseLibInfo = null as any;
-  if (typeof config.basePackage === 'string') {
-    // 以 json 链接方式配置
-    const { name, publicPath, typesPack, ...other } = await btkNetwork.getJson<any>(config.basePackage);
-    _baseLibInfo = {
-      ...other,
-      name,
-      version: `${publicPath}${typesPack}`,
-    };
-    const baseLibAbsent = !packageJson.dependencies[name];
-    const baseLibDifferent = packageJson.dependencies[name] !== _baseLibInfo.version;
-    const baseLibNoInWorkspace = !/workspace/.test(packageJson.dependencies[name]);
-    if (baseLibAbsent || (baseLibDifferent && baseLibNoInWorkspace)) {
-      await installDependencies({ [name]: _baseLibInfo.version });
+  let _baseLibInfo:BaseLibInfo = {};
+  if (config.basePackage === 'use-cdn-runtime') {
+    // 加载CDN运行时脚本
+    _baseLibInfo.remoteEntry = 'https://unpkg.com/@bricking/runtime@0.4.6/dist/bricking.min.js';
+  } else if (config.basePackage === 'use-local-runtime') {
+    // 加载本地运行时脚本
+    _baseLibInfo.remoteEntry = config.publicPath ? `${config.publicPath}bricking.min.js` : './bricking.min.js';
+  } else if (typeof config.basePackage === 'string') {
+    if (/\.js$/.test(config.basePackage)) {
+      // 指定一个自定义的运行时脚本
+      _baseLibInfo.remoteEntry = config.basePackage;
+    } else {
+      // 指定一个运行时 + 共享依赖的包，以 json 配置文件的方式
+      const { name, publicPath, typesPack, ...other } = await btkNetwork.getJson<any>(config.basePackage);
+      _baseLibInfo = {
+        ...other,
+        name,
+        version: `${publicPath}${typesPack}`,
+      };
+      const baseLibAbsent = !packageJson.dependencies[name];
+      const baseLibDifferent = packageJson.dependencies[name] !== _baseLibInfo.version;
+      const baseLibNoInWorkspace = !/workspace/.test(packageJson.dependencies[name]);
+      if (_baseLibInfo.version && (baseLibAbsent || (baseLibDifferent && baseLibNoInWorkspace))) {
+        await installDependencies({ [name]: _baseLibInfo.version });
+      }
     }
   } else if (config.basePackage?.name) {
-    // 指定名称和版本号的方式配置
+    // 指定一个运行时 + 共享依赖的包, 以 npm 包的方式
     const { name, version = 'latest' } = config.basePackage;
     let modulePath = '';
     let pkgInfo = {} as any;
@@ -120,9 +131,8 @@ async function initBaseLibInfo() {
 }
 
 async function install(deps: string[] = []) {
-  // 不存在就不安装了
-  if (!baseLibInfo) return;
   const { peerDependencies } = baseLibInfo;
+  if (!peerDependencies) return;
   if (deps.length === 0) {
     const choices = Object.entries(peerDependencies).map(([name, version]) => ({
       name,

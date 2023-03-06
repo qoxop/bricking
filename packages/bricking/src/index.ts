@@ -42,6 +42,9 @@ export function defineBricking(options: BrickingOptions): Required<BrickingOptio
   if (!options.externals) {
     options.externals = [];
   }
+  if (!options.basePackage) {
+    options.basePackage = 'use-local-runtime';
+  }
   if (options.doPack === true) {
     try {
       const { name } = require(packageJsonPath);
@@ -65,13 +68,6 @@ export function defineBricking(options: BrickingOptions): Required<BrickingOptio
   options.plugins = options.plugins ?? [];
   if (!options.bootstrap && (process.env.NODE_ENV === 'development')) {
     throw new Error('options.bootstrap is require~');
-  }
-  if (!(
-    (typeof options.basePackage === 'string' && options.basePackage)
-        // @ts-ignore
-        || (options.basePackage?.name && options.basePackage?.version)
-  )) {
-    throw new Error('options.basePackage is require~');
   }
   return options as any;
 }

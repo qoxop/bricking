@@ -27,7 +27,7 @@ if (!fs.existsSync(DistDir)) fs.mkdirSync(DistDir);
     plugins: [
       require('@rollup/plugin-node-resolve').nodeResolve(),
       require('@rollup/plugin-commonjs')(),
-      require('rollup-plugin-terser').terser({ format: { comments: false } }),
+      require('@rollup/plugin-terser').default({ format: { comments: false } }),
     ],
   });
   await rollupBundle.write({
