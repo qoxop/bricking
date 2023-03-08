@@ -1,0 +1,22 @@
+{
+    "included": ["src/**/*"],
+    "compilerOptions": {
+        "baseUrl": ".",
+        "outDir": "dist",
+        "target": "ES2018",
+        "declaration": true,
+        "sourceMap": true,
+        "noUnusedLocals": true,
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+        "module": "esnext",
+        "skipLibCheck": true,
+        "noImplicitAny": false,
+        "jsx": "react",
+        "typeRoots": ["node_modules/@types", "node_modules/@bricking/runtime/global.d.ts"]
+    },
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}

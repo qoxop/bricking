@@ -1,0 +1,29 @@
+{
+  "extends": "@tsconfig/svelte/tsconfig.json",
+  "include": ["src/**/*", "*.svelte", "node_modules/svelte"],
+  "exclude": ["__sapper__/*", "public/*", "dist"],
+  "compilerOptions": {
+    "typeRoots": ["node_modules/svelte"],
+    "composite": true,
+    "baseUrl": ".",
+    "outDir": "dist",
+    "target": "ES2015",
+    "declaration": true,
+    "sourceMap": true,
+    "noUnusedLocals": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "module": "esnext",
+    "skipLibCheck": false,
+    "noImplicitAny": false,
+    "jsx": "react",
+    "preserveSymlinks": true,
+    "lib": [
+      "dom",
+      "es2015",
+      "ES2016",
+      "ES2019"
+    ],
+    "paths": {}
+  }
+}
