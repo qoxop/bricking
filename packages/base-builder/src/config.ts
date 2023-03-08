@@ -277,7 +277,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
               and: [/\.(ts|tsx|js|jsx|md|mdx)$/],
             },
           },
-          // app script
+          // @ts-ignore
           compileOptions.loaderModify.appScript({
             test: /\.(js|mjs|jsx|ts|tsx)$/,
             exclude: /(node_modules|bower_components)/,
