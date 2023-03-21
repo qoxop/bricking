@@ -12,7 +12,7 @@ import { createFilter, FilterPattern } from '@rollup/pluginutils';
 
 const mkdir = util.promisify(fs.mkdir);
 const PLUGIN_NAME = 'bricking-url';
-const PREFIX = `\0${PLUGIN_NAME}:`;
+const PREFIX = `\0${PLUGIN_NAME}:::`;
 
 const fsStatPromise = util.promisify(fs.stat);
 const fsReadFilePromise = util.promisify(fs.readFile);
@@ -34,11 +34,6 @@ type UrlOptions = {
    * 发布地址&路径
    */
   publicPath?: string;
-  /**
-   * - bundle 模式会将文件转化成字符串链接
-   * - 非 bundle 模式只会改写文件名和路径
-   */
-  bundle?: boolean;
 }
 
 function copy(src: string, dest: string) {
@@ -62,15 +57,6 @@ async function mkDir(dir: string) {
   }
 }
 
-function getCode(relativePath: string, publicPath = '') {
-  // Windows fix - exports must be in unix format
-  relativePath = relativePath.split(sep).join(posix.sep);
-  if (publicPath && /https?:\/\/.*/.test(publicPath)) {
-    return `export default "${publicPath}${relativePath}"`;
-  }
-  return `export default new URL("${relativePath}", import.meta.url).href`;
-}
-
 /**
  * 共享资源映射表，保证同一份资源只被处理一次
  */
@@ -83,84 +69,104 @@ const url = (options:UrlOptions = {}):Plugin => {
     exclude = [],
     publicPath = '',
     fileName = '[hash][extname]',
-    bundle = true,
   } = options;
   const filter = createFilter(include, exclude);
-  const resolveAssets = (id, buffer) => {
+  const resolveAssets = async (id, buffer) => {
     const cachePath = AssetsMap.get(id);
-    if (cachePath) {
-      return id;
+    if (cachePath) return cachePath;
+    // data url
+    const fStat = await fsStatPromise(id);
+    if (fStat.size < limit) {
+      const dataUrl = btkFunc.getDataUrl(id, buffer);
+      AssetsMap.set(id, dataUrl);
+      return dataUrl;
     }
+    // relative url
     const hash = btkHash.getHash(buffer, id);
     const ext = path.extname(id);
     const name = path.basename(id, ext);
 
     const outputFileName = fileName
-      .replace(/\[hash\]/g, hash)
-      .replace(/\[extname\]/g, ext)
-      .replace(/\[name\]/g, name);
+      .replace(/\[hash]/g, hash)
+      .replace(/\[extname]/g, ext)
+      .replace(/\[name]/g, name);
     AssetsMap.set(id, outputFileName);
     return outputFileName;
   };
   return {
     name: PLUGIN_NAME,
-    async resolveId(source, importer) {
-      if (importer && source.startsWith(PREFIX)) {
-        return {
-          id: source,
-          external: true,
-        };
-      }
-      return null;
-    },
     async load(id: string) {
       if (!filter(id)) {
         return null;
       }
-      if (!bundle) {
-        const buff = await fsReadFilePromise(id);
-        const outputFileName = resolveAssets(id, buff);
-        return `export * from "${PREFIX + outputFileName}";\n export { default } from "${PREFIX + outputFileName}";\n`;
+      const buff = await fsReadFilePromise(id);
+      const outputFileName = await resolveAssets(id, buff);
+      // 导出 base64 URL
+      if (/^data:/.test(outputFileName)) {
+        return `export default "${outputFileName}"`;
       }
-      return Promise.all([fsStatPromise(id), fsReadFilePromise(id)]).then(([stats, buffer]) => {
-        if ((limit && stats.size > limit) || limit === 0) {
-          const outputFileName = resolveAssets(id, buffer);
-          return getCode(outputFileName, publicPath);
+      // 导出字符串模板
+      return `export default "${PREFIX}${outputFileName}"`;
+    },
+    async generateBundle(outputOptions, bundle) {
+      if (!Object.keys(bundle).length || !AssetsMap.size) return Promise.resolve();
+      // 将模板字符串替换成正确的路径或代码
+      const isSourceJs = ['commonjs', 'cjs', 'module', 'esm', 'es'].includes(outputOptions.format);
+      Object.entries(bundle).forEach(([, chunk]) => {
+        if (chunk.type === 'chunk') {
+          // 不存在对静态资源的引用时直接跳过
+          if (chunk.code.indexOf(PREFIX) === -1) return;
+          const ast = parse(chunk.code, {
+            parser: {
+              parse: (source: string) => this.parse(source, { ecmaVersion: 'latest', locations: true }),
+            },
+          });
+          const bds = types.builders;
+          visit(ast, {
+            visitLiteral(nodePath) {
+              const { value } = nodePath.node;
+              if (typeof value !== 'string' || !value.startsWith(PREFIX)) return this.traverse(nodePath);
+              const relativeUrl = value
+                .replace(PREFIX, (/^\.\//.test(value) ? '' : './'))
+                .split(sep)
+                .join(posix.sep); // Windows fix - exports must be in unix format
+              const replacementNode = isSourceJs
+                ? bds.callExpression( // 编译成 npm 包时，使用 require 语句引入图片
+                  bds.identifier('require'),
+                  [bds.literal(relativeUrl)],
+                )
+                : ( // 使用网络路径
+                  publicPath
+                    ? bds.literal(`${publicPath}${relativeUrl.replace(/^\.\//, '')}`)
+                    : bds.memberExpression(
+                      bds.newExpression(
+                        bds.identifier('URL'),
+                        [
+                          bds.literal(relativeUrl),
+                          bds.identifier('import.meta.url'),
+                        ],
+                      ),
+                      bds.identifier('href'),
+                    )
+                );
+              nodePath.replace(replacementNode);
+              this.traverse(nodePath);
+            },
+          });
+          // 修改代码 和 source-map
+          const result = print(ast);
+          chunk.code = result.code;
+          chunk.map = require('merge-source-map')(chunk.map, result.map);
         }
-        return `export default "${btkFunc.getDataUrl(id, buffer)}"`;
       });
-    },
-    async renderChunk(code) {
-      if (!bundle) {
-        // TODO SourceMap 规则
-        const ast = parse(code, {
-          parser: {
-            parse: (source: string) => this.parse(source, { ecmaVersion: 'latest', locations: true }),
-          },
-        });
-        visit(ast, {
-          visitLiteral(nodePath) {
-            const { value } = nodePath.node;
-            if (typeof value !== 'string' || !value.startsWith(PREFIX)) return this.traverse(nodePath);
-            const replacementNode = types.builders.literal(value.replace(PREFIX, (/^\.\//.test(value) ? '' : './')));
-            nodePath.replace(replacementNode);
-            this.traverse(nodePath);
-          },
-        });
-        const result = print(ast);
-        return {
-          code: result.code,
-          map: null,
-        };
-      }
-      return null;
-    },
-    generateBundle: async function write(outputOptions) {
-      if (AssetsMap.size === 0) return;
+
+      // 资源写入
       const base = outputOptions.dir || path.dirname(outputOptions.file as string);
       await mkDir(base);
       await Promise.all(
         Array.from(AssetsMap.entries()).map(async ([id, output]) => {
+          // data url 不需要写入本地
+          if (/^data:/.test(output)) return;
           await mkDir(path.join(base, path.dirname(output)));
           return copy(id, path.join(base, output));
         }),

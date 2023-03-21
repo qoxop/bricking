@@ -3,9 +3,7 @@
  */
 import * as fs from 'fs';
 import * as path from 'path';
-import { btkPath } from '@bricking/toolkit';
 import { getUserOptions } from './options';
-import { excludePackages } from './utils/constants';
 
 const workspace = process.cwd();
 
@@ -28,7 +26,7 @@ const paths = {
   brickingrc: process.env.BRICKING_RC,
 };
 
-const getCustomWebpackPath = () => {
+function getCustomWebpackPath() {
   let { bundle: { webpack: customWebpackPath } } = userOptions;
   if (!customWebpackPath) {
     return false;
@@ -37,14 +35,12 @@ const getCustomWebpackPath = () => {
     customWebpackPath = path.resolve(workspace, customWebpackPath);
   }
   return fs.existsSync(customWebpackPath) ? customWebpackPath : false;
-};
+}
 
 const getPackageJson = () => {
-  if (!fs.existsSync(paths.packageJson)) {
-    throw new Error(`${paths.packageJson} 不存在 ～`);
-  }
+  if (!fs.existsSync(paths.packageJson)) throw new Error(`${paths.packageJson} 不存在 ～`);
 
-  const { bundle: { dependencies: deps } } = getUserOptions();
+  const { bundle: { expose, exposeAll, exposeExclude } } = getUserOptions();
   let {
     name,
     version,
@@ -53,58 +49,37 @@ const getPackageJson = () => {
     dependencies = {},
     peerDependencies = {},
   } = require(paths.packageJson);
-
-  if (deps.autoInject) {
-    const { exclude = [] } = deps;
-    // 将 dependencies 改为 peerDependencies(用作开发时类型提醒)
-    peerDependencies = { ...peerDependencies, ...dependencies };
-    // 移除内置包依赖
-    excludePackages.forEach((_name) => peerDependencies[_name] && (delete peerDependencies[_name]));
-    // 移除 exclude
-    exclude.forEach((_name) => {
-      if (peerDependencies[_name]) {
-        (delete peerDependencies[_name]);
-      }
-      if (peerDependencies[`@types/${_name}`]) {
-        delete peerDependencies[`@types/${_name}`];
+  let shareDependencies: Record<string, string> = {};
+  if (exposeAll) {
+    Object.entries(dependencies).forEach(([key, value]) => {
+      const excluded = exposeExclude.some((item) => (typeof item === 'string' ? item === key : item.test(key)));
+      if (!excluded) {
+        shareDependencies[key] = value as string;
       }
     });
-    return {
-      name,
-      version,
-      description,
-      author,
-      peerDependencies,
-    };
+  } else {
+    expose.forEach((item) => {
+      if (typeof item === 'string') {
+        if (dependencies[item] !== undefined) {
+          shareDependencies[item] = dependencies[item];
+        }
+      } else if (dependencies[item.name]) {
+        shareDependencies[item.name] = dependencies[item.name];
+      }
+    });
   }
-  const { include = [] } = deps;
-  peerDependencies = include.reduce((pre, moduleName) => {
-    const modulePath = btkPath.findModulePath(moduleName);
-    const { version: _version } = require(path.resolve(modulePath, 'package.json'));
-    return { ...pre, [moduleName]: _version };
-  }, {});
   return {
     name,
+    author,
     version,
     description,
-    author,
-    peerDependencies,
+    peerDependencies: { ...peerDependencies, ...shareDependencies },
   };
-};
-
-const reloadOptions = () => {
-  const cacheKey = require.resolve(paths.brickingrc);
-  if (require.cache[cacheKey]) {
-    delete require.cache[cacheKey];
-    require(paths.brickingrc);
-  }
-  return getUserOptions();
 };
 
 export {
   paths,
   workspace,
-  reloadOptions,
   getPackageJson,
   getCustomWebpackPath,
 };

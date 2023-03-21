@@ -1,0 +1,30 @@
+{
+  "include": ["src/**/*", "./bootstrap.tsx"],
+  "exclude": ["__sapper__/*", "public/*", "dist"],
+  "compilerOptions": {
+    "composite": true,
+    "baseUrl": ".",
+    "outDir": "dist",
+    "target": "es2015",
+    "declaration": true,
+    "sourceMap": true,
+    "noUnusedLocals": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "module": "esnext",
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "jsx": "react",
+    "preserveSymlinks": true,
+    "lib": [
+      "dom",
+      "es2015",
+      "ES2016",
+      "ES2019"
+    ],
+    "paths": {
+      "src/*": ["./src/*"],
+      "todo-app": ["./src/bundle.ts"]
+    }
+  }
+}

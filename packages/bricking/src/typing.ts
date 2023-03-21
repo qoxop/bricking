@@ -2,39 +2,18 @@ import { Plugin } from 'rollup';
 import { RollupStylePluginOptions as StyleOptions } from '@bricking/plugin-style';
 import { ServeConfig } from '@bricking/plugin-server';
 
-export type BrickingAsset = {
-  modules: {
-    [name: string]: string
-  },
-  version: string;
-  publicPath: string;
-  updateTime: string;
-}
-
 export type BrickingOptions = {
-  /**
-   * 模块入口文件配置
-   */
-  entry?: {
-    [name: string]: string;
-  };
-  /**
-   * 源码基础路径, 默认'./src'
-   */
-  sourceBase?: string;
-  /**
-   * 打包模式
-   */
+  /** 打包模式 */
   mode?: 'app'|'lib'|'app|lib';
-  /**
-   * 输出目录
-   */
+  /** 浏览器入口 */
+  bootstrap: string;
+  /** 模块入口文件配置 */
+  modules?: Record<string, string>;
+  /** 输出目录 */
   output?: string;
-  externals?: string[];
-  /**
-   * 浏览器入口
-   */
-  browseEntry: string;
+  /** 第三方依赖库 */
+  externals?: (string | RegExp)[];
+  /** 入口 html 配置 */
   html?: {
     path: string;
     scripts?: {
@@ -46,27 +25,16 @@ export type BrickingOptions = {
     replacement?: Record<string, string>;
   },
   /**
-   * 公共基座包
+   * 共享的基础依赖包(内置模块映射)
    */
-  basePackage: {
-    name: string;
-    version: string;
-  } | string;
-  /**
-   * 是否压缩
-   */
+  basePackage?: ({ name: string; version: string; }) | 'use-local-runtime' | 'use-cdn-runtime' | string;
+  /** 是否压缩 */
   minimize?: boolean;
-  /**
-   * 是否进行打包, 如果需要自定义压缩包名称，传入字符串
-   */
+  /** 是否进行打包, 如果需要自定义压缩包名称, 可传入字符串用于指定包名 */
   doPack?: string|true;
-  /**
-   * 样式配置
-   */
+  /** 样式配置 */
   style?: StyleOptions,
-  /**
-   * 静态资源配置
-   */
+  /**  静态资源配置 */
   assets?: {
     /**
      * 包含哪些文件类型
@@ -90,10 +58,19 @@ export type BrickingOptions = {
     filename?: string;
     loadPaths?: string[];
   },
-  devServe?: Partial<ServeConfig>;
-  publicPath?: string;
-  replacement?: Record<string, string>;
+  /** rollup 插件 */
   plugins?: (false | Plugin)[];
+  /** 开发服务器配置 */
+  devServe?: Partial<ServeConfig>;
+  /** 线上资源根路径 */
+  publicPath?: string;
+  /** 字符串模版替换映射 */
+  replacement?: Record<string, string>;
+  /**
+   * @babel/preset-env 的配置信息，可选
+   * https://babeljs.io/docs/babel-preset-env#options
+   */
+  babelOption?: any;
 }
 
 export type BrickingJson = {

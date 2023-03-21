@@ -49,6 +49,8 @@ module.exports = {
         "@typescript-eslint/no-explicit-any": 0,
         "no-underscore-dangle": 0,
         "no-sequences": 0,
-        "no-restricted-globals": 0
+        "no-restricted-globals": 0,
+        "import/no-extraneous-dependencies": 0,
+        "no-unused-expressions": 0
     }
 }

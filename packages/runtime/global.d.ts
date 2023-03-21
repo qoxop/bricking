@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /// <reference types="systemjs" />
 declare global {
     export type TPromiseFn<MT = any> = () => Promise<MT>;

@@ -2,15 +2,15 @@ import fs from 'fs-extra';
 import path from 'path';
 import ts from 'typescript';
 import { Extractor, ExtractorConfig } from '@microsoft/api-extractor';
-import { ls } from './files';
+import { ls } from '../files';
 
 const extensions = ['.ts', '.tsx', '/index.ts', '/index.tsx'];
 
 export const generateDTS = (props: {
-    /** 绝对路径文件列表 */
-    rootNames: string[],
-    /** 输出目录的绝对路径 */
-    outDir: string
+  /** 绝对路径文件列表 */
+  rootNames: string[],
+  /** 输出目录的绝对路径 */
+  outDir: string
 }) => {
   ts.createProgram({
     rootNames: props.rootNames,
@@ -25,12 +25,12 @@ export const generateDTS = (props: {
 };
 
 export const rollupDTS = ({ input, output, cwd = process.cwd() }:{
-    /** 输入文件的绝对路径 */
-    input: string;
-    /** 输出文件的绝对路径 */
-    output: string;
-    /** 项目目录 */
-    cwd?: string;
+  /** 输入文件的绝对路径 */
+  input: string;
+  /** 输出文件的绝对路径 */
+  output: string;
+  /** 项目目录 */
+  cwd?: string;
 }) => {
   Extractor.invoke(ExtractorConfig.prepare({
     configObjectFullPath: path.resolve(cwd, './tsconfig.json'),
@@ -54,12 +54,12 @@ export const rollupDTS = ({ input, output, cwd = process.cwd() }:{
 };
 
 export const createTypeDefine = (props: {
-    /** 输入文件的绝对路径 */
-    input: string;
-    /** 输出文件的绝对路径 */
-    output: string;
-    /** 项目目录 */
-    cwd?: string;
+  /** 输入文件的绝对路径 */
+  input: string;
+  /** 输出文件的绝对路径 */
+  output: string;
+  /** 项目目录 */
+  cwd?: string;
 }) => {
   let {
     input,
@@ -75,19 +75,22 @@ export const createTypeDefine = (props: {
   }
   const TempDir = path.resolve(cwd, './__temp');
   const OutputName = path.resolve(TempDir, `${path.parse(input).name}.d.ts`);
-  // 生成类型定义文件
-  generateDTS({
-    rootNames: [input, ...ls(path.dirname(input))],
-    outDir: TempDir,
-  });
-  // 对类型定义文件进行捆绑
-  rollupDTS({
-    cwd,
-    output,
-    input: OutputName,
-  });
-  // 删除临时目录
-  fs.removeSync(TempDir);
+  try {
+    // 生成类型定义文件
+    generateDTS({
+      rootNames: [input, ...ls(path.dirname(input))],
+      outDir: TempDir,
+    });
+    // 对类型定义文件进行捆绑
+    rollupDTS({
+      cwd,
+      output,
+      input: OutputName,
+    });
+  } finally {
+    // 删除临时目录
+    fs.removeSync(TempDir);
+  }
 };
 
 export const createTypeDefines = (props: {

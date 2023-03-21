@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { btkCompile } from '@bricking/toolkit/dist';
+import { btkCompile } from '@bricking/toolkit';
 
-btkCompile.registerTsHooks();
+btkCompile.registerTsHooks(['.ts', '.tsx']);
 
 // 初始化 NODE_ENV
 if (!process.env.NODE_ENV) {

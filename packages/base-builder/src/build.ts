@@ -2,9 +2,10 @@ import './initialize';
 import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
 
+import { fsExtra } from '@bricking/toolkit';
 import { getWebpackConfig, devServerConfig } from './config';
 import { getUserOptions } from './options';
-import typesPack from './utils/types-pack';
+import { createTypes } from './utils/create-types';
 
 /**
  * 构建任务默认回调方法
@@ -27,6 +28,11 @@ const defaultCallback = (err, stats) => {
  * @param callback
  */
 const runBuild = (callback = defaultCallback) => {
+  const { output } = getUserOptions();
+  if (fsExtra.existsSync(output)) {
+    fsExtra.removeSync(output);
+  }
+  fsExtra.mkdirSync(output, { recursive: true });
   webpack(getWebpackConfig(process.env.NODE_ENV), callback);
 };
 
@@ -41,7 +47,7 @@ const runServer = async (port?: string) => {
 
   let log:Function;
   compiler.hooks.assetEmitted.tap('bricking-run-server', (file) => {
-    if (/^base-js-bricking\..*js$/.test(file)) {
+    if (/base-js-bricking\..*js$/.test(file)) {
       log = () => {
         const { devServer: { hostname } } = getUserOptions();
         const origin = `${devServerConfig?.https ? 'https' : 'http'}://${hostname}:${devServerConfig?.port}`;
@@ -66,9 +72,7 @@ const runServer = async (port?: string) => {
 };
 
 const runTest = async () => {
-  const { publicPath = 'http://localhost:8080' } = getUserOptions();
-  const remoteEntry = `${publicPath}${/\/$/.test(publicPath) ? '' : '/'}base-js-bricking.js;`;
-  typesPack(remoteEntry);
+  await createTypes();
 };
 
 export {

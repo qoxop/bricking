@@ -1,57 +1,67 @@
 /**
  * 入口代码生成
  */
-import { getPackageJson, reloadOptions } from '../paths';
-import { excludePackages } from './constants';
+import { ModuleInfo } from '../types';
+import { getUserOptions } from '../options';
+import { paths } from '../paths';
 
-module.exports = (source) => {
-  const { bundle } = reloadOptions();
-  const depsExclude = (
-    bundle.dependencies.autoInject === true ? (
-      (bundle.dependencies.exclude || [])
-        .concat(bundle.dependencies.rewrites || [])
-        .concat(excludePackages)
-    ) : excludePackages
-  );
-  const autoInjectDependencies = bundle?.dependencies?.autoInject;
-  const defines = bundle?.moduleDefines?.defines || {};
-  const autoInjectDefines = bundle?.moduleDefines?.autoInject || {};
+module.exports = () => {
+  const { dependencies, name } = require(paths.packageJson);
+  const { bundle: { entry, expose, exposeAll, exposeExclude } } = getUserOptions(true);
 
-  if (!autoInjectDefines && !bundle.entry) {
-    throw new Error('需要指定入口文件 ～');
+  const moduleRecord: Record<string, ModuleInfo> = {};
+
+  if (exposeAll) {
+    Object.keys(dependencies).forEach((key) => {
+      if (!exposeExclude.some((item) => (typeof item === 'string' ? item === key : item.test(key)))) {
+        moduleRecord[key] = {
+          name: key,
+          sync: false,
+        };
+      }
+    });
   }
-  source = bundle.excludeRuntime ? '' : 'import "@bricking/runtime";\n';
-
-  const { peerDependencies, name: baseName } = getPackageJson();
-  const pkgName = bundle.packageName || baseName;
-
-  let indexInjected = false;
-  if (bundle.entry) {
-    if (bundle.entry === defines.index) { // TODO 处理后缀
-      source += `import * as baseEntry from "${bundle.entry}";\n`;
-      source += `\nself.$bricking.mm.set({ "${pkgName}": baseEntry })\n`;
-      indexInjected = true;
-    } else {
-      source += `import "${bundle.entry}";\n`;
+  expose.forEach((item) => {
+    if (typeof item === 'string') {
+      if (!moduleRecord[item] && dependencies[item]) {
+        moduleRecord[item] = {
+          name: item,
+          sync: false,
+        };
+      }
+    } else if (dependencies[item.name]) {
+      moduleRecord[item.name] = { sync: false, ...item };
+    } else if (item.path) {
+      // 自定义模块
+      const moduleName = (item.name.indexOf(`${name}/`) === 0 || item.subPath) ? item.name : `${name}/${item.name}`;
+      moduleRecord[moduleName] = {
+        sync: true,
+        ...item,
+        name: moduleName === `${name}/index` ? name : moduleName,
+      };
     }
-  }
-  if (defines.index && !indexInjected) {
-    source += `\nself.$bricking.mm.set({ "${pkgName}": require("${defines.index}") })\n`;
-  }
+  });
+  const modules = Object.values(moduleRecord);
+  let source = 'import "@bricking/runtime";\n';
 
-  if (autoInjectDefines) {
-    const definesImports = Object.entries(defines)
-      .filter(([key]) => key !== 'index')
-      .map(([key, value]) => (`\t"${pkgName}/${key}": () => import("${value}"),`))
-      .join('\n');
-    source += `\nself.$bricking.mm.setDynamic({\n${definesImports}\n});`;
+  const syncModules = modules.filter((item) => item.sync).map((item, index) => ({
+    importCode: `import * as _var_${index}_ from "${item.path || item.name}";`,
+    varCode: `_var_${index}_`,
+    name: item.name,
+  }));
+  const asyncModules = modules.filter((item) => !item.sync).map((item) => ({
+    importCode: `() => import("${item.path || item.name}")`,
+    name: item.name,
+  }));
+
+  // 添加同步导入
+  source += syncModules.map((item) => item.importCode).join('\n');
+  if (entry) {
+    source += `import "${entry}"\n`;
   }
-  if (autoInjectDependencies) {
-    const depsImports = Object.keys(peerDependencies)
-      .filter((key) => (!/^@types\//.test(key) && !depsExclude.includes(key)))
-      .map((key) => `\t"${key}": () => import("${key}"),`)
-      .join('\n');
-    source += `\nself.$bricking.mm.setDynamic({\n${depsImports}\n});`;
-  }
+  // 添加同步注入
+  source += `\nwindow.$bricking.set({\n${syncModules.map((item) => (`\t"${item.name}": ${item.varCode},`)).join('\n')}\n});\n`;
+  // 添加异步注入
+  source += `\nwindow.$bricking.setDynamic({\n${asyncModules.map((item) => (`\t"${item.name}": ${item.importCode},`)).join('\n')}\n});\n`;
   return source;
 };

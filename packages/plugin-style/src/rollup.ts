@@ -3,38 +3,42 @@
  * 将所有的样式文件进行捆绑，统一通过入口 chunk 进行引入(通过 link 方式)
  */
 import path from 'path';
-import { createFilter } from 'rollup-pluginutils';
+import { createFilter } from '@rollup/pluginutils';
 import Concat from 'concat-with-sourcemaps';
 import { GetModuleInfo, OutputChunk, Plugin } from 'rollup';
 import { btkHash, btkPath } from '@bricking/toolkit';
-import { INJECT_REMOTE_CSS_CODE, INJECT_REMOTE_CSS_ID, REMOTE_CSS_PREFIX, STYLE_EXTERNALS_MODULE } from './constants';
 import transformCss, { PostCSSOptions } from './transform/transform-css';
 import transformLess, { LessOption } from './transform/transform-less';
 import transformSass, { SassOptions } from './transform/transform-sass';
 import { CssLoaderProps } from './transform/types';
 
-/**
- * 对模块ID按引用顺序进行排序
- * @param id
- * @param getModuleInfo
- * @param seen
- * @returns
- */
-function getRecursiveImportOrder(id: string, getModuleInfo: GetModuleInfo, seen = new Set()): string[] {
-  if (seen.has(id)) return [];
-  seen.add(id);
-  const result = [id];
-  const moduleInfo = getModuleInfo(id);
-  if (moduleInfo) {
-    moduleInfo.importedIds.forEach((importFile) => {
-      result.push(...getRecursiveImportOrder(importFile, getModuleInfo, seen));
-    });
+const STYLE_EXTERNALS_MODULE = '___INJECT_STYLE_LINK___';
+const PluginName = 'bricking-runtime-css';
+
+function sortAllModules(entryChunks: [string, OutputChunk][], getModuleInfo: GetModuleInfo) {
+  const seen = new Set<string>();
+  // 对模块ID按引用顺序进行排序
+  function getRecursiveImportOrder(id: string) {
+    if (seen.has(id)) return;
+    seen.add(id);
+    const moduleInfo = getModuleInfo(id);
+    if (moduleInfo && moduleInfo.importedIds) {
+      moduleInfo.importedIds.forEach((importFile) => {
+        getRecursiveImportOrder(importFile);
+      });
+    }
   }
-  return result;
+  for (const chunk of entryChunks) {
+    const { modules, facadeModuleId } = chunk[1];
+    if (modules && facadeModuleId) {
+      getRecursiveImportOrder(facadeModuleId);
+    }
+  }
+  return [...seen];
 }
 
 const LessRegExp = /\.less$/;
-const SassRegExp = /\.s(a|c)ss$/;
+const SassRegExp = /\.s[a,c]ss$/;
 
 type RollupStylePluginOptions = {
     /**
@@ -63,7 +67,6 @@ type RollupStylePluginOptions = {
      * postcss 配置
      */
     postcss?: PostCSSOptions;
-    useCssLinkPlugin?: boolean;
 }
 
 /**
@@ -72,52 +75,28 @@ type RollupStylePluginOptions = {
  */
 const rollupStylePlugin = (options: RollupStylePluginOptions): Plugin => {
   // 设置默认选项值
-  const { filename = '[hash].css', sourceMap = true, postcss, less, sass, useCssLinkPlugin = true } = options;
+  const { filename = '[hash].css', sourceMap = true, postcss, less, sass } = options;
   // 过滤器
   const filter = createFilter([/\.css$/, LessRegExp, SassRegExp]);
   // css 文件集合
   const allCssFiles = new Map<string, { id: string; css: string; map: any; }>();
+  const remoteCssUrls = new Set<string>();
   return {
-    name: 'bricking-runtime-css',
+    name: PluginName,
     resolveId(source: string) {
-      // 处理远程样式文件
-      if (/^https?:\/\/.*\.css(\?.*)?$/.test(source)) {
-        return `${REMOTE_CSS_PREFIX}${source}`;
-      }
-      if (/^https?:\/\/.*\|css$/.test(source)) {
-        return `${REMOTE_CSS_PREFIX}${source.replace(/\|css$/, '')}`;
-      }
-      if (source === INJECT_REMOTE_CSS_ID) {
-        return INJECT_REMOTE_CSS_ID;
-      }
-      return null;
-    },
-    load(id) {
-      // 处理远程样式文件
-      if (id === INJECT_REMOTE_CSS_ID) {
-        return INJECT_REMOTE_CSS_CODE;
-      }
-      if (id.indexOf(REMOTE_CSS_PREFIX) === 0) {
-        return `import inject from "${INJECT_REMOTE_CSS_ID}";\ninject("${id.replace(REMOTE_CSS_PREFIX, '')}");`;
+      if (
+        /^https?:\/\/.*\.css(\?.*)?$/.test(source) // 远程 css 文件
+        || /^https?:\/\/.*\|css$/.test(source) // 远程 css 文件(兼容非 .css 后缀)
+        || source === STYLE_EXTERNALS_MODULE
+      ) {
+        remoteCssUrls.add(source.replace(/\|css$/, ''));
+        // 作为外部模块，不参与编译
+        return { id: source, external: true };
       }
       return null;
     },
     async transform(code: string, id: string) {
-      const moduleInfo = this.getModuleInfo(id);
-      // 给入口文件添加导入样式的代码
-      if (useCssLinkPlugin && moduleInfo && moduleInfo.isEntry) {
-        // @ts-ignore
-        const concat = new Concat(true, id, '\n');
-        concat.add(null, `import "${STYLE_EXTERNALS_MODULE}";`);
-        concat.add(id, code, this.getCombinedSourcemap().toString());
-        return {
-          code: concat.content.toString(),
-          map: concat.sourceMap,
-        };
-      }
-      if (id.indexOf(REMOTE_CSS_PREFIX) === 0) return null;
       if (!filter(id)) return null;
-
       // 配置 loader 上下文
       const loaderProps: CssLoaderProps<any> = {
         content: code,
@@ -160,7 +139,6 @@ const rollupStylePlugin = (options: RollupStylePluginOptions): Plugin => {
         map: null,
       };
     },
-
     augmentChunkHash(chunkInfo) {
       if (allCssFiles.size === 0 || !chunkInfo.isEntry) return;
       const extractedValue = [...allCssFiles].reduce((object, [key, value]) => ({
@@ -170,82 +148,78 @@ const rollupStylePlugin = (options: RollupStylePluginOptions): Plugin => {
       return JSON.stringify(extractedValue);
     },
     renderChunk(code, chunk, outputOptions) {
-      // 如果存在样式
-      if (!useCssLinkPlugin && allCssFiles.size && chunk.isEntry && (outputOptions.dir || outputOptions.file)) {
+      // 如果存在样式文件
+      if ((allCssFiles.size || remoteCssUrls.size) && chunk.isEntry && (outputOptions.dir || outputOptions.file)) {
+        const newImports:string[] = [];
         const concat = new Concat(true, chunk.fileName, '\n');
-        concat.add(null, `import "${STYLE_EXTERNALS_MODULE}";`)
+        if (allCssFiles.size) {
+          newImports.push(STYLE_EXTERNALS_MODULE);
+          concat.add(null, `import "${STYLE_EXTERNALS_MODULE}";`);
+        }
+        if (remoteCssUrls.size) {
+          remoteCssUrls.forEach((url) => {
+            newImports.push(url);
+            concat.add(null, `import "${url}";`);
+          });
+        }
+        chunk.imports.unshift(...newImports);
         concat.add(chunk.fileName, code);
         return {
           code: concat.content.toString(),
           map: concat.sourceMap,
-        }
+        };
       }
       return null;
     },
     async generateBundle(outputOptions, bundle) {
+      // 前置判断
       if (allCssFiles.size === 0 || !(outputOptions.dir || outputOptions.file)) return;
-      // 输出目录
       const dir = outputOptions.dir || path.dirname(outputOptions.file as string);
-      // 入口 chunk
       const entryChunks = Object.entries(bundle).filter(([, chunk]) => chunk.type === 'chunk' && chunk.isEntry) as [string, OutputChunk][];
       if (!entryChunks.length) return;
 
-      const [[entryChunkId, entryChunk], ...restChunks] = entryChunks;
-      // 入口chunk文件(输出位置)
-      const entryFile = outputOptions.file || path.join(outputOptions.dir as string, entryChunkId);
-      const entries = [...allCssFiles.values()];
-      // 模块排序
-      const { modules, facadeModuleId } = entryChunk;
-      if (modules && facadeModuleId) {
-        const moduleIds = getRecursiveImportOrder(facadeModuleId, this.getModuleInfo);
-        entries.sort((a, b) => moduleIds.indexOf(a.id) - moduleIds.indexOf(b.id));
-      }
-      // 计算 hash 值
-      const filehash = btkHash.getHash(entries.map((entry) => entry.css).join('-'), path.parse(entryFile).name);
+      // 按引用顺序进行排序后的模块ID数组(由于多入口的原因，还是可能存在顺序误差)
+      const sortedModuleIds = sortAllModules(entryChunks, this.getModuleInfo.bind(this));
+      const cssEntries = [...allCssFiles.values()].sort((a, b) => sortedModuleIds.indexOf(a.id) - sortedModuleIds.indexOf(b.id));
+
       // 计算文件名称
+      const getChunkNameIfOnlyOne = () => {
+        if (entryChunks.length === 1) {
+          const [[entryChunkId]] = entryChunks;
+          const entryFile = outputOptions.file || path.join(outputOptions.dir as string, entryChunkId);
+          return path.parse(entryFile).name;
+        }
+        return '';
+      };
+      const fileHash = btkHash.getHash(cssEntries.map((entry) => entry.css).join('-'), PluginName);
       const fileName = filename
-        .replace('[name]', path.parse(entryFile).name)
-        .replace('[hash]', filehash)
+        .replace('[name]', getChunkNameIfOnlyOne())
+        .replace('[hash]', fileHash)
         .replace('[extname]', '.css');
       const mapFileName = `${fileName}.map`;
-      // 拼接代码
-      // @ts-ignore
+
+      // 拼接代码并输出
       const concat = new Concat(true, fileName, '\n');
-      for (const result of entries) {
+      for (const result of cssEntries) {
         const relative = btkPath.normalizePath(path.relative(dir, result.id));
         const map = result.map || null;
         concat.add(relative, result.css, map);
       }
       const cssCode = sourceMap ? `${concat.content.toString()}\n/*# sourceMappingURL=./${path.basename(mapFileName)} */` : concat.content.toString();
-      if (useCssLinkPlugin) {
-        // 替换
-        entryChunk.code = entryChunk.code.replace(STYLE_EXTERNALS_MODULE, `${STYLE_EXTERNALS_MODULE}?link=./${fileName}`);
-      } else {
-        // 替换
-        entryChunk.code = entryChunk.code.replace(STYLE_EXTERNALS_MODULE, `./${fileName}`);
-      }
-      // 输出
       this.emitFile({ fileName, type: 'asset', source: cssCode });
       if (sourceMap && concat.sourceMap) {
         this.emitFile({ fileName: mapFileName, type: 'asset', source: concat.sourceMap });
       }
-      // 替换剩余的入口文件
-      if (restChunks.length) {
-        restChunks.forEach(chunk => {
-          if (useCssLinkPlugin) {
-            // 替换
-            chunk[1].code = chunk[1].code.replace(STYLE_EXTERNALS_MODULE, `${STYLE_EXTERNALS_MODULE}?link=./${fileName}`);
-          } else {
-            // 替换
-            chunk[1].code = chunk[1].code.replace(STYLE_EXTERNALS_MODULE, `./${fileName}`);
-          }
-        })
-      }
+      entryChunks.forEach((chunk) => {
+        // 替换成相对路径
+        chunk[1].code = chunk[1].code.replace(STYLE_EXTERNALS_MODULE, `./${fileName}`);
+      });
     },
   };
 };
 
-export  {
+export {
   rollupStylePlugin,
+  STYLE_EXTERNALS_MODULE,
   RollupStylePluginOptions,
-}
+};

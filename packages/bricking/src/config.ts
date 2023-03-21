@@ -13,7 +13,6 @@ const packageJsonPath = path.resolve(workspace, './package.json');
 
 const config: Required<BrickingOptions> = require(configPath).default;
 const outputPackPath = path.join(config.output, './npm');
-const sourceBase = path.isAbsolute(config.sourceBase) ? config.sourceBase : path.join(workspace, config.sourceBase);
 
 const tsConfig = require(tsConfigPath);
 const packageJson = require(packageJsonPath);
@@ -37,7 +36,6 @@ export {
   tsConfigPath,
   packageJsonPath,
   outputPackPath,
-  sourceBase,
 };
 
 export default config;

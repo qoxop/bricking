@@ -3,7 +3,7 @@
  */
 import fs from 'fs';
 import path, { sep } from 'path';
-
+import fsExtra from 'fs-extra';
 /**
  * normalizePath
  * @param filepath 文件路径
@@ -73,10 +73,38 @@ const findModulePath = (moduleName: string) => {
   }
 };
 
+const cleanPath = async (output: string) => {
+  if (fs.existsSync(output)) {
+    await fsExtra.emptyDir(output);
+  } else {
+    fs.mkdirSync(output, { recursive: true });
+  }
+};
+
+const getPathAliasByTsConfig = (tsConfig: any, workspace: string) => {
+  const entries = {};
+  Object.entries(tsConfig?.compilerOptions?.paths || {}).forEach(([key, value]) => {
+    // @ts-ignore
+    let relativePath = value[0];
+    if (/\/\*$/.test(key)) {
+      key = key.replace(/\/\*$/, '');
+    }
+    if (/\/\*$/.test(relativePath)) {
+      relativePath = relativePath.replace(/\/\*$/, '');
+    }
+    if (!entries[key]) {
+      entries[key] = path.join(workspace, relativePath);
+    }
+  });
+  return entries;
+};
+
 export {
+  cleanPath,
   replaceExt,
   normalizePath,
   humanlizePath,
   findModulePath,
   modulePathResolve,
+  getPathAliasByTsConfig,
 };

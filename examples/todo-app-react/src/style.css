@@ -1,0 +1,67 @@
+.todo-module {
+    max-width: 768px;
+    margin: 0 auto;
+}
+
+.todo-module .add-todo {
+    display: flex;
+    margin: 10px 0px;
+}
+
+.todo-module .add-todo input {
+    display: block;
+    flex: 1;
+}
+
+.todo-module .add-todo button {
+    margin: 0 12px;
+}
+
+.todo-module .filter {
+    margin: 10px 0px;
+}
+
+.todo-module .filter span {
+    display: inline-block;
+    margin: 0 6px;
+    color: #666;
+    cursor: pointer;
+}
+
+.todo-module .filter span:hover {
+    text-decoration: underline;
+}
+
+.todo-module .filter span.active {
+    color: #1050b1;
+}
+
+.todo-module .todo {
+    display: flex;
+    margin: 10px 0px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.todo-module .todo .todo-text {
+    margin: 0px 10px;
+    flex: 1;
+    align-items: center;
+}
+
+.todo-module .todo .todo-text.finished {
+    text-decoration: line-through;
+    color: #999;
+}
+
+.todo-module .todo .todo-del {
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    background-color: red;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 10px;
+}

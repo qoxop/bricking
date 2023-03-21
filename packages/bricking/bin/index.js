@@ -3,6 +3,17 @@
 require('yargs')
   .scriptName('bricking')
   .command(
+    'gen-type',
+    '生成模块类型文件',
+    () => void 0,
+    () => {
+      process.env.NODE_ENV = 'development';
+      const { initBaseLibInfo } = require('../dist/install');
+      const { generateTypes } = require('../dist/build');
+      initBaseLibInfo().then(generateTypes);
+    },
+  )
+  .command(
     'dev',
     '启动开发服务器',
     () => void 0,

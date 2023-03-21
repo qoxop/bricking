@@ -2,19 +2,17 @@ import {
   Compilation,
   Compiler,
 } from 'webpack';
+import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'fs';
 import path from 'path';
-import { existsSync, readFileSync } from 'fs';
-import { btkFile, btkHash } from '@bricking/toolkit';
-
-import typesPack, { updatePkgJson } from './types-pack';
-import { getUserOptions } from '../options';
+import { updatePkgJson, createTypes } from './create-types';
 import { getPackageJson, paths } from '../paths';
+import { getUserOptions } from '../options';
+import { createWebpackInfo } from './create-webpack-info';
 
 /**
  * webpack 插件：用于构建 SDK
  */
 const PLUGIN_NAME = 'BRICKING_PACK_PLUGIN';
-const { Zipper } = btkFile;
 
 export default class BrickingPackPlugin {
   private options = getUserOptions();
@@ -24,8 +22,8 @@ export default class BrickingPackPlugin {
     for (const [name, entry] of compilation.entrypoints) {
       if (name === 'bricking') {
         return entry.getFiles().find((filename) => (
-          /^base-js-bricking\.\w+\.js$/.test(filename)
-                    || filename === 'base-js-bricking.js'
+          /^browser\/base-js-bricking\.\w+\.js$/.test(filename)
+                    || filename === 'browser/base-js-bricking.js'
         ));
       }
     }
@@ -33,7 +31,6 @@ export default class BrickingPackPlugin {
 
   apply(compiler: Compiler) {
     const { webpack } = compiler;
-    const { RawSource } = webpack.sources;
     const { thisCompilation, ...otherHooks } = this.options.compile.hooks || {};
     compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (compilation) => {
       if (typeof thisCompilation === 'function') {
@@ -46,45 +43,38 @@ export default class BrickingPackPlugin {
         },
         async (assets, callback) => {
           const bundleFilename = this.getBundleFilename(compilation);
-          const publicPath = this.options.publicPath || '/';
-          const remoteEntry = `${publicPath}${/\/$/.test(publicPath) ? '' : '/'}${bundleFilename}`;
-          const typesPackPath = typesPack(remoteEntry);
-          const zipper = new Zipper(path.resolve(compiler.outputPath, './pack.zip'));
-          Object.entries(assets).forEach(([name, value]) => {
-            if (!/\.txt$/.test(name)) {
-              const source = value.source();
-              const buff = Buffer.isBuffer(source) ? source : Buffer.from(source);
-              zipper.add(name, buff);
-            }
-          });
-          const bundlePackBuff = await zipper.finish([]) as Buffer;
-          const bundlePackHash = btkHash.getHash(bundlePackBuff);
-          const bundlePackName = `bundlePack.${bundlePackHash}.zip`;
-          compilation.assets[bundlePackName] = new RawSource(bundlePackBuff);
+          const publicPath = this.options.publicPath === 'auto' ? '/' : this.options.publicPath;
+          const remoteEntry = `${publicPath}${bundleFilename}`;
 
-          const typesPackBuff = await Zipper.tarFolder(typesPackPath, []) as Buffer;
-          const typesPackName = 'pack.tgz';
-          compilation.assets[typesPackName] = new RawSource(typesPackBuff);
           const { name, version, description = '', author = '', peerDependencies } = getPackageJson();
+
           let document = '';
-          if (existsSync(paths.readme)) {
-            compilation.assets['README.md'] = new RawSource(readFileSync(paths.readme));
-            document = `${publicPath}${/\/$/.test(publicPath) ? '' : '/'}${'README.md'}`;
+          if (!existsSync(this.options.output)) {
+            mkdirSync(this.options.output, { recursive: true });
           }
-          const infoJson = JSON.stringify(updatePkgJson({
-            name,
-            version,
-            author,
-            description,
-            peerDependencies,
-            publicPath,
-            bundle: bundleFilename,
-            typesPack: typesPackName,
-            bundlePack: bundlePackName,
-            remoteEntry,
-            ...(document ? { document } : {}),
-          }), null, '\t');
-          compilation.assets['package.json'] = new RawSource(infoJson);
+          if (existsSync(paths.readme)) {
+            writeFileSync(
+              path.resolve(this.options.output, 'README.md'),
+              readFileSync(paths.readme),
+            );
+            document = `${publicPath}${'README.md'}`;
+          }
+          writeFileSync(
+            path.resolve(this.options.output, 'package.json'),
+            JSON.stringify(updatePkgJson({
+              name,
+              version,
+              author,
+              description,
+              publicPath,
+              remoteEntry,
+              peerDependencies,
+              bundle: `${bundleFilename}`,
+              ...(document ? { document } : {}),
+            }), null, '\t'),
+          );
+          createWebpackInfo();
+          await createTypes();
           callback();
         },
       );

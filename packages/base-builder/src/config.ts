@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import * as path from 'path';
 import WebpackBar from 'webpackbar';
 import TerserPlugin from 'terser-webpack-plugin';
 import NpmImportPlugin from 'less-plugin-npm-import';
@@ -30,7 +29,6 @@ const RS = require.resolve;
 const {
   react = {} as any,
   compile: compileOptions,
-  publicPath,
   devServer: { hostname, ...devServerOptions },
 } = getUserOptions();
 
@@ -140,24 +138,24 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
       ...(devEntry ? { devEntry } : {}),
     },
     output: {
-      clean: true,
-      publicPath: publicPath || 'auto',
-      path: path.join(paths.outputPath, 'packages'),
+      clean: false,
+      publicPath: 'auto',
+      path: paths.outputPath,
       pathinfo: isEnvDevelopment,
       filename: isEnvProduction
-        ? 'base-js-[name].[chunkhash:8].js'
-        : 'base-js-[name].js',
+        ? 'browser/base-js-[name].[chunkhash:8].js'
+        : 'browser/base-js-[name].js',
       chunkFilename: isEnvProduction
-        ? 'chunk-js-[name].[chunkhash:8].js'
-        : 'chunk-js-[name].chunk.js',
-      assetModuleFilename: 'media/[hash][ext][query]',
+        ? 'browser/chunk-js-[name].[chunkhash:8].js'
+        : 'browser/chunk-js-[name].chunk.js',
+      assetModuleFilename: 'browser/media/[hash][ext][query]',
     },
     cache: {
       type: 'filesystem',
       cacheDirectory: paths.webpackCache,
       store: 'pack',
       buildDependencies: {
-        config: [__filename, paths.tsconfig, paths.packageJson],
+        config: [__filename, paths.tsconfig, paths.packageJson, paths.brickingrc],
         tsconfig: [paths.tsconfig, paths.jsconfig, paths.packageJson].filter((f) => fs.existsSync(f)),
       },
     },
@@ -277,7 +275,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
               and: [/\.(ts|tsx|js|jsx|md|mdx)$/],
             },
           },
-          // app script
+          // @ts-ignore
           compileOptions.loaderModify.appScript({
             test: /\.(js|mjs|jsx|ts|tsx)$/,
             exclude: /(node_modules|bower_components)/,
@@ -391,7 +389,6 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
         ...compileOptions.htmlOptions,
         chunks: ['bricking', 'devEntry'],
         chunksSortMode: 'manual',
-
       }),
     ].filter(Boolean) as any[],
   };
@@ -420,5 +417,11 @@ export const devServerConfig: Configuration['devServer'] = {
   devMiddleware: {
     writeToDisk: true,
   },
+  static: [
+    {
+      directory: paths.outputPath,
+      publicPath: '/',
+    },
+  ],
   ...devServerOptions,
 };

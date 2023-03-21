@@ -5,19 +5,14 @@ import { spawnSync } from 'child_process';
 import { btkPath, btkNetwork, colors } from '@bricking/toolkit';
 import config, { packageJson } from './config';
 
-// eslint-disable-next-line no-unused-vars
 const upSearch = (p: string, cb: (_p: string) => void):void => {
-  while (existsSync(p) && p !== path.join(p, '../')) {
-    cb(p);
+  while (existsSync(p) && p !== path.join(p, '../') && cb(p)) {
     p = path.join(p, '../');
   }
 };
 
-let command = '';
-/**
- * 获取安装命令
- */
-const getCommands = async () => {
+const getInstallCommands = async () => {
+  let command = '';
   const subCommands = {
     npm: 'install',
     yarn: 'add',
@@ -38,6 +33,7 @@ const getCommands = async () => {
       } else if (existsSync(path.resolve(p, 'package-lock.json'))) {
         command = 'npm';
       }
+      return !command;
     });
   }
   if (!subCommands[command]) {
@@ -45,18 +41,10 @@ const getCommands = async () => {
       name: 'pkgManager',
       type: 'list',
       message: '请选择一个包管理器',
-      choices: [{
-        name: 'yarn',
-        value: 'yarn',
-      },
-      {
-        name: 'npm',
-        value: 'npm',
-      },
-      {
-        name: 'pnpm',
-        value: 'pnpm',
-      },
+      choices: [
+        { name: 'yarn', value: 'yarn' },
+        { name: 'npm', value: 'npm' },
+        { name: 'pnpm', value: 'pnpm' },
       ],
     }]);
     command = answers.pkgManager;
@@ -67,65 +55,69 @@ const getCommands = async () => {
   };
 };
 
-/**
- * 依赖安装
- */
-const installDeps = async (deps: Record<string, string>) => {
-  const pkgs = Object.entries(deps).map(([name, version]) => `${name}@${version}`);
-  // eslint-disable-next-line no-shadow
-  const { command, subCommand } = await getCommands();
+const installDependencies = async (dependencies: Record<string, string>) => {
+  const pkgs = Object.entries(dependencies).map(([name, version]) => `${name}@${version}`);
+  const { command, subCommand } = await getInstallCommands();
   const sub = [subCommand, ...pkgs];
   console.log(colors.grey(`\n 🚂 ${command} ${sub.join(' ')} \n`));
   spawnSync(command, sub, { stdio: 'inherit' });
 };
 
-export type BaseLibInfo = {
-  name: string,
-  version: string,
-  peerDependencies: Record<string, string>;
-  remoteEntry: string;
+type BaseLibInfo = {
+  name?: string,
+  version?: string,
+  peerDependencies?: Record<string, string>;
+  remoteEntry?: string;
   document?: string;
 }
 
-let baseLibInfo: BaseLibInfo;
-export function getBaseLibInfo() {
+let baseLibInfo: BaseLibInfo = {};
+function getBaseLibInfo() {
   return baseLibInfo;
 }
 
-/**
- * 获取基座包信息，并下载相关依赖
- */
-export async function initBaseLibInfo() {
-  let _baseLibInfo:BaseLibInfo = null as any;
-  // 以 json 链接方式配置
-  if (typeof config.basePackage === 'string') {
-    const { name, publicPath, typesPack, ...other } = await btkNetwork.getJson<any>(config.basePackage);
-    _baseLibInfo = {
-      ...other,
-      name,
-      version: `${publicPath}${typesPack}`,
-    };
-    if (!packageJson.dependencies[name] || (packageJson.dependencies[name] !== _baseLibInfo.version && !/workspace/.test(packageJson.dependencies[name]))) {
-      await installDeps({ [name]: _baseLibInfo.version });
+async function initBaseLibInfo() {
+  let _baseLibInfo:BaseLibInfo = {};
+  if (config.basePackage === 'use-cdn-runtime') {
+    // 加载CDN运行时脚本
+    _baseLibInfo.remoteEntry = 'https://unpkg.com/@bricking/runtime@0.4.6/dist/bricking.min.js';
+  } else if (config.basePackage === 'use-local-runtime') {
+    // 加载本地运行时脚本
+    _baseLibInfo.remoteEntry = config.publicPath ? `${config.publicPath}bricking.min.js` : './bricking.min.js';
+  } else if (typeof config.basePackage === 'string') {
+    if (/\.js$/.test(config.basePackage)) {
+      // 指定一个自定义的运行时脚本
+      _baseLibInfo.remoteEntry = config.basePackage;
+    } else {
+      // 指定一个运行时 + 共享依赖的包，以 json 配置文件的方式
+      const { name, publicPath, typesPack, ...other } = await btkNetwork.getJson<any>(config.basePackage);
+      _baseLibInfo = {
+        ...other,
+        name,
+        version: `${publicPath}${typesPack}`,
+      };
+      const baseLibAbsent = !packageJson.dependencies[name];
+      const baseLibDifferent = packageJson.dependencies[name] !== _baseLibInfo.version;
+      const baseLibNoInWorkspace = !/workspace/.test(packageJson.dependencies[name]);
+      if (_baseLibInfo.version && (baseLibAbsent || (baseLibDifferent && baseLibNoInWorkspace))) {
+        await installDependencies({ [name]: _baseLibInfo.version });
+      }
     }
-  } else {
-    // 指定名称和版本号的方式配置
-    const { name, version } = config.basePackage;
+  } else if (config.basePackage?.name) {
+    // 指定一个运行时 + 共享依赖的包, 以 npm 包的方式
+    const { name, version = 'latest' } = config.basePackage;
     let modulePath = '';
     let pkgInfo = {} as any;
     try {
       // 本地依赖包存在
       modulePath = btkPath.findModulePath(name);
       pkgInfo = require(`${modulePath}${path.sep}package.json`);
-      // 版本不一致 -> 重新安装
       if (pkgInfo.name !== name || pkgInfo.version !== version) {
-        await installDeps({ [name]: version });
-        modulePath = btkPath.findModulePath(name);
-        pkgInfo = require(`${modulePath}${path.sep}package.json`);
+        throw new Error('版本信息不一致');
       }
     } catch (error) {
-      // 本地依赖包不存在 -> 安装
-      await installDeps({ [name]: version });
+      // 本地依赖包不存在 或者 版本信息不一致 -> 安装
+      await installDependencies({ [name]: version });
       modulePath = btkPath.findModulePath(name);
       pkgInfo = require(`${modulePath}${path.sep}package.json`);
     }
@@ -138,8 +130,9 @@ export async function initBaseLibInfo() {
   baseLibInfo = _baseLibInfo;
 }
 
-export async function install(deps: string[] = []) {
+async function install(deps: string[] = []) {
   const { peerDependencies } = baseLibInfo;
+  if (!peerDependencies) return;
   if (deps.length === 0) {
     const choices = Object.entries(peerDependencies).map(([name, version]) => ({
       name,
@@ -160,5 +153,12 @@ export async function install(deps: string[] = []) {
     prev[name] = peerDependencies[name] || version;
     return prev;
   }, {});
-  await installDeps(pkgs);
+  await installDependencies(pkgs);
 }
+
+export {
+  install,
+  initBaseLibInfo,
+  getBaseLibInfo,
+  BaseLibInfo,
+};

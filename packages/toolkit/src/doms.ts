@@ -16,7 +16,7 @@ type ContentScript = {
   props?: Record<string, string>
 }
 type UrlScript = {
-  url: string,
+  url?: string,
   type?: string,
   props?: Record<string, string>
 }
@@ -39,9 +39,9 @@ async function injectScripts(dom: any, scripts: Script[], replacement:Record<str
     if (item.type) {
       script.type = item.type;
     }
-    if ('url' in item) {
+    if ('url' in item && item.url) {
       script.src = item.url;
-    } else {
+    } else if ('content' in item && item.content) {
       script.innerHTML = item.content;
     }
     if (item.props) {

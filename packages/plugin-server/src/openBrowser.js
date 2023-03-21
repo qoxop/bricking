@@ -5,6 +5,7 @@
  * LICENSE file at
  * https://github.com/facebookincubator/create-react-app/blob/master/LICENSE
  */
+/* eslint-disable */
 
 'use strict';
 

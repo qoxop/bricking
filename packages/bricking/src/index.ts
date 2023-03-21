@@ -33,14 +33,15 @@ export function defineBricking(options: BrickingOptions): Required<BrickingOptio
       path: path.resolve(workspace, './index.html'),
     };
   }
-  if (!options.sourceBase) {
-    options.sourceBase = './src';
-  }
   if (!options.mode) {
     options.mode = 'app';
   }
   if (!options.externals) {
     options.externals = [];
+  }
+  // 支持 --no-base 参数进行全量编译
+  if (!options.basePackage || process.argv.some((item) => /--no-base/.test(item))) {
+    options.basePackage = 'use-local-runtime';
   }
   if (options.doPack === true) {
     try {
@@ -63,15 +64,8 @@ export function defineBricking(options: BrickingOptions): Required<BrickingOptio
     ...options.devServe,
   };
   options.plugins = options.plugins ?? [];
-  if (!options.browseEntry && (process.env.NODE_ENV === 'development')) {
-    throw new Error('options.browseEntry is require~');
-  }
-  if (!(
-    (typeof options.basePackage === 'string' && options.basePackage)
-        // @ts-ignore
-        || (options.basePackage?.name && options.basePackage?.version)
-  )) {
-    throw new Error('options.basePackage is require~');
+  if (!options.bootstrap && (process.env.NODE_ENV === 'development')) {
+    throw new Error('options.bootstrap is require~');
   }
   return options as any;
 }

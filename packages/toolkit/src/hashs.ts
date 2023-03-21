@@ -4,7 +4,6 @@
 import MD5 from 'md5';
 import { createHash } from 'crypto';
 import { makeLegalIdentifier } from '@rollup/pluginutils';
-// eslint-disable-next-line import/no-unresolved
 import { fileIterator } from './files';
 
 /**
@@ -13,7 +12,7 @@ import { fileIterator } from './files';
  * @param other 其他
  * @returns
  */
-const getHash = (data: unknown, ...other:unknown[]) => createHash('sha256').update([data, 'yt7RWop1a', ...other].join(':')).digest('hex').slice(0, 8);
+const getHash = (data: unknown, ...other:unknown[]) => createHash('sha256').update([data, 'yt7RWop1a', ...other].join(':')).digest('hex').slice(0, 16);
 
 /**
  * 安全地获取 ID 字符串
@@ -37,9 +36,23 @@ const getDirMd5 = (dir: string) => {
   });
   return MD5(pathChunk + contentChunk);
 };
+/**
+ * 获取整个目录的 hash 值
+ * @param dir 目录路径
+ * @returns
+ */
+const getDirHash = (dir: string, len = 8) => {
+  const hash = createHash('sha256');
+  fileIterator(dir, '', (paths, buff) => {
+    hash.update(paths.relative);
+    hash.update(buff);
+  });
+  return hash.digest('hex').slice(0, len);
+};
 
 export {
   getHash,
   getSafeId,
   getDirMd5,
+  getDirHash,
 };

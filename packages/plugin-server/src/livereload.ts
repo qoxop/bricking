@@ -1,7 +1,6 @@
 import chokidar from 'chokidar';
 import express from 'express';
 import http from 'http';
-import { parse } from 'url';
 import { WebSocket, WebSocketServer } from 'ws';
 
 const WS_PATH = '/bricking-ws';
@@ -12,7 +11,7 @@ function createWss(app: ReturnType<typeof express>) {
   const wss = new WebSocketServer({ noServer: true });
   server.on('upgrade', (request, socket, head) => {
     if (request.url) {
-      const { pathname } = parse(request.url);
+      const pathname = /^http/.test(request.url) ? new URL(request.url).pathname : request.url;
       if (pathname === WS_PATH) {
         wss.handleUpgrade(request, socket, head, (ws) => {
           wss.emit('connection', ws, request);
