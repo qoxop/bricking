@@ -112,7 +112,7 @@ async function initBaseLibInfo() {
       // 本地依赖包存在
       modulePath = btkPath.findModulePath(name);
       pkgInfo = require(`${modulePath}${path.sep}package.json`);
-      if (pkgInfo.name !== name || pkgInfo.version !== version) {
+      if (!/workspace/.test(version) && (pkgInfo.name !== name || pkgInfo.version !== version)) {
         throw new Error('版本信息不一致');
       }
     } catch (error) {

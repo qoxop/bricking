@@ -5,5 +5,8 @@ export default defineBricking({
   modules: {
     'todo-app': './src/bundle.ts'
   },
-  basePackage: "http://localhost:8080/package.json",
+  basePackage: {
+    name: '@bricking/shared-libs',
+    version: 'workspace:*'
+  },
 })
