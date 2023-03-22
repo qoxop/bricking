@@ -1,6 +1,13 @@
 # Change Log - @bricking/plugin-style
 
-This log was last generated on Mon, 19 Dec 2022 08:05:57 GMT and should not be manually modified.
+This log was last generated on Wed, 22 Mar 2023 08:24:17 GMT and should not be manually modified.
+
+## 1.0.0
+Wed, 22 Mar 2023 08:24:17 GMT
+
+### Breaking changes
+
+- 升级依赖库 & 优化构建模式
 
 ## 0.6.6
 Mon, 19 Dec 2022 08:05:57 GMT

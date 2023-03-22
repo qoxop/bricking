@@ -2,6 +2,18 @@
   "name": "@bricking/plugin-server",
   "entries": [
     {
+      "version": "2.0.0",
+      "tag": "@bricking/plugin-server_v2.0.0",
+      "date": "Wed, 22 Mar 2023 08:24:17 GMT",
+      "comments": {
+        "major": [
+          {
+            "comment": "升级依赖库"
+          }
+        ]
+      }
+    },
+    {
       "version": "1.0.5",
       "tag": "@bricking/plugin-server_v1.0.5",
       "date": "Thu, 05 Jan 2023 13:01:14 GMT",
