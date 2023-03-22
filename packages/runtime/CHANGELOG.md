@@ -1,6 +1,13 @@
 # Change Log - @bricking/runtime
 
-This log was last generated on Mon, 19 Dec 2022 08:05:57 GMT and should not be manually modified.
+This log was last generated on Wed, 22 Mar 2023 08:21:32 GMT and should not be manually modified.
+
+## 1.0.0
+Wed, 22 Mar 2023 08:21:32 GMT
+
+### Breaking changes
+
+- 优化导出类型和Css引用插件&新增模块联邦代码生成函数
 
 ## 0.4.6
 Mon, 19 Dec 2022 08:05:57 GMT
