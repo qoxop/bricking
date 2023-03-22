@@ -1,6 +1,13 @@
 # Change Log - bricking
 
-This log was last generated on Thu, 05 Jan 2023 13:01:14 GMT and should not be manually modified.
+This log was last generated on Wed, 22 Mar 2023 08:04:34 GMT and should not be manually modified.
+
+## 1.0.0
+Wed, 22 Mar 2023 08:04:34 GMT
+
+### Breaking changes
+
+- 升级基础依赖&优化构建模式
 
 ## 0.7.20
 Thu, 05 Jan 2023 13:01:14 GMT

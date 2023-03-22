@@ -2,6 +2,26 @@
   "name": "@bricking/base-builder",
   "entries": [
     {
+      "version": "3.0.0",
+      "tag": "@bricking/base-builder_v3.0.0",
+      "date": "Wed, 22 Mar 2023 08:04:34 GMT",
+      "comments": {
+        "major": [
+          {
+            "comment": "配置简化 & 自动生成模块联邦配置"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@bricking/toolkit\" from `^0.6.5` to `^1.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@bricking/runtime\" from `^0.4.6` to `^1.0.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "2.3.2",
       "tag": "@bricking/base-builder_v2.3.2",
       "date": "Mon, 19 Dec 2022 08:05:57 GMT",
