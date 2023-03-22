@@ -2,6 +2,18 @@
   "name": "@bricking/toolkit",
   "entries": [
     {
+      "version": "1.0.0",
+      "tag": "@bricking/toolkit_v1.0.0",
+      "date": "Wed, 22 Mar 2023 07:57:05 GMT",
+      "comments": {
+        "major": [
+          {
+            "comment": "优化各种工具方法"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.6.5",
       "tag": "@bricking/toolkit_v0.6.5",
       "date": "Mon, 19 Dec 2022 08:05:57 GMT",
