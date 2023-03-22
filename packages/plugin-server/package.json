@@ -1,6 +1,6 @@
 {
   "name": "@bricking/plugin-server",
-  "version": "1.0.5",
+  "version": "2.0.0",
   "description": "rollup dev server",
   "main": "dist/index.js",
   "typings": "dist/index.d.js",
