@@ -2,6 +2,23 @@
   "name": "@bricking/plugin-style",
   "entries": [
     {
+      "version": "1.0.0",
+      "tag": "@bricking/plugin-style_v1.0.0",
+      "date": "Wed, 22 Mar 2023 08:02:23 GMT",
+      "comments": {
+        "major": [
+          {
+            "comment": "升级依赖库 & 优化构建模式"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@bricking/toolkit\" from `^0.6.5` to `^1.0.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.6.6",
       "tag": "@bricking/plugin-style_v0.6.6",
       "date": "Mon, 19 Dec 2022 08:05:57 GMT",

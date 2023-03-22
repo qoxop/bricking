@@ -2,6 +2,18 @@
   "name": "@bricking/runtime",
   "entries": [
     {
+      "version": "1.0.0",
+      "tag": "@bricking/runtime_v1.0.0",
+      "date": "Wed, 22 Mar 2023 08:02:23 GMT",
+      "comments": {
+        "major": [
+          {
+            "comment": "优化导出类型和Css引用插件&新增模块联邦代码生成函数"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.4.6",
       "tag": "@bricking/runtime_v0.4.6",
       "date": "Mon, 19 Dec 2022 08:05:57 GMT",
