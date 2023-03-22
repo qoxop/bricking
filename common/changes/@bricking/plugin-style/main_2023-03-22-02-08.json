@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@bricking/plugin-style",
+      "comment": "升级依赖库 & 优化构建模式",
+      "type": "major"
+    }
+  ],
+  "packageName": "@bricking/plugin-style"
+}

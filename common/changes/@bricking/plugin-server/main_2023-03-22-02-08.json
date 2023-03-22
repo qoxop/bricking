@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@bricking/plugin-server",
+      "comment": "升级依赖库",
+      "type": "major"
+    }
+  ],
+  "packageName": "@bricking/plugin-server"
+}

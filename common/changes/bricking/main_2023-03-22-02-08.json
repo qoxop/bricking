@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "bricking",
+      "comment": "升级基础依赖&优化构建模式",
+      "type": "major"
+    }
+  ],
+  "packageName": "bricking"
+}

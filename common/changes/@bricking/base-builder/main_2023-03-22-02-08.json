@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@bricking/base-builder",
+      "comment": "配置简化 & 自动生成模块联邦配置",
+      "type": "major"
+    }
+  ],
+  "packageName": "@bricking/base-builder"
+}

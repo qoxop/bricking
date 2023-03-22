@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@bricking/runtime",
+      "comment": "优化导出类型和Css引用插件&新增模块联邦代码生成函数",
+      "type": "major"
+    }
+  ],
+  "packageName": "@bricking/runtime"
+}
