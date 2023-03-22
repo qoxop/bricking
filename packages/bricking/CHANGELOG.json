@@ -2,6 +2,29 @@
   "name": "bricking",
   "entries": [
     {
+      "version": "1.0.0",
+      "tag": "bricking_v1.0.0",
+      "date": "Wed, 22 Mar 2023 12:55:25 GMT",
+      "comments": {
+        "major": [
+          {
+            "comment": "升级基础依赖&优化构建模式"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@bricking/plugin-server\" to `2.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@bricking/plugin-style\" to `1.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@bricking/toolkit\" from `^0.6.5` to `^1.0.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.7.20",
       "tag": "bricking_v0.7.20",
       "date": "Thu, 05 Jan 2023 13:01:14 GMT",
