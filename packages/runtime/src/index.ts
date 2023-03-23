@@ -138,7 +138,12 @@ const bricking = Object.freeze({
       System.import(key).then((m) => {
         resolve({
           get(k) {
-            return () => (k && k !== '.' ? m[k] : m);
+            if (k === '.') return () => m;
+            // 加载子模块
+            const sub = `${key}${k.replace('.', '')}`;
+            if (CUSTOM_MODULE_MAPS[sub]) return System.import(sub).then((subM) => () => subM);
+            // 尝试从字段中获取
+            return () => m[k.replace('./', '')];
           },
           init() {
             return m;
