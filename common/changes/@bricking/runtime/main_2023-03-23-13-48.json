@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@bricking/runtime",
+      "comment": "修复模块联邦模块查询方式",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@bricking/runtime"
+}
