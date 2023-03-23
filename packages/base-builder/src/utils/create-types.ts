@@ -31,7 +31,7 @@ export async function createTypes() {
   const types:Record<string, btkType.TypesData['list'][0]> = {};
   bundle.expose.forEach((item) => {
     // 自定义模块需要生成类型
-    if (typeof item !== 'string' && !dependencies[item.name] && item.path && !item.subPath) {
+    if (typeof item !== 'string' && !dependencies[item.name] && item.path && !item.isSubLib) {
       // 移除可能存在的前缀
       const moduleName = item.name.indexOf(`${name}/`) === 0 ? item.name.replace(`${name}/`, '') : item.name;
       types[moduleName] = {
@@ -41,6 +41,7 @@ export async function createTypes() {
       };
     }
   });
+  if (!Object.keys(types).length) return;
   const worker = btkType.runTypesWorker(Object.values(types));
   await worker?.generated;
   await worker?.terminate();

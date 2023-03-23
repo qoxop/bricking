@@ -25,7 +25,7 @@ export function createWebpackInfo() {
       }
     } else {
       // 自定义导出模块添加前缀
-      let moduleName = (dependencies[item.name] || item.name.indexOf(`${name}/`) === 0 || item.subPath) ? item.name : `${name}/${item.name}`;
+      let moduleName = (dependencies[item.name] || item.name.indexOf(`${name}/`) === 0 || item.isSubLib) ? item.name : `${name}/${item.name}`;
       if (moduleName === `${name}/index`) {
         moduleName = name;
       }
@@ -34,7 +34,13 @@ export function createWebpackInfo() {
   });
   const webpackOutput = path.resolve(output, './webpack');
   const remotesJSPath = path.resolve(webpackOutput, './remotes.js');
-  const remotesJsCode = `module.exports = ${JSON.stringify(remotes, null, '\t')}`;
+
+  // 将remotes 按照key值长度排序，保证子模块在父模块前面
+  const remotesSorted = Object.keys(remotes).sort((a, b) => b.length - a.length)
+    .reduce((obj, key) => ({ ...obj, [key]: remotes[key] }), {});
+
+  // 生成 remotes.js 文件
+  const remotesJsCode = `module.exports = ${JSON.stringify(remotesSorted, null, '\t')}`;
   if (!fs.existsSync(webpackOutput)) {
     fs.mkdirSync(webpackOutput, { recursive: true });
   }

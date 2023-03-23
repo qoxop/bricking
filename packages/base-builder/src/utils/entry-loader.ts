@@ -33,7 +33,7 @@ module.exports = () => {
       moduleRecord[item.name] = { sync: false, ...item };
     } else if (item.path) {
       // 自定义模块
-      const moduleName = (item.name.indexOf(`${name}/`) === 0 || item.subPath) ? item.name : `${name}/${item.name}`;
+      const moduleName = (item.name.indexOf(`${name}/`) === 0 || item.isSubLib) ? item.name : `${name}/${item.name}`;
       moduleRecord[moduleName] = {
         sync: true,
         ...item,

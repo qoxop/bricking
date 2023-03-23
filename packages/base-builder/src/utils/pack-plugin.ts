@@ -2,7 +2,7 @@ import {
   Compilation,
   Compiler,
 } from 'webpack';
-import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 import { updatePkgJson, createTypes } from './create-types';
 import { getPackageJson, paths } from '../paths';
@@ -74,7 +74,7 @@ export default class BrickingPackPlugin {
             }), null, '\t'),
           );
           createWebpackInfo();
-          await createTypes();
+          createTypes().then(() => console.log('createTypes done ~'));
           callback();
         },
       );

@@ -19,7 +19,7 @@ export type ModuleInfo = {
    * 是否同步注入，默认否
    */
   sync?: boolean;
-  subPath?: boolean;
+  isSubLib?: boolean;
 };
 export type UserOptions = {
   /**
