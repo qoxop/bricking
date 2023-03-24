@@ -12,7 +12,7 @@
     "linkDirectory": true
   },
   "dependencies": {
-		"@babel/runtime": "^7.17.2",
+		"@babel/runtime": "7.17.2",
 		"@bricking/runtime": "workspace:*",
 		"@types/react": "18.0.15",
 		"@types/react-dom": "18.0.6",

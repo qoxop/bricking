@@ -34,7 +34,7 @@
     "@babel/preset-env": "~7.20.2",
     "@babel/preset-react": "^7.18.6",
     "@babel/preset-typescript": "^7.21.0",
-    "@babel/runtime": "^7.17.2",
+    "@babel/runtime": "7.17.2",
     "@bricking/toolkit": "workspace:^1.0.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.4",
     "@svgr/webpack": "^6.2.1",

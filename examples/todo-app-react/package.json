@@ -8,7 +8,7 @@
     "build": "bricking build"
   },
   "dependencies": {
-    "@babel/runtime": "^7.17.2",
+    "@babel/runtime": "7.17.2",
     "@bricking/runtime": "workspace:*",
     "@bricking/shared-libs": "workspace:*",
     "@types/react": "18.0.15",
