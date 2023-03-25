@@ -2,6 +2,18 @@
   "name": "@bricking/runtime",
   "entries": [
     {
+      "version": "1.0.2",
+      "tag": "@bricking/runtime_v1.0.2",
+      "date": "Sat, 25 Mar 2023 03:00:52 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "模块查询优化"
+          }
+        ]
+      }
+    },
+    {
       "version": "1.0.1",
       "tag": "@bricking/runtime_v1.0.1",
       "date": "Fri, 24 Mar 2023 03:06:54 GMT",
