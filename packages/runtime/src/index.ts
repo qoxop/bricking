@@ -30,6 +30,12 @@ const ORIGIN_INSTANTIATE = SystemPrototype.instantiate;
 /** 原始的模块元数据生产函数 */
 const ORIGIN_CREATE_CONTEXT = SystemPrototype.createContext;
 
+// TODO 移除兼容旧版本的代码
+/** Link 模式引入的 css 模块正则  */
+const CSS_LINK_MODULE_PATTERN = /^___INJECT_STYLE_LINK___\?link=/;
+/** Link 模式引入的 css 模块标识 */
+const CSS_LINK_MODULE_STRING = '___INJECT_STYLE_LINK___';
+
 function getVarRegister(m: unknown) {
   return [[], (_export: Function) => ({ setters: [], execute: () => { _export(m); } })];
 }
@@ -46,7 +52,8 @@ SystemPrototype.createContext = function (parentId: string) {
 
 // 自定义 模块 id 处理钩子
 SystemPrototype.resolve = function (id: string, parentURL?: string) {
-  if (CUSTOM_MODULE_MAPS[id]) return id;
+  // TODO 移除兼容旧版本的代码
+  if (CUSTOM_MODULE_MAPS[id] || CSS_LINK_MODULE_PATTERN.test(id) || CSS_LINK_MODULE_STRING === id) return id;
   // 调用原始方法处理URL
   const finalUrl = IMPORT_MAPS[id] ? ORIGIN_RESOLVE.call(this, IMPORT_MAPS[id], parentURL) : ORIGIN_RESOLVE.call(this, id, parentURL);
   // 更新 metadata
@@ -71,7 +78,8 @@ SystemPrototype.instantiate = function (url: string, firstParentUrl?: string) {
   // 处理 css 模块
   if (/(\.|\|)css$/.test(url)) { // 兼容非 .css 后缀的 css 文件
     return new Promise((resolve) => {
-      const cssUrl = url.replace(/\|css$/, '');
+      // TODO 移除兼容旧版本的代码
+      const cssUrl = CSS_LINK_MODULE_PATTERN.test(url) ? url.split('?link=')[1].replace(/\|css$/, '') : url.replace(/\|css$/, '');
       // 处理绝对路径和相对路径
       const cssHref = /^https?:\/\//.test(cssUrl) ? cssUrl : new URL(cssUrl, firstParentUrl).href;
       // 插入 link 元素
@@ -93,10 +101,16 @@ SystemPrototype.instantiate = function (url: string, firstParentUrl?: string) {
       }
     });
   }
+  // TODO 移除兼容旧版本的代码
+  if (CSS_LINK_MODULE_STRING === url) {
+    return new Promise((resolve) => {
+      resolve(getVarRegister({ }));
+    });
+  }
   return ORIGIN_INSTANTIATE.call(this, url, firstParentUrl);
 };
 
-// FIXME 移除版本旧的兼容 Api
+// TODO 移除兼容旧版本的代码
 const mm = {
   /**
    * 注入自定义模块
@@ -119,7 +133,7 @@ const mm = {
   /**
    * 获取当前的模块映射
    */
-  getAll: () => ({ CUSTOM_MODULE_MAPS, IMPORT_MAPS }),
+  getAll: () => ({ CUSTOM_MODULE_MAPS, IMPORT_MAPS, META_DATA_MAPS }),
   /**
    * 注入动态模块
    */

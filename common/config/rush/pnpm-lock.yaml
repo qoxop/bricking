@@ -396,10 +396,10 @@ importers:
       eslint: ~8.23.1
       fs-extra: ^10.1.0
       rollup: ^3.17.2
-      systemjs: ^6.12.1
+      systemjs: ^6.14.1
       typescript: ^4.9.5
     dependencies:
-      systemjs: 6.13.0
+      systemjs: 6.14.1
     devDependencies:
       '@bricking/common-config': link:../_common
       '@rollup/plugin-commonjs': 24.0.1_rollup@3.17.2
@@ -9920,8 +9920,8 @@ packages:
     resolution: {integrity: sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==}
     dev: false
 
-  /systemjs/6.13.0:
-    resolution: {integrity: sha512-P3cgh2bpaPvAO2NE3uRp/n6hmk4xPX4DQf+UzTlCAycssKdqhp6hjw+ENWe+aUS7TogKRFtptMosTSFeC6R55g==}
+  /systemjs/6.14.1:
+    resolution: {integrity: sha512-8ftwWd+XnQtZ/aGbatrN4QFNGrKJzmbtixW+ODpci7pyoTajg4sonPP8aFLESAcuVxaC1FyDESt+SpfFCH9rZQ==}
     dev: false
 
   /tapable/2.2.1:
