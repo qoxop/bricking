@@ -1,6 +1,13 @@
 # Change Log - @bricking/runtime
 
-This log was last generated on Fri, 24 Mar 2023 03:06:54 GMT and should not be manually modified.
+This log was last generated on Sat, 25 Mar 2023 02:58:04 GMT and should not be manually modified.
+
+## 1.0.2
+Sat, 25 Mar 2023 02:58:04 GMT
+
+### Patches
+
+- 模块查询优化
 
 ## 1.0.1
 Fri, 24 Mar 2023 03:06:54 GMT
