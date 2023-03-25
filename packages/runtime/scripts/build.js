@@ -17,7 +17,7 @@ if (!fs.existsSync(DistDir)) fs.mkdirSync(DistDir);
       outDir: DistDir,
       emitDeclarationOnly: false,
       esModuleInterop: true,
-      declaration: false,
+      declaration: true,
       skipLibCheck: true,
     },
   }).emit();
@@ -33,15 +33,16 @@ if (!fs.existsSync(DistDir)) fs.mkdirSync(DistDir);
   await rollupBundle.write({
     format: 'iife',
     file: path.resolve(DistDir, 'bricking.min.js'),
+    name: 'bricking',
     sourcemap: false,
   })
 
 
-  // copy
-  fs.writeFileSync(
-    path.resolve(DistDir, './index.d.ts'),
-    fs.readFileSync(path.resolve(__dirname, '../global.d.ts'), 'utf8'),
-  );
+  // // copy
+  // fs.writeFileSync(
+  //   path.resolve(DistDir, './index.d.ts'),
+  //   fs.readFileSync(path.resolve(__dirname, '../global.d.ts'), 'utf8'),
+  // );
 })();
 
 

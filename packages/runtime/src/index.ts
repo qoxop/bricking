@@ -3,6 +3,12 @@
  */
 import 'systemjs/dist/s.min.js';
 
+type TPromiseFn<MT = any> = () => Promise<MT>;
+type TImportMaps = Record<string, string>;
+type TCustomModuleMaps = Record<string, any>;
+type TDynamicModuleMaps = Record<string, TPromiseFn>;
+type TMetaDataMaps = Record<string, any>;
+
 const isAsyncFlag = 'Symbol' in window ? Symbol('$async') : '$\0_is_async__';
 
 /** 拓展 systemjs 的 import-maps */
@@ -90,8 +96,11 @@ SystemPrototype.instantiate = function (url: string, firstParentUrl?: string) {
   return ORIGIN_INSTANTIATE.call(this, url, firstParentUrl);
 };
 
-const bricking = Object.freeze({
-  /** 注入自定义模块 */
+// FIXME 移除版本旧的兼容 Api
+const mm = {
+  /**
+   * 注入自定义模块
+   */
   set(maps:TCustomModuleMaps, force = true) {
     Object.keys(maps).forEach((name) => {
       if (force || !CUSTOM_MODULE_MAPS[name]) {
@@ -101,6 +110,16 @@ const bricking = Object.freeze({
       }
     });
   },
+  /**
+   * 查询单个自定义模块
+   */
+  get(name: string) {
+    return CUSTOM_MODULE_MAPS[name] || IMPORT_MAPS[name];
+  },
+  /**
+   * 获取当前的模块映射
+   */
+  getAll: () => ({ CUSTOM_MODULE_MAPS, IMPORT_MAPS }),
   /**
    * 注入动态模块
    */
@@ -115,7 +134,9 @@ const bricking = Object.freeze({
       }
     });
   },
-  /** 拓展 systemjs 的 import map  */
+  /**
+   * 拓展 systemjs 的 importmap
+   */
   extendImportMaps(maps:TImportMaps, force = true) {
     Object.keys(maps).forEach((name) => {
       if (force || !IMPORT_MAPS[name]) {
@@ -123,7 +144,9 @@ const bricking = Object.freeze({
       }
     });
   },
-  /** 加载模块前为该模块设置 meta 数据 */
+  /**
+   * 加载模块前为该模块设置 meta 数据
+   */
   setMetadata(id: string, data:Record<string, any>) {
     if (typeof id === 'string' && typeof data === 'object') {
       META_DATA_MAPS[id] = data;
@@ -139,10 +162,16 @@ const bricking = Object.freeze({
         resolve({
           get(k) {
             if (k === '.') return () => m;
-            // 加载子模块
+            // 全路径尝试
             const sub = `${key}${k.replace('.', '')}`;
             if (CUSTOM_MODULE_MAPS[sub]) return System.import(sub).then((subM) => () => subM);
-            // 尝试从字段中获取
+            // 二层路径尝试
+            const sSubArr = sub.split('/');
+            if (sSubArr.length > 2) {
+              const sSub = sSubArr.slice(0, 2).join('/');
+              if (CUSTOM_MODULE_MAPS[sSub]) return System.import(sSub).then((subM) => () => subM[sSubArr.slice(2).join('/')]);
+            }
+            // 尝试从子字段中尝试
             return () => m[k.replace('./', '')];
           },
           init() {
@@ -152,6 +181,7 @@ const bricking = Object.freeze({
       });
     });
   },
+  /** 加载 css 文件 */
   addCssLink(links: string[], parentUrl?: string) {
     return Promise.all(
       links
@@ -166,13 +196,18 @@ const bricking = Object.freeze({
         }))),
     );
   },
-});
+};
 
-if (!window.$bricking) {
+const bricking = Object.freeze({
+  mm,
+  ...mm,
+});
+if (!(window as any).$bricking) {
   Object.defineProperty(window, '$bricking', {
     get() {
       return bricking;
     },
   });
 }
+export type TBricking = typeof bricking;
 export default bricking;
