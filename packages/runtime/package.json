@@ -1,6 +1,6 @@
 {
   "name": "@bricking/runtime",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "bricking 运行时",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
