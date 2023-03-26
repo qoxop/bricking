@@ -2,6 +2,18 @@
   "name": "bricking",
   "entries": [
     {
+      "version": "1.0.1",
+      "tag": "bricking_v1.0.1",
+      "date": "Sun, 26 Mar 2023 13:58:07 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "修复图片引用问题&修复依赖安装命令"
+          }
+        ]
+      }
+    },
+    {
       "version": "1.0.0",
       "tag": "bricking_v1.0.0",
       "date": "Wed, 22 Mar 2023 12:57:38 GMT",
