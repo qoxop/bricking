@@ -1,5 +1,5 @@
 {
-  "include": ["src/**/*", "./bootstrap.tsx"],
+  "include": ["src/**/*", "./bootstrap.tsx", "global.d.ts"],
   "exclude": ["__sapper__/*", "public/*", "dist"],
   "compilerOptions": {
     "composite": true,

@@ -5,6 +5,11 @@ export default defineBricking({
   modules: {
     'todo-app': './src/bundle.ts'
   },
+  assets: {
+    include: [/\.png$/, /\.svg$/],
+    limit: 10,
+    filename: 'imgs/[hash][extname]'
+  },
   basePackage: {
     name: '@bricking/shared-libs',
     version: 'workspace:*'

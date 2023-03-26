@@ -10,10 +10,10 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { getBabelOutputPlugin } from '@rollup/plugin-babel';
 import { rollupStylePlugin } from '@bricking/plugin-style';
 import { livereloadServer, openBrowser } from '@bricking/plugin-server';
-import { btkDom, btkFile, btkType, fsExtra } from '@bricking/toolkit';
+import { btkDom, btkFile, btkType, fsExtra, btkPath } from '@bricking/toolkit';
 import config, { packageJson, tsConfig, tsConfigPath, workspace, outputPackPath, configPath } from './config';
 import rollupBundle from './plugins/rollup-bundle';
-import rollupUrl from './plugins/rollup-url';
+import rollupUrl, { BabelUrlReplacePlugin } from './plugins/rollup-url';
 import rollupLog from './plugins/rollup-log';
 import { getBaseLibInfo } from './install';
 import { BrickingJson } from './typing';
@@ -22,24 +22,6 @@ import * as logs from './utils/log';
 const cleanPath = async (output: string) => {
   await fsExtra.emptyDir(output);
   mkdirSync(output, { recursive: true });
-};
-
-const getModuleAliasFromTsConfig = () => {
-  const entries = {};
-  Object.entries(tsConfig?.compilerOptions?.paths || {}).forEach(([key, value]) => {
-    // @ts-ignore
-    let relativePath = value[0];
-    if (/\/\*$/.test(key)) {
-      key = key.replace(/\/\*$/, '');
-    }
-    if (/\/\*$/.test(relativePath)) {
-      relativePath = relativePath.replace(/\/\*$/, '');
-    }
-    if (!entries[key]) {
-      entries[key] = path.join(workspace, relativePath);
-    }
-  });
-  return entries;
 };
 
 /**
@@ -73,7 +55,7 @@ const getCommonPlugin = () => ([
   commonjs(),
   builtins({ crypto: true }),
   alias({
-    entries: getModuleAliasFromTsConfig(),
+    entries: btkPath.getPathAliasByTsConfig(tsConfig, workspace),
     customResolver: nodeResolve({
       extensions: ['.mjs', '.js', '.jsx', '.ts', '.tsx', '.json', '.sass', '.scss', '.less', '.svelte', '.vue'],
     }) as any,
@@ -171,6 +153,9 @@ const build = async (
       format: 'esm',
       plugins: [
         getBabelOutputPlugin({
+          plugins: [
+            [BabelUrlReplacePlugin, { mode: 'script' }],
+          ],
           presets: [
             [require.resolve('@babel/preset-env'), {
               useBuiltIns: 'entry',
@@ -195,6 +180,13 @@ const build = async (
       dir: outputPackPath,
       format: 'esm',
       entryFileNames: '[name].js',
+      plugins: [
+        getBabelOutputPlugin({
+          plugins: [
+            [BabelUrlReplacePlugin, { mode: 'module' }],
+          ],
+        }),
+      ],
       sourcemap: true,
     });
     if (!ret.bundle) ret.bundle = bundle;
@@ -217,6 +209,9 @@ const build = async (
       format: 'esm',
       plugins: [
         getBabelOutputPlugin({
+          plugins: [
+            [BabelUrlReplacePlugin, { mode: 'script' }],
+          ],
           presets: [
             [require.resolve('@babel/preset-env'), {
               useBuiltIns: 'entry',
@@ -261,6 +256,7 @@ const watch = async (
       plugins: [
         getBabelOutputPlugin({
           plugins: [
+            [BabelUrlReplacePlugin, { mode: 'script' }],
             require.resolve('@babel/plugin-proposal-dynamic-import'),
             require.resolve('@babel/plugin-transform-modules-systemjs'),
           ],

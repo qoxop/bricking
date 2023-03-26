@@ -60,7 +60,10 @@ require('yargs')
     '安装基座包的对等依赖(以供开发时的类型提醒)',
     () => void 0,
     (args) => {
-      require('../dist/install').install((args._ || []).slice(1));
+      const { initBaseLibInfo, install } = require('../dist/install');
+      initBaseLibInfo().then(() => {
+        install((args._ || []).slice(1));
+      });
     },
   )
   .command(

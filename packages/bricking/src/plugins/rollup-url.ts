@@ -6,17 +6,17 @@ import fs from 'fs';
 import path from 'path';
 import util from 'util';
 import { Plugin } from 'rollup';
-import { parse, print, types, visit } from 'recast';
 import { btkFunc, btkHash } from '@bricking/toolkit';
 import { createFilter, FilterPattern } from '@rollup/pluginutils';
 
 const mkdir = util.promisify(fs.mkdir);
 const PLUGIN_NAME = 'bricking-url';
-const PREFIX = `\0${PLUGIN_NAME}:::`;
+const PREFIX = `${PLUGIN_NAME}:::`;
+const BabelUrlReplacePlugin = require.resolve('./babel-replace');
 
 const fsStatPromise = util.promisify(fs.stat);
 const fsReadFilePromise = util.promisify(fs.readFile);
-const { posix, sep } = path;
+
 const defaultInclude = ['**/*.svg', '**/*.png', '**/*.jp(e)?g', '**/*.gif', '**/*.webp'];
 
 type UrlOptions = {
@@ -67,7 +67,6 @@ const url = (options:UrlOptions = {}):Plugin => {
     limit = 14 * 1024,
     include = defaultInclude,
     exclude = [],
-    publicPath = '',
     fileName = '[hash][extname]',
   } = options;
   const filter = createFilter(include, exclude);
@@ -109,57 +108,8 @@ const url = (options:UrlOptions = {}):Plugin => {
       return `export default "${PREFIX}${outputFileName}"`;
     },
     async generateBundle(outputOptions, bundle) {
+      // 没有资源不需要处理
       if (!Object.keys(bundle).length || !AssetsMap.size) return Promise.resolve();
-      // 将模板字符串替换成正确的路径或代码
-      const isSourceJs = ['commonjs', 'cjs', 'module', 'esm', 'es'].includes(outputOptions.format);
-      Object.entries(bundle).forEach(([, chunk]) => {
-        if (chunk.type === 'chunk') {
-          // 不存在对静态资源的引用时直接跳过
-          if (chunk.code.indexOf(PREFIX) === -1) return;
-          const ast = parse(chunk.code, {
-            parser: {
-              parse: (source: string) => this.parse(source, { ecmaVersion: 'latest', locations: true }),
-            },
-          });
-          const bds = types.builders;
-          visit(ast, {
-            visitLiteral(nodePath) {
-              const { value } = nodePath.node;
-              if (typeof value !== 'string' || !value.startsWith(PREFIX)) return this.traverse(nodePath);
-              const relativeUrl = value
-                .replace(PREFIX, (/^\.\//.test(value) ? '' : './'))
-                .split(sep)
-                .join(posix.sep); // Windows fix - exports must be in unix format
-              const replacementNode = isSourceJs
-                ? bds.callExpression( // 编译成 npm 包时，使用 require 语句引入图片
-                  bds.identifier('require'),
-                  [bds.literal(relativeUrl)],
-                )
-                : ( // 使用网络路径
-                  publicPath
-                    ? bds.literal(`${publicPath}${relativeUrl.replace(/^\.\//, '')}`)
-                    : bds.memberExpression(
-                      bds.newExpression(
-                        bds.identifier('URL'),
-                        [
-                          bds.literal(relativeUrl),
-                          bds.identifier('import.meta.url'),
-                        ],
-                      ),
-                      bds.identifier('href'),
-                    )
-                );
-              nodePath.replace(replacementNode);
-              this.traverse(nodePath);
-            },
-          });
-          // 修改代码 和 source-map
-          const result = print(ast);
-          chunk.code = result.code;
-          chunk.map = require('merge-source-map')(chunk.map, result.map);
-        }
-      });
-
       // 资源写入
       const base = outputOptions.dir || path.dirname(outputOptions.file as string);
       await mkDir(base);
@@ -177,7 +127,9 @@ const url = (options:UrlOptions = {}):Plugin => {
 };
 
 export {
+  PREFIX,
   AssetsMap,
+  BabelUrlReplacePlugin,
 };
 
 export default url;
