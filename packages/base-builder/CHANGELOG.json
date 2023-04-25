@@ -2,6 +2,18 @@
   "name": "@bricking/base-builder",
   "entries": [
     {
+      "version": "3.0.3",
+      "tag": "@bricking/base-builder_v3.0.3",
+      "date": "Tue, 25 Apr 2023 09:08:36 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "修复资源文件输出目录"
+          }
+        ]
+      }
+    },
+    {
       "version": "3.0.2",
       "tag": "@bricking/base-builder_v3.0.2",
       "date": "Tue, 25 Apr 2023 07:26:20 GMT",
