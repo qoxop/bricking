@@ -225,7 +225,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
             type: 'asset',
             mimetype: 'image/avif',
             generator: {
-              filename: 'img-[hash][ext]',
+              filename: 'browser/media/img-[hash][ext]',
             },
             parser: {
               dataUrlCondition: {
@@ -238,7 +238,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
             test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
             type: 'asset',
             generator: {
-              filename: 'img-[hash][ext]',
+              filename: 'browser/media/img-[hash][ext]',
             },
             parser: {
               dataUrlCondition: {
@@ -267,7 +267,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
               {
                 loader: RS('file-loader'),
                 options: {
-                  name: 'svg-[name].[hash].[ext]',
+                  name: 'browser/media/svg-[name].[hash].[ext]',
                 },
               },
             ].filter(Boolean),
@@ -363,7 +363,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
             exclude: [/^$/, /\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
             type: 'asset/resource',
             generator: {
-              filename: 'asset-[hash][ext]',
+              filename: 'browser/media/asset-[hash][ext]',
             },
           },
         ],
