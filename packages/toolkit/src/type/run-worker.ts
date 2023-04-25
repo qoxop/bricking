@@ -1,3 +1,5 @@
+import path from 'path';
+import fs from 'fs-extra';
 import { Worker } from 'node:worker_threads';
 
 export type TypesData = {
@@ -6,6 +8,7 @@ export type TypesData = {
 }
 
 export const runTypesWorker = (workerData: TypesData['list']) => {
+  const cwd = workerData[0]?.cwd || process.cwd();
   const worker = new Worker(require.resolve('./types-worker'), { workerData });
   const callbacks:any = {};
   worker.on('message', (data) => {
@@ -44,6 +47,9 @@ export const runTypesWorker = (workerData: TypesData['list']) => {
   return {
     emit,
     generated,
-    terminate: () => worker.terminate(),
+    terminate: async () => {
+      await worker.terminate();
+      return fs.removeSync(path.resolve(cwd, './__temp'));
+    },
   };
 };

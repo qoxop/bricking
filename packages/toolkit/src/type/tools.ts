@@ -87,9 +87,9 @@ export const createTypeDefine = (props: {
       output,
       input: OutputName,
     });
-  } finally {
-    // 删除临时目录
-    fs.removeSync(TempDir);
+    return TempDir;
+  } catch (e) {
+    return TempDir;
   }
 };
 
