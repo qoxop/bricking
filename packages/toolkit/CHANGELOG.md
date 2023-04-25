@@ -1,6 +1,13 @@
 # Change Log - @bricking/toolkit
 
-This log was last generated on Wed, 22 Mar 2023 12:57:38 GMT and should not be manually modified.
+This log was last generated on Tue, 25 Apr 2023 07:26:20 GMT and should not be manually modified.
+
+## 1.0.1
+Tue, 25 Apr 2023 07:26:20 GMT
+
+### Patches
+
+- 修复临时类型目录被提前删除的问题
 
 ## 1.0.0
 Wed, 22 Mar 2023 12:57:38 GMT

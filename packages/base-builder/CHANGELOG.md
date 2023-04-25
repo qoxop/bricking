@@ -1,6 +1,13 @@
 # Change Log - @bricking/base-builder
 
-This log was last generated on Fri, 24 Mar 2023 03:06:54 GMT and should not be manually modified.
+This log was last generated on Tue, 25 Apr 2023 07:26:20 GMT and should not be manually modified.
+
+## 3.0.2
+Tue, 25 Apr 2023 07:26:20 GMT
+
+### Patches
+
+- 修复构建报错
 
 ## 3.0.1
 Fri, 24 Mar 2023 03:06:54 GMT

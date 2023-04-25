@@ -32,7 +32,7 @@
     "@babel/preset-env": "~7.20.2",
     "@bricking/plugin-server": "workspace:*",
     "@bricking/plugin-style": "workspace:*",
-    "@bricking/toolkit": "workspace:^1.0.0",
+    "@bricking/toolkit": "workspace:^1.0.1",
     "@rollup/plugin-alias": "^4.0.3",
     "@rollup/plugin-commonjs": "^24.0.1",
     "@rollup/plugin-json": "^6.0.0",

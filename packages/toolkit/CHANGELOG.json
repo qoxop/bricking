@@ -2,6 +2,18 @@
   "name": "@bricking/toolkit",
   "entries": [
     {
+      "version": "1.0.1",
+      "tag": "@bricking/toolkit_v1.0.1",
+      "date": "Tue, 25 Apr 2023 07:26:20 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "修复临时类型目录被提前删除的问题"
+          }
+        ]
+      }
+    },
+    {
       "version": "1.0.0",
       "tag": "@bricking/toolkit_v1.0.0",
       "date": "Wed, 22 Mar 2023 12:57:38 GMT",
