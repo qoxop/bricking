@@ -49,7 +49,11 @@ export const runTypesWorker = (workerData: TypesData['list']) => {
     generated,
     terminate: async () => {
       await worker.terminate();
-      return fs.removeSync(path.resolve(cwd, './__temp'));
+      try {
+        fs.removeSync(path.resolve(cwd, './__temp'));
+      } catch (error) {
+        // ignore
+      }
     },
   };
 };

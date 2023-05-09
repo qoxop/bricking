@@ -73,7 +73,7 @@ export const createTypeDefine = (props: {
     }
     input = `${input}${ext}`;
   }
-  const TempDir = path.resolve(cwd, './__temp');
+  const TempDir = path.resolve(cwd, `./__temp/${Math.random().toString(36).slice(2)}}`);
   const OutputName = path.resolve(TempDir, `${path.parse(input).name}.d.ts`);
   try {
     // 生成类型定义文件
@@ -87,9 +87,9 @@ export const createTypeDefine = (props: {
       output,
       input: OutputName,
     });
-    return TempDir;
+    return fs.removeSync(TempDir);
   } catch (e) {
-    return TempDir;
+    return fs.removeSync(TempDir);
   }
 };
 
