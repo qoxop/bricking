@@ -1,8 +1,19 @@
 # Change Log - bricking
 
+## 1.0.2
+
+### Patch Changes
+
+- 58beea3c: 更新 lint
+- Updated dependencies [58beea3c]
+  - @bricking/plugin-server@2.0.1
+  - @bricking/plugin-style@1.0.1
+  - @bricking/toolkit@1.0.2
+
 This log was last generated on Sun, 26 Mar 2023 13:58:07 GMT and should not be manually modified.
 
 ## 1.0.1
+
 Sun, 26 Mar 2023 13:58:07 GMT
 
 ### Patches
@@ -10,6 +21,7 @@ Sun, 26 Mar 2023 13:58:07 GMT
 - 修复图片引用问题&修复依赖安装命令
 
 ## 1.0.0
+
 Wed, 22 Mar 2023 12:57:38 GMT
 
 ### Breaking changes
@@ -17,11 +29,13 @@ Wed, 22 Mar 2023 12:57:38 GMT
 - 升级基础依赖&优化构建模式
 
 ## 0.7.20
+
 Thu, 05 Jan 2023 13:01:14 GMT
 
 _Version update only_
 
 ## 0.7.19
+
 Thu, 05 Jan 2023 09:25:42 GMT
 
 ### Patches
@@ -29,6 +43,7 @@ Thu, 05 Jan 2023 09:25:42 GMT
 - 优化开发体验
 
 ## 0.7.18
+
 Tue, 03 Jan 2023 06:24:26 GMT
 
 ### Patches
@@ -36,6 +51,7 @@ Tue, 03 Jan 2023 06:24:26 GMT
 - 不打包 .map 文件
 
 ## 0.7.17
+
 Tue, 27 Dec 2022 01:18:24 GMT
 
 ### Patches
@@ -43,16 +59,19 @@ Tue, 27 Dec 2022 01:18:24 GMT
 - 优化页面启动时机
 
 ## 0.7.16
+
 Mon, 26 Dec 2022 15:24:50 GMT
 
 _Version update only_
 
 ## 0.7.15
+
 Mon, 26 Dec 2022 15:16:22 GMT
 
 _Version update only_
 
 ## 0.7.14
+
 Mon, 26 Dec 2022 14:58:14 GMT
 
 ### Patches
@@ -60,6 +79,7 @@ Mon, 26 Dec 2022 14:58:14 GMT
 - 替换热重载功能
 
 ## 0.7.13
+
 Wed, 21 Dec 2022 05:47:53 GMT
 
 ### Patches
@@ -67,6 +87,7 @@ Wed, 21 Dec 2022 05:47:53 GMT
 - 添加 scriptId 参数
 
 ## 0.7.12
+
 Wed, 21 Dec 2022 03:30:25 GMT
 
 ### Patches
@@ -74,6 +95,7 @@ Wed, 21 Dec 2022 03:30:25 GMT
 - 支持多个热重载服务
 
 ## 0.7.11
+
 Wed, 21 Dec 2022 02:44:14 GMT
 
 ### Patches
@@ -81,6 +103,7 @@ Wed, 21 Dec 2022 02:44:14 GMT
 - 支持修改热更新端口
 
 ## 0.7.10
+
 Tue, 20 Dec 2022 02:19:10 GMT
 
 ### Patches
@@ -88,6 +111,7 @@ Tue, 20 Dec 2022 02:19:10 GMT
 - 优化开发体验
 
 ## 0.7.9
+
 Mon, 19 Dec 2022 09:37:06 GMT
 
 ### Patches
@@ -95,6 +119,7 @@ Mon, 19 Dec 2022 09:37:06 GMT
 - 统一处理 externals
 
 ## 0.7.8
+
 Mon, 19 Dec 2022 08:05:57 GMT
 
 ### Patches
@@ -102,21 +127,24 @@ Mon, 19 Dec 2022 08:05:57 GMT
 - update ts & 优化开发体验
 
 ## 0.7.7
+
 Sun, 18 Dec 2022 04:00:03 GMT
 
 ### Patches
 
-- 撤销rollup更新
+- 撤销 rollup 更新
 - 修复问题
 
 ## 0.7.6
+
 Sun, 18 Dec 2022 03:07:26 GMT
 
 ### Patches
 
-- 输出和消费externals
+- 输出和消费 externals
 
 ## 0.7.5
+
 Sun, 18 Dec 2022 02:58:35 GMT
 
 ### Patches
@@ -124,13 +152,15 @@ Sun, 18 Dec 2022 02:58:35 GMT
 - 修复问题
 
 ## 0.7.4
+
 Sun, 18 Dec 2022 02:35:36 GMT
 
 ### Patches
 
--  优化开发模式
+- 优化开发模式
 
 ## 0.7.3
+
 Sat, 17 Dec 2022 09:14:36 GMT
 
 ### Patches
@@ -138,6 +168,7 @@ Sat, 17 Dec 2022 09:14:36 GMT
 - 修复问题
 
 ## 0.7.2
+
 Sat, 17 Dec 2022 08:18:25 GMT
 
 ### Patches
@@ -145,6 +176,7 @@ Sat, 17 Dec 2022 08:18:25 GMT
 - 优化库模式构建逻辑
 
 ## 0.7.1
+
 Fri, 16 Dec 2022 08:25:57 GMT
 
 ### Patches
@@ -152,6 +184,7 @@ Fri, 16 Dec 2022 08:25:57 GMT
 - 优化库打包模式
 
 ## 0.7.0
+
 Thu, 15 Dec 2022 09:11:11 GMT
 
 ### Minor changes
@@ -159,6 +192,7 @@ Thu, 15 Dec 2022 09:11:11 GMT
 - 增加库打包模式
 
 ## 0.6.7
+
 Sat, 19 Nov 2022 05:16:53 GMT
 
 ### Patches
@@ -166,20 +200,23 @@ Sat, 19 Nov 2022 05:16:53 GMT
 - 添加错误捕获
 
 ## 0.6.6
+
 Mon, 31 Oct 2022 09:31:55 GMT
 
 ### Patches
 
-- 避免更改workspace协议的版本号
+- 避免更改 workspace 协议的版本号
 
 ## 0.6.5
+
 Tue, 25 Oct 2022 15:40:47 GMT
 
 ### Patches
 
-- 修复 monorepo 项目的生产模式下子项目安装依赖失败的问题 
+- 修复 monorepo 项目的生产模式下子项目安装依赖失败的问题
 
 ## 0.6.4
+
 Tue, 25 Oct 2022 12:21:10 GMT
 
 ### Patches
@@ -187,6 +224,7 @@ Tue, 25 Oct 2022 12:21:10 GMT
 - 自动安装版本变更&优化别名配置
 
 ## 0.6.3
+
 Mon, 17 Oct 2022 14:47:18 GMT
 
 ### Patches
@@ -194,6 +232,7 @@ Mon, 17 Oct 2022 14:47:18 GMT
 - 修复相对路径问题
 
 ## 0.6.2
+
 Mon, 17 Oct 2022 13:41:30 GMT
 
 ### Patches
@@ -201,13 +240,15 @@ Mon, 17 Oct 2022 13:41:30 GMT
 - fix external
 
 ## 0.6.1
+
 Mon, 17 Oct 2022 08:51:34 GMT
 
 ### Patches
 
-- 使publicPath支持非正式URL
+- 使 publicPath 支持非正式 URL
 
 ## 0.6.0
+
 Sun, 16 Oct 2022 16:18:59 GMT
 
 ### Minor changes
@@ -216,9 +257,9 @@ Sun, 16 Oct 2022 16:18:59 GMT
 - 配置项优化
 
 ## 0.5.0
+
 Sun, 18 Sep 2022 14:02:44 GMT
 
 ### Minor changes
 
-- 修改内部插件API名称
-
+- 修改内部插件 API 名称

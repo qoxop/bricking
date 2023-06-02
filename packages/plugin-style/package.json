@@ -1,6 +1,6 @@
 {
   "name": "@bricking/plugin-style",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "rollup style plugin",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -8,7 +8,9 @@
     "build": "del dist && tsc",
     "lint": "eslint ."
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "author": "张集伟",
   "publishConfig": {
     "access": "public"
@@ -20,7 +22,7 @@
   },
   "license": "ISC",
   "dependencies": {
-    "@bricking/toolkit": "workspace:^1.0.1",
+    "@bricking/toolkit": "workspace:^1.0.2",
     "concat-with-sourcemaps": "^1.1.0",
     "cssnano": "^5.1.12",
     "postcss": "^8.4.8",

@@ -1,43 +1,43 @@
 {
-	"name": "@bricking/shared-libs",
-	"version": "0.0.1",
-	"description": "基于 React 的基座包项目模版",
-	"main": "src/index.ts",
-	"scripts": {
-		"build": "base-builder build",
-    "dev": "base-builder dev"
-	},
-  "publishConfig": {
-    "directory": "dist",
-    "linkDirectory": true
-  },
-  "dependencies": {
-		"@babel/runtime": "7.17.2",
-		"@bricking/runtime": "workspace:*",
-		"@types/react": "18.0.15",
-		"@types/react-dom": "18.0.6",
-		"@types/styled-components": "^5.1.26",
-		"antd": "4.22.8",
-		"axios": "0.27.2",
-		"core-js": "~3.28.0",
-		"history": "^5.3.0",
-		"immer": "9.0.15",
-		"qs": "6.11.0",
-		"react": "18.2.0",
-		"react-dom": "18.2.0",
-		"react-ducky": "1.2.2",
-		"react-is": "18.2.0",
-		"react-router": "6.3.0",
-		"react-router-dom": "6.3.0",
-		"redux": "4.2.0",
-		"redux-saga": "1.1.3",
-		"styled-components": "5.3.5"
-	},
-	"devDependencies": {
-		"@bricking/base-builder": "workspace:*",
-		"less": "4.1.3",
-		"less-loader": "^10.2.0"
-	},
-	"author": "张集伟",
-	"license": "ISC"
+		"name": "@bricking/shared-libs",
+		"version": "0.0.1",
+		"description": "基于 React 的基座包项目模版",
+		"main": "src/index.ts",
+		"scripts": {
+				"build": "base-builder build",
+				"dev": "base-builder dev"
+		},
+		"publishConfig": {
+				"directory": "dist",
+				"linkDirectory": true
+		},
+		"dependencies": {
+				"@babel/runtime": "7.17.2",
+				"@bricking/runtime": "workspace:*",
+				"@types/react": "18.0.15",
+				"@types/react-dom": "18.0.6",
+				"@types/styled-components": "^5.1.26",
+				"antd": "4.22.8",
+				"axios": "0.27.2",
+				"core-js": "~3.28.0",
+				"history": "^5.3.0",
+				"immer": "9.0.15",
+				"qs": "6.11.0",
+				"react": "18.2.0",
+				"react-dom": "18.2.0",
+				"react-ducky": "1.2.2",
+				"react-is": "18.2.0",
+				"react-router": "6.3.0",
+				"react-router-dom": "6.3.0",
+				"redux": "4.2.0",
+				"redux-saga": "1.1.3",
+				"styled-components": "5.3.5"
+		},
+		"devDependencies": {
+				"@bricking/base-builder": "workspace:*",
+				"less": "4.1.3",
+				"less-loader": "^10.2.0"
+		},
+		"author": "张集伟",
+		"license": "ISC"
 }
