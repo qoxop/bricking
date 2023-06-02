@@ -10,7 +10,6 @@
   "ignore": [
     "@bricking/shared-libs",
     "@bricking/todo-app-react",
-    "@bricking/todo-app-svelte",
-    "@bricking/common-config"
+    "@bricking/todo-app-svelte"
   ]
 }

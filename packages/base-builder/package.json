@@ -79,7 +79,6 @@
   },
   "devDependencies": {
     "@types/node": "^17.0.21",
-    "@bricking/common-config": "workspace:*",
     "del-cli": "^4.0.1",
     "eslint": "~8.23.1"
   }

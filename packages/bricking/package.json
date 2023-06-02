@@ -69,7 +69,6 @@
     }
   },
   "devDependencies": {
-    "@bricking/common-config": "workspace:*",
     "@types/babel__core": "^7.20.0",
     "@types/express": "~4.17.15",
     "@types/inquirer": "^9.0.1",

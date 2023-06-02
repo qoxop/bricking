@@ -1,5 +1,5 @@
 {
-  "extends": "@bricking/common-config/tsconfig/node.json",
+  "extends": "../../tsconfig.json",
   "include": ["src/**/*"],
   "exclude": ["dist"],
   "compilerOptions": {

@@ -21,6 +21,16 @@ module.exports = {
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
+    "ignorePatterns": [
+        "node_modules/",
+        "dist/",
+        "scripts/",
+        "bin/",
+        "build/",
+        "public/",
+        "coverage/",
+        "*.min.js"
+    ],
     "plugins": [
         "react",
         "@typescript-eslint"

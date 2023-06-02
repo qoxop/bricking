@@ -1,5 +1,16 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
   "include": ["src/*", "global.d.ts"],
   "exclude": ["node_module", "dist"],
-  "extends": "@bricking/common-config/tsconfig/web.json",
+  "compilerOptions": {
+    "module": "ES6",
+    "moduleResolution": "Node",
+    "strict": true,
+    "declaration": true,
+    "sourceMap": false,
+    "noUnusedLocals": true,
+    "esModuleInterop": true,
+    "noImplicitAny": false,
+    "lib": ["ES2018", "dom"]
+  }
 }
