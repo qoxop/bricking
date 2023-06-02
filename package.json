@@ -1,8 +1,10 @@
 {
+	"type": "module",
 	"scripts": {
 		"build": "turbo build",
 		"test": "turbo test",
-		"lint": "turbo lint"
+		"lint": "turbo lint",
+		"deploy": "npx changeset status && changeset publish"
 	},
 	"dependencies": {
 		"@changesets/cli": "^2.26.1",

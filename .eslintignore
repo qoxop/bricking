@@ -8,3 +8,4 @@ apps/**/types/**/*
 **/dist/**/*
 
 _bricking/**/*
+scripts/**/*.js
