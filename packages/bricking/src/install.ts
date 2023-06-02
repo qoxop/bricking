@@ -36,6 +36,9 @@ const getInstallCommands = async () => {
       return !command;
     });
   }
+  if (!command && packageJson.packageManager) {
+    command = (packageJson.packageManager as string).split('@')[0] as string;
+  }
   if (!subCommands[command]) {
     const answers = await inquirer.prompt([{
       name: 'pkgManager',

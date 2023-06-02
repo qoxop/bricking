@@ -1,0 +1,11 @@
+{
+	"scripts": {
+		"build": "turbo build",
+		"test": "turbo test",
+		"lint": "turbo lint"
+	},
+	"dependencies": {
+		"@changesets/cli": "^2.26.1",
+		"turbo": "^1.10.1"
+	}
+}
