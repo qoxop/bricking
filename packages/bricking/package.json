@@ -1,6 +1,6 @@
 {
   "name": "bricking",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "一个基于 rollup 的 Systemjs 模块打包器",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -32,7 +32,7 @@
     "@babel/preset-env": "~7.20.2",
     "@bricking/plugin-server": "workspace:*",
     "@bricking/plugin-style": "workspace:*",
-    "@bricking/toolkit": "workspace:^1.0.2",
+    "@bricking/toolkit": "workspace:^1.0.3",
     "@rollup/plugin-alias": "^4.0.3",
     "@rollup/plugin-commonjs": "^24.0.1",
     "@rollup/plugin-json": "^6.0.0",
