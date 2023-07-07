@@ -276,13 +276,7 @@ const watch = async (
     return opt;
   }));
   if (config.modules) {
-    const worker = btkType.runTypesWorker(getTypesDefine());
-    // 如果是纯粹的 lib 模式，需要实时生成类型，以便于调试
-    if (mode === 'lib') {
-      watcher.on('change', () => {
-        worker.emit(getTypesDefine());
-      });
-    }
+    btkType.runTypesWorker(getTypesDefine());
   }
   return new Promise<string>((resolve) => {
     watcher.on('event', (event) => {
@@ -429,9 +423,11 @@ async function runBuild(devMode: boolean) {
   // 打包 npm 包
   if (config.modules) {
     // 同步地生成类型文件
-    const worker = btkType.runTypesWorker(getTypesDefine());
-    await worker.generated;
-    await worker.terminate();
+    try {
+      await btkType.runTypesWorker(getTypesDefine());
+    } catch (error) {
+      console.error('💥 runTypesWorkerError:', error);
+    }
     // 打包 tgz 文件
     const tgzBuff = await btkFile.Zipper.tarFolder(outputPackPath, []);
     await fsExtra.writeFile(`${outputPackPath.replace(/\/$/, '')}.tgz`, tgzBuff as Buffer);

@@ -9,7 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "bricking": "workspace:*",
+    "bricking": "workspace:^",
     "svelte": "^3.55.1"
   },
   "devDependencies": {

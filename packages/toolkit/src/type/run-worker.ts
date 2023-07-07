@@ -1,59 +1,38 @@
 import path from 'path';
-import fs from 'fs-extra';
 import { Worker } from 'node:worker_threads';
+import { generateDTS } from './tools';
+import { ls } from '../files';
 
-export type TypesData = {
-  list: Array<{ input: string, output: string, cwd: string }>;
-  id: string;
-}
+export type Types = Array<{
+  input: string;
+  output: string;
+  cwd: string;
+}>
 
-export const runTypesWorker = (workerData: TypesData['list']) => {
-  const cwd = workerData[0]?.cwd || process.cwd();
-  const worker = new Worker(require.resolve('./types-worker'), { workerData });
-  const callbacks:any = {};
-  worker.on('message', (data) => {
-    const finished:string[] = [];
-    // 执行
-    Object.keys(callbacks).forEach((k) => {
-      if (callbacks[k](data)) {
-        finished.push(k);
-      }
-    });
-    // 删除
-    finished.forEach((k) => {
-      delete callbacks[k];
-    });
+export const runTypesWorker = async (types: Types) => {
+  const cwd = types[0]?.cwd || process.cwd();
+  const TempDir = path.resolve(cwd, './__temp');
+  // 生成类型定义文件
+  generateDTS({
+    outDir: TempDir,
+    rootNames: [...ls(cwd)].filter((item) => /\.tsx?$/.test(item)),
   });
-  const generated = new Promise<void>((resolve, reject) => {
-    callbacks.init = (data) => {
-      if (typeof data.init === 'boolean') {
-        data.init ? resolve() : reject();
-        return true;
-      }
+  const DTypes = types.map((item) => {
+    const rPath = path.relative(cwd, item.input);
+    return {
+      ...item,
+      input: path.resolve(TempDir, rPath.replace(/\.tsx?$/, '.d.ts')),
     };
   });
-  const emit = (data: TypesData['list']) => {
-    const id = Date.now() + Math.floor(Math.random() * 1000);
-    worker.postMessage({ id, list: data });
-    return new Promise<void>((resolve, reject) => {
-      callbacks[id] = (msg) => {
-        if (typeof msg[id] === 'boolean') {
-          msg[id] ? resolve() : reject();
-          return true;
-        }
-      };
-    });
-  };
-  return {
-    emit,
-    generated,
-    terminate: async () => {
-      await worker.terminate();
-      try {
-        fs.removeSync(path.resolve(cwd, './__temp'));
-      } catch (error) {
-        // ignore
+  const worker = new Worker(require.resolve('./types-worker'), { workerData: DTypes });
+  return new Promise<void>((resolve, reject) => {
+    worker.on('message', (data) => {
+      if (data.finished) {
+        resolve();
+        worker.terminate();
+      } else if (data.error) {
+        reject(data.error);
       }
-    },
-  };
+    });
+  });
 };

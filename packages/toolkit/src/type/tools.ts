@@ -6,12 +6,25 @@ import { ls } from '../files';
 
 const extensions = ['.ts', '.tsx', '/index.ts', '/index.tsx'];
 
+export const findTruePath = (input: string) => {
+  if (!/\.tsx?$/.test(input)) {
+    const ext = extensions.find((_ext) => fs.existsSync(`${input}${_ext}`));
+    if (!ext) {
+      throw new Error(`${input} 文件不存在`);
+    }
+    input = `${input}${ext}`;
+  }
+};
+
 export const generateDTS = (props: {
   /** 绝对路径文件列表 */
   rootNames: string[],
   /** 输出目录的绝对路径 */
   outDir: string
 }) => {
+  if (!fs.existsSync(props.outDir)) {
+    fs.mkdirSync(props.outDir, { recursive: true });
+  }
   ts.createProgram({
     rootNames: props.rootNames,
     options: {
@@ -51,46 +64,6 @@ export const rollupDTS = ({ input, output, cwd = process.cwd() }:{
     localBuild: true,
     showVerboseMessages: true,
   });
-};
-
-export const createTypeDefine = (props: {
-  /** 输入文件的绝对路径 */
-  input: string;
-  /** 输出文件的绝对路径 */
-  output: string;
-  /** 项目目录 */
-  cwd?: string;
-}) => {
-  let {
-    input,
-    output,
-    cwd = process.cwd(),
-  } = props;
-  if (!/\.tsx?$/.test(input)) {
-    const ext = extensions.find((_ext) => fs.existsSync(`${input}${_ext}`));
-    if (!ext) {
-      throw new Error(`${input} 文件不存在`);
-    }
-    input = `${input}${ext}`;
-  }
-  const TempDir = path.resolve(cwd, `./__temp/${Math.random().toString(36).slice(2)}}`);
-  const OutputName = path.resolve(TempDir, `${path.parse(input).name}.d.ts`);
-  try {
-    // 生成类型定义文件
-    generateDTS({
-      rootNames: [input, ...ls(path.dirname(input))],
-      outDir: TempDir,
-    });
-    // 对类型定义文件进行捆绑
-    rollupDTS({
-      cwd,
-      output,
-      input: OutputName,
-    });
-    return fs.removeSync(TempDir);
-  } catch (e) {
-    return fs.removeSync(TempDir);
-  }
 };
 
 export const createTypeDefines = (props: {

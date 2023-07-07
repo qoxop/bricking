@@ -1,35 +1,21 @@
 import { workerData, parentPort } from 'node:worker_threads';
-import { createTypeDefine } from './tools';
+import { rollupDTS } from './tools';
 
-type TypesData = {
-  list: Array<{ input: string, output: string, cwd: string }>;
-  id: string;
-}
+type TypesData = Array<{ input: string, output: string, cwd: string }>;
 
 if (workerData && workerData.length) {
   setTimeout(() => {
     try {
-      workerData.forEach(((item) => {
+      (workerData as TypesData).forEach(((item) => {
         try {
-          createTypeDefine(item);
+          rollupDTS(item);
         } catch (e) {
-          console.trace(e);
+          console.error(e);
         }
       }));
-      parentPort?.postMessage({ init: true });
-    } catch (e) {
-      parentPort?.postMessage({ init: false });
+      parentPort?.postMessage({ finished: true });
+    } catch (error) {
+      parentPort?.postMessage({ error });
     }
   }, 10);
 }
-
-parentPort?.on('message', (data: TypesData) => {
-  try {
-    data.list.forEach(((item) => {
-      createTypeDefine(item);
-    }));
-    parentPort?.postMessage({ [data.id]: true });
-  } catch (e) {
-    parentPort?.postMessage({ [data.id]: false });
-  }
-});

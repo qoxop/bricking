@@ -36,8 +36,8 @@ importers:
   examples/shared-libs:
     specifiers:
       '@babel/runtime': 7.17.2
-      '@bricking/base-builder': workspace:*
-      '@bricking/runtime': workspace:*
+      '@bricking/base-builder': workspace:^
+      '@bricking/runtime': workspace:^
       '@types/react': 18.0.15
       '@types/react-dom': 18.0.6
       '@types/styled-components': ^5.1.26
@@ -88,14 +88,14 @@ importers:
   examples/todo-app-react:
     specifiers:
       '@babel/runtime': 7.17.2
-      '@bricking/runtime': workspace:*
-      '@bricking/shared-libs': workspace:*
+      '@bricking/runtime': workspace:^
+      '@bricking/shared-libs': workspace:^
       '@types/react': 18.0.15
       '@types/react-dom': 18.0.6
       '@types/styled-components': ^5.1.26
       antd: 4.22.8
       axios: 0.27.2
-      bricking: workspace:*
+      bricking: workspace:^
       core-js: ~3.28.0
       history: ^5.3.0
       immer: 9.0.15
@@ -137,7 +137,7 @@ importers:
   examples/todo-app-svelte:
     specifiers:
       '@tsconfig/svelte': ^3.0.0
-      bricking: workspace:*
+      bricking: workspace:^
       rollup-plugin-svelte: ^7.1.3
       svelte: ^3.55.1
       svelte-check: ^3.0.4
@@ -164,17 +164,20 @@ importers:
       '@babel/preset-env': ~7.20.2
       '@babel/preset-react': ^7.18.6
       '@babel/preset-typescript': ^7.21.0
-      '@bricking/toolkit': workspace:^1.0.1
+      '@bricking/runtime': workspace:^
+      '@bricking/toolkit': workspace:^
       '@pmmmwh/react-refresh-webpack-plugin': ^0.5.4
       '@svgr/webpack': ^6.2.1
       '@types/node': ^17.0.21
       babel-loader: ^9.1.2
+      core-js: '3'
       css-loader: ^6.6.0
       cssnano: ^5.1.12
       del-cli: ^4.0.1
       eslint: ~8.23.1
       file-loader: ^6.2.0
       html-webpack-plugin: ^5.5.0
+      less: ^4.1.2
       less-loader: ^10.2.0
       less-plugin-npm-import: ^2.1.0
       loader-utils: ^3.2.0
@@ -184,6 +187,7 @@ importers:
       postcss-preset-env: ^7.4.0
       react-refresh: ^0.11.0
       resolve-url-loader: ^5.0.0
+      sass: ^1.49.7
       sass-loader: ^12.6.0
       source-map-loader: ^4.0.0
       style-loader: ^3.3.1
@@ -213,7 +217,7 @@ importers:
       cssnano: 5.1.12_postcss@8.4.8
       file-loader: 6.2.0_webpack@5.80.0
       html-webpack-plugin: 5.5.0_webpack@5.80.0
-      less-loader: 10.2.0_webpack@5.80.0
+      less-loader: 10.2.0_less@4.1.2+webpack@5.80.0
       less-plugin-npm-import: 2.1.0
       loader-utils: 3.2.0
       postcss: 8.4.8
@@ -222,7 +226,7 @@ importers:
       postcss-preset-env: 7.4.0_postcss@8.4.8
       react-refresh: 0.11.0
       resolve-url-loader: 5.0.0
-      sass-loader: 12.6.0_webpack@5.80.0
+      sass-loader: 12.6.0_sass@1.49.7+webpack@5.80.0
       source-map-loader: 4.0.0_webpack@5.80.0
       style-loader: 3.3.1_webpack@5.80.0
       terser-webpack-plugin: 5.3.1_webpack@5.80.0
@@ -234,9 +238,13 @@ importers:
       webpackbar: 5.0.2_webpack@5.80.0
       yargs: 17.3.1
     devDependencies:
+      '@bricking/runtime': link:../runtime
       '@types/node': 17.0.21
+      core-js: 3.0.0
       del-cli: 4.0.1
       eslint: 8.23.1
+      less: 4.1.2
+      sass: 1.49.7
 
   packages/bricking:
     specifiers:
@@ -244,9 +252,9 @@ importers:
       '@babel/plugin-proposal-dynamic-import': ~7.18.6
       '@babel/plugin-transform-modules-systemjs': ~7.20.11
       '@babel/preset-env': ~7.20.2
-      '@bricking/plugin-server': workspace:*
-      '@bricking/plugin-style': workspace:*
-      '@bricking/toolkit': workspace:^1.0.1
+      '@bricking/plugin-server': workspace:^
+      '@bricking/plugin-style': workspace:^
+      '@bricking/toolkit': workspace:^
       '@rollup/plugin-alias': ^4.0.3
       '@rollup/plugin-babel': ^6.0.3
       '@rollup/plugin-commonjs': ^24.0.1
@@ -348,7 +356,7 @@ importers:
 
   packages/plugin-style:
     specifiers:
-      '@bricking/toolkit': workspace:^1.0.1
+      '@bricking/toolkit': workspace:*
       '@rollup/pluginutils': ^5.0.2
       '@types/less': ~3.0.3
       '@types/node-sass': ~4.11.3
@@ -4294,7 +4302,6 @@ packages:
     resolution: {integrity: sha512-1j20GZTsvKNkc4BY3NpMOM8tt///wY3FpIzozTOFO2ffuZcV61nojHXVKIy3WM+7ADCy5FVhdZYHYDdgTU0yJw==}
     dependencies:
       is-what: 3.14.1
-    dev: true
 
   /copy-to-clipboard/3.3.3:
     resolution: {integrity: sha512-2KV8NhB5JqC3ky0r9PMCAZKbUHSwtEo4CwCs0KXgruG43gX5PMqDEBbVU4OUzw2MuAWUfsuFmWvEKG5QRfSnJA==}
@@ -4311,6 +4318,11 @@ packages:
   /core-js-pure/3.30.2:
     resolution: {integrity: sha512-p/npFUJXXBkCCTIlEGBdghofn00jWG6ZOtdoIXSJmAu2QBvN0IqpZXWweOytcwE6cfx8ZvVUy1vw8zxhe4Y2vg==}
     requiresBuild: true
+
+  /core-js/3.0.0:
+    resolution: {integrity: sha512-WBmxlgH2122EzEJ6GH8o9L/FeoUKxxxZ6q6VUxoTlsE4EvbTWKJb447eyVxTEuq0LpXjlq/kCB2qgBvsYRkLvQ==}
+    deprecated: core-js@<3.23.3 is no longer maintained and not recommended for usage due to the number of issues. Because of the V8 engine whims, feature detection in old core-js versions could cause a slowdown up to 100x even if nothing is polyfilled. Some versions have web compatibility issues. Please, upgrade your dependencies to the actual version of core-js.
+    dev: true
 
   /core-js/3.28.0:
     resolution: {integrity: sha512-GiZn9D4Z/rSYvTeg1ljAIsEqFm0LaN9gVtwDCrKL80zHtS31p9BAjmTxVqTQDMpwlMolJZOFntUG2uwyj7DAqw==}
@@ -6352,7 +6364,6 @@ packages:
     engines: {node: '>=0.10.0'}
     dependencies:
       safer-buffer: 2.1.2
-    dev: false
 
   /iconv-lite/0.6.3:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
@@ -6390,7 +6401,6 @@ packages:
     engines: {node: '>=0.10.0'}
     hasBin: true
     requiresBuild: true
-    dev: true
     optional: true
 
   /immer/9.0.15:
@@ -6399,7 +6409,6 @@ packages:
 
   /immutable/4.3.0:
     resolution: {integrity: sha512-0AOCmOip+xgJwEVTQj1EfiDDOkPmuyllDuTuEX+DDXUgapLAsBIfkg3sxCYyCEA8mQqZrrxPUGjcOQ2JS3WLkg==}
-    dev: true
 
   /import-fresh/3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
@@ -6707,7 +6716,6 @@ packages:
 
   /is-what/3.14.1:
     resolution: {integrity: sha512-sNxgpk9793nzSs7bA6JQJGeIuRBQhAaNGG77kzYQgMkrID+lS6SlK07K5LaptscDlSaIgH+GPFzf+d75FVxozA==}
-    dev: true
 
   /is-windows/1.0.2:
     resolution: {integrity: sha512-eXK1UInq2bPmjyX6e3VHIzMLobc4J94i4AWn+Hpq3OU5KkrRC96OAcR3PRJ/pGu6m8TRnBHP9dkXQVsT/COVIA==}
@@ -6918,6 +6926,18 @@ packages:
       language-subtag-registry: 0.3.22
     dev: true
 
+  /less-loader/10.2.0_less@4.1.2+webpack@5.80.0:
+    resolution: {integrity: sha512-AV5KHWvCezW27GT90WATaDnfXBv99llDbtaj4bshq6DvAihMdNjaPDcUMa6EXKLRF+P2opFenJp89BXg91XLYg==}
+    engines: {node: '>= 12.13.0'}
+    peerDependencies:
+      less: ^3.5.0 || ^4.0.0
+      webpack: ^5.0.0
+    dependencies:
+      klona: 2.0.6
+      less: 4.1.2
+      webpack: 5.80.0
+    dev: false
+
   /less-loader/10.2.0_less@4.1.3:
     resolution: {integrity: sha512-AV5KHWvCezW27GT90WATaDnfXBv99llDbtaj4bshq6DvAihMdNjaPDcUMa6EXKLRF+P2opFenJp89BXg91XLYg==}
     engines: {node: '>= 12.13.0'}
@@ -6929,17 +6949,6 @@ packages:
       less: 4.1.3
     dev: true
 
-  /less-loader/10.2.0_webpack@5.80.0:
-    resolution: {integrity: sha512-AV5KHWvCezW27GT90WATaDnfXBv99llDbtaj4bshq6DvAihMdNjaPDcUMa6EXKLRF+P2opFenJp89BXg91XLYg==}
-    engines: {node: '>= 12.13.0'}
-    peerDependencies:
-      less: ^3.5.0 || ^4.0.0
-      webpack: ^5.0.0
-    dependencies:
-      klona: 2.0.6
-      webpack: 5.80.0
-    dev: false
-
   /less-plugin-npm-import/2.1.0:
     resolution: {integrity: sha512-f7pVkEooRq2/jge/M/Y+spoPXj5rRIY30q1as+3kZsDG8Rs+loNJUCVQjzXB9Ao/9FeIJULiq2zrXymv+OMTbw==}
     engines: {node: '>=0.4.2'}
@@ -6947,6 +6956,25 @@ packages:
       promise: 7.0.4
       resolve: 1.1.7
     dev: false
+
+  /less/4.1.2:
+    resolution: {integrity: sha512-EoQp/Et7OSOVu0aJknJOtlXZsnr8XE8KwuzTHOLeVSEx8pVWUICc8Q0VYRHgzyjX78nMEyC/oztWFbgyhtNfDA==}
+    engines: {node: '>=6'}
+    hasBin: true
+    dependencies:
+      copy-anything: 2.0.6
+      parse-node-version: 1.0.1
+      tslib: 2.5.2
+    optionalDependencies:
+      errno: 0.1.8
+      graceful-fs: 4.2.11
+      image-size: 0.5.5
+      make-dir: 2.1.0
+      mime: 1.6.0
+      needle: 2.9.1
+      source-map: 0.6.1
+    transitivePeerDependencies:
+      - supports-color
 
   /less/4.1.3:
     resolution: {integrity: sha512-w16Xk/Ta9Hhyei0Gpz9m7VS8F28nieJaL/VyShID7cYvP6IL5oHeL6p4TXSDJqZE/lNv0oJ2pGVjJsRkfwm5FA==}
@@ -7226,7 +7254,6 @@ packages:
     dependencies:
       pify: 4.0.1
       semver: 5.7.1
-    dev: true
     optional: true
 
   /make-dir/3.1.0:
@@ -7490,6 +7517,19 @@ packages:
   /natural-compare/1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
     dev: true
+
+  /needle/2.9.1:
+    resolution: {integrity: sha512-6R9fqJ5Zcmf+uYaFgdIHmLwNldn5HbK8L5ybn7Uz+ylX/rnOsSp1AHcvQSrCaFN+qNM1wpymHqD7mVasEOlHGQ==}
+    engines: {node: '>= 4.4.x'}
+    hasBin: true
+    requiresBuild: true
+    dependencies:
+      debug: 3.2.7
+      iconv-lite: 0.4.24
+      sax: 1.2.4
+    transitivePeerDependencies:
+      - supports-color
+    optional: true
 
   /needle/3.2.0:
     resolution: {integrity: sha512-oUvzXnyLiVyVGoianLijF9O/RecZUf7TkBfimjGrLM4eQhXyeJwM6GeAWccwfQ9aa4gMCZKqhAOuLaMIcQxajQ==}
@@ -7846,7 +7886,6 @@ packages:
   /parse-node-version/1.0.1:
     resolution: {integrity: sha512-3YHlOa/JgH6Mnpr05jP9eDG254US9ek25LyIxZlDItp2iJtwyaXQb57lBYLdT3MowkUFYEV2XXNAYIPlESvJlA==}
     engines: {node: '>= 0.10'}
-    dev: true
 
   /parse5/6.0.1:
     resolution: {integrity: sha512-Ofn/CTFzRGTTxwpNEs9PP93gXShHcTq255nzRYSKe8AkVpZY7e1fpmTfOyoIvjP5HG7Z2ZM7VS9PPhQGW2pOpw==}
@@ -9886,7 +9925,7 @@ packages:
       rimraf: 2.7.1
     dev: true
 
-  /sass-loader/12.6.0_webpack@5.80.0:
+  /sass-loader/12.6.0_sass@1.49.7+webpack@5.80.0:
     resolution: {integrity: sha512-oLTaH0YCtX4cfnJZxKSLAyglED0naiYfNG1iXfU5w1LNZ+ukoA5DtyDIN5zmKVZwYNJP4KRc5Y3hkWga+7tYfA==}
     engines: {node: '>= 12.13.0'}
     peerDependencies:
@@ -9907,8 +9946,18 @@ packages:
     dependencies:
       klona: 2.0.6
       neo-async: 2.6.2
+      sass: 1.49.7
       webpack: 5.80.0
     dev: false
+
+  /sass/1.49.7:
+    resolution: {integrity: sha512-13dml55EMIR2rS4d/RDHHP0sXMY3+30e1TKsyXaSz3iLWVoDWEoboY8WzJd5JMnxrRHffKO3wq2mpJ0jxRJiEQ==}
+    engines: {node: '>=12.0.0'}
+    hasBin: true
+    dependencies:
+      chokidar: 3.5.3
+      immutable: 4.3.0
+      source-map-js: 1.0.2
 
   /sass/1.62.1:
     resolution: {integrity: sha512-NHpxIzN29MXvWiuswfc1W3I0N8SXBd8UR26WntmDlRYf0bSADnwnOjsyMZ3lMezSlArD33Vs3YFhp7dWvL770A==}
@@ -9922,7 +9971,6 @@ packages:
 
   /sax/1.2.4:
     resolution: {integrity: sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==}
-    dev: true
     optional: true
 
   /saxes/5.0.1:
@@ -11594,6 +11642,7 @@ time:
   /chalk/4.1.2: '2021-07-30T12:02:52.839Z'
   /chokidar/3.5.3: '2022-01-18T07:42:19.335Z'
   /concat-with-sourcemaps/1.1.0: '2018-05-02T22:24:23.605Z'
+  /core-js/3.0.0: '2019-03-19T19:17:41.933Z'
   /core-js/3.28.0: '2023-02-13T19:12:12.569Z'
   /cross-spawn/7.0.3: '2020-05-25T15:35:07.209Z'
   /css-loader/6.6.0: '2022-02-02T10:47:46.367Z'
@@ -11618,6 +11667,7 @@ time:
   /jsdom/19.0.0: '2021-12-02T21:45:15.876Z'
   /less-loader/10.2.0: '2021-10-18T13:18:55.001Z'
   /less-plugin-npm-import/2.1.0: '2015-05-30T13:08:09.535Z'
+  /less/4.1.2: '2021-10-03T23:18:07.340Z'
   /less/4.1.3: '2022-06-08T19:30:07.532Z'
   /loader-utils/3.2.0: '2021-11-11T15:42:51.973Z'
   /log-update/4.0.0: '2020-02-20T08:07:17.654Z'
@@ -11649,6 +11699,7 @@ time:
   /rollup-plugin-svelte/7.1.3: '2023-02-16T20:50:35.806Z'
   /rollup/3.17.2: '2023-02-20T05:47:33.625Z'
   /sass-loader/12.6.0: '2022-02-15T11:13:21.844Z'
+  /sass/1.49.7: '2022-02-01T22:05:05.402Z'
   /source-map-loader/4.0.0: '2022-06-13T00:44:42.097Z'
   /style-loader/3.3.1: '2021-10-21T15:03:14.617Z'
   /styled-components/5.3.5: '2022-03-24T14:36:58.098Z'

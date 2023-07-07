@@ -1,6 +1,6 @@
 {
   "name": "@bricking/base-builder",
-  "version": "3.0.5",
+  "version": "3.0.6",
   "description": "Sytemjs 模块基座打包器",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -34,7 +34,7 @@
     "@babel/preset-env": "~7.20.2",
     "@babel/preset-react": "^7.18.6",
     "@babel/preset-typescript": "^7.21.0",
-    "@bricking/toolkit": "workspace:^1.0.3",
+    "@bricking/toolkit": "workspace:^",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.4",
     "@svgr/webpack": "^6.2.1",
     "babel-loader": "^9.1.2",
@@ -64,7 +64,7 @@
     "yargs": "^17.3.1"
   },
   "peerDependencies": {
-    "@bricking/runtime": "workspace:^1.0.4",
+    "@bricking/runtime": "workspace:^",
     "core-js": "3",
     "less": "^4.1.2",
     "sass": "^1.49.7"
@@ -78,8 +78,12 @@
     }
   },
   "devDependencies": {
+    "@bricking/runtime": "workspace:^",
     "@types/node": "^17.0.21",
     "del-cli": "^4.0.1",
-    "eslint": "~8.23.1"
+    "eslint": "~8.23.1",
+    "core-js": "3",
+    "less": "^4.1.2",
+    "sass": "^1.49.7"
   }
 }

@@ -28,7 +28,7 @@ export async function createTypes() {
   const { dependencies, name } = require(paths.packageJson);
   const { bundle, output } = getUserOptions();
   if (!bundle.expose.length) return;
-  const types:Record<string, btkType.TypesData['list'][0]> = {};
+  const types:Record<string, btkType.Types[0]> = {};
   bundle.expose.forEach((item) => {
     // 自定义模块需要生成类型
     if (typeof item !== 'string' && !dependencies[item.name] && item.path && !item.isSubLib) {
@@ -42,7 +42,5 @@ export async function createTypes() {
     }
   });
   if (!Object.keys(types).length) return;
-  const worker = btkType.runTypesWorker(Object.values(types));
-  await worker?.generated;
-  await worker?.terminate();
+  await btkType.runTypesWorker(Object.values(types));
 }
