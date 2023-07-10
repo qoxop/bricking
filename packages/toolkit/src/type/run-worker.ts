@@ -1,4 +1,5 @@
 import path from 'path';
+import fsExtra from 'fs-extra';
 import { Worker } from 'node:worker_threads';
 import { generateDTS } from './tools';
 import { ls } from '../files';
@@ -30,6 +31,7 @@ export const runTypesWorker = async (types: Types) => {
       if (data.finished) {
         resolve();
         worker.terminate();
+        fsExtra.removeSync(TempDir);
       } else if (data.error) {
         reject(data.error);
       }

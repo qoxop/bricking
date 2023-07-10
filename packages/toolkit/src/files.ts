@@ -14,7 +14,7 @@ function ls(dir: string) {
     files.forEach((file) => {
       file = path.resolve(d, file);
       const fStat = fs.statSync(file);
-      if (fStat.isDirectory()) {
+      if (fStat.isDirectory() && !file.includes('node_modules')) {
         read(file);
       } else if (fStat.isFile()) {
         arr.push(file);
