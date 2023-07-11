@@ -398,7 +398,7 @@ export const getWebpackConfig = (webpackEnv: 'development' | 'production' = 'pro
     if (typeof mergeConf === 'function') {
       return mergeConf(baseConfig);
     } if (mergeConf && typeof mergeConf === 'object') {
-      return webpackMerge(mergeConf);
+      return webpackMerge(baseConfig, mergeConf);
     }
   }
   return baseConfig as any;
