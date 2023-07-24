@@ -10,7 +10,7 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { getBabelOutputPlugin } from '@rollup/plugin-babel';
 import { rollupStylePlugin } from '@bricking/plugin-style';
 import { livereloadServer, openBrowser } from '@bricking/plugin-server';
-import { btkDom, btkFile, btkType, fsExtra, btkPath } from '@bricking/toolkit';
+import { btkDom, btkFile, fsExtra, btkPath } from '@bricking/toolkit';
 import config, { packageJson, tsConfig, tsConfigPath, workspace, outputPackPath, configPath } from './config';
 import rollupBundle from './plugins/rollup-bundle';
 import rollupUrl, { BabelUrlReplacePlugin } from './plugins/rollup-url';
@@ -275,9 +275,6 @@ const watch = async (
     opt.plugins = (opt.plugins as any[])?.filter((item) => item && item.name !== 'terser'); // 移除 terser 压缩插件
     return opt;
   }));
-  if (config.modules) {
-    btkType.runTypesWorker(getTypesDefine());
-  }
   return new Promise<string>((resolve) => {
     watcher.on('event', (event) => {
       if (event.code === 'BUNDLE_END') {
@@ -423,11 +420,11 @@ async function runBuild(devMode: boolean) {
   // 打包 npm 包
   if (config.modules) {
     // 同步地生成类型文件
-    try {
-      await btkType.runTypesWorker(getTypesDefine());
-    } catch (error) {
-      console.error('💥 runTypesWorkerError:', error);
-    }
+    // try {
+    //   await btkType.runTypesWorker(getTypesDefine());
+    // } catch (error) {
+    //   console.error('💥 runTypesWorkerError:', error);
+    // }
     // 打包 tgz 文件
     const tgzBuff = await btkFile.Zipper.tarFolder(outputPackPath, []);
     await fsExtra.writeFile(`${outputPackPath.replace(/\/$/, '')}.tgz`, tgzBuff as Buffer);
