@@ -426,8 +426,10 @@ async function runBuild(devMode: boolean) {
     //   console.error('💥 runTypesWorkerError:', error);
     // }
     // 打包 tgz 文件
-    const tgzBuff = await btkFile.Zipper.tarFolder(outputPackPath, []);
-    await fsExtra.writeFile(`${outputPackPath.replace(/\/$/, '')}.tgz`, tgzBuff as Buffer);
+    if (mode === 'lib' || mode === 'app|lib') {
+      const tgzBuff = await btkFile.Zipper.tarFolder(outputPackPath, []);
+      await fsExtra.writeFile(`${outputPackPath.replace(/\/$/, '')}.tgz`, tgzBuff as Buffer);
+    }
     if (!devMode) {
       await fsExtra.remove(outputPackPath);
     }
