@@ -125,11 +125,11 @@ const getCommonOptions = async (
 /**
  * 获取类型定义数组
  */
-const getTypesDefine = () => Object.entries(config.modules).map(([name, filePath]) => ({
-  output: path.resolve(outputPackPath, `${name}.d.ts`),
-  input: path.isAbsolute(filePath) ? filePath : path.resolve(workspace, filePath),
-  cwd: workspace,
-}));
+// const getTypesDefine = () => Object.entries(config.modules).map(([name, filePath]) => ({
+//   output: path.resolve(outputPackPath, `${name}.d.ts`),
+//   input: path.isAbsolute(filePath) ? filePath : path.resolve(workspace, filePath),
+//   cwd: workspace,
+// }));
 
 /**
  * 构建任务
