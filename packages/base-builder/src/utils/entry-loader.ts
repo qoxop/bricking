@@ -5,6 +5,19 @@ import { ModuleInfo } from '../types';
 import { getUserOptions } from '../options';
 import { paths } from '../paths';
 
+const getDynamicImportStr = (name:string) => `() => import("${name}").then((mod) => {
+  if (mod?.default) {
+    if (typeof mod.default === 'object') {
+      return { ...mod.default, ...mod }
+    }
+    return mod.default
+  }
+  if (typeof mod === 'object') {
+    return { ...mod, default: mod }
+  }
+  return mod
+})`;
+
 module.exports = () => {
   const { dependencies, name } = require(paths.packageJson);
   const { bundle: { entry, expose, exposeAll, exposeExclude } } = getUserOptions(true);
@@ -50,7 +63,7 @@ module.exports = () => {
     name: item.name,
   }));
   const asyncModules = modules.filter((item) => !item.sync).map((item) => ({
-    importCode: `() => import("${item.path || item.name}")`,
+    importCode: getDynamicImportStr(item.path || item.name),
     name: item.name,
   }));
 
